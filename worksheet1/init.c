@@ -60,9 +60,9 @@ void init_uvp(  double UI,  double VI,  double PI,
   							double **U,  double **V,  double **P	){
 	int i, j;
 
-	for (int i = 0; i < imax; ++i)
+	for (i = 0; i < imax; ++i)
 	{
-		for (int i = 0; i < jmax; ++i)
+		for (j = 0; j < jmax; ++j)
 		{
 			U[i][j] = UI;
 			V[i][j] = VI;
