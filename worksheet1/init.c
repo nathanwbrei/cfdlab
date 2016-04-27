@@ -58,15 +58,7 @@ int read_parameters( const char *szFileName,       /* name of the file */
 void init_uvp(  double UI,  double VI,  double PI,
   							int imax,  int jmax,
   							double **U,  double **V,  double **P	){
-	int i, j;
-
-	for (i = 0; i < imax; ++i)
-	{
-		for (j = 0; j < jmax; ++j)
-		{
-			U[i][j] = UI;
-			V[i][j] = VI;
-			P[i][j] = PI;
-		}
-	}
+	init_matrix(U,1,imax,1,jmax,UI);
+	init_matrix(V,1,imax,1,jmax,VI);
+	init_matrix(P,1,imax,1,jmax,PI);
 }

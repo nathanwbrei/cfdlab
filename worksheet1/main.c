@@ -1,6 +1,9 @@
 #include "helper.h"
 #include "visual.h"
 #include "init.h"
+#include "uvp.h"
+#include "boundary_val.h"
+#include "sor.h"
 #include <stdio.h>
 
 
@@ -38,5 +41,53 @@
  * - calculate_uv() Calculate the velocity at the next time step.
  */
 int main(int argn, char** args){
+
+	char *szFileName = "cavity100.dat";
+  double Re,   UI,   VI,   PI,   GX,   GY,   t_end,   xlength,   ylength,   dt,   dx,   dy, alpha, omg, tau, eps, dt_value, res, t=0 , timeStepNumber = 1;
+  int  imax,  jmax,  itermax, n = 0, it;
+  double **U, **V, **P, **RS, **F, **G;
+
+	read_parameters( 
+		szFileName, &Re, &UI, &VI,	&PI,	&GX, &GY,	&t_end,	&xlength,	&ylength,	
+		&dt,	&dx, &dy,	&imax, &jmax,	&alpha,	&omg,	&tau,	& itermax, &eps,	&dt_value	);
+
+
+	U = matrix(0,imax+1,0,jmax+1);
+	V = matrix(0,imax+1,0,jmax+1);
+	P = matrix(0,imax+1,0,jmax+1);
+	F = matrix(0,imax+1,0,jmax+1);
+	G = matrix(0,imax+1,0,jmax+1);
+	RS = matrix(0,imax+1,0,jmax+1);
+
+	init_uvp( UI,  VI,   PI, imax,  jmax,	U, V, P	);
+
+	while(t<t_end){
+		calculate_dt(Re, tau, &dt, dx, dy, imax, jmax, U, V);
+		boundaryvalues(imax, jmax, U, V);
+		calculate_fg(  Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V, F, G);
+		calculate_rs(  dt, dx, dy, imax, jmax, F, G, RS);
+		it = 0;
+		res = eps;
+		while (it < itermax || res < eps){
+			sor( omg, dx, dy, imax, jmax, P, RS, &res);
+			it = it + 1 ; 
+		}
+		calculate_uv(  dt, dx, dy, imax, jmax, U, V, F, G, P);
+		t = t + dt;
+		n = n + 1;
+		if ( (t+dt)/dt_value > timeStepNumber )	{
+			 write_vtkFile(szFileName,  timeStepNumber, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+			 timeStepNumber = timeStepNumber + 1 ;
+		}
+	}
+	write_vtkFile(szFileName,  timeStepNumber, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+
+	free_matrix(U , 0, imax+1 , 0, jmax+1 );
+	free_matrix(V , 0, imax+1 , 0, jmax+1 );
+	free_matrix(P , 0, imax+1 , 0, jmax+1 );
+	free_matrix(F , 0, imax+1 , 0, jmax+1 );
+	free_matrix(G , 0, imax+1 , 0, jmax+1 );
+	free_matrix(RS , 0, imax+1 , 0, jmax+1 );
+
   return -1;
 }
