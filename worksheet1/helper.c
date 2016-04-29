@@ -503,3 +503,16 @@ int **read_pgm(const char *filename)
     
     return pic;
 }
+
+
+void print_matrix(char* message, int xmin, int xmax, int ymin, int ymax, double **M) {
+    printf("--------------------\n%s\n--------------------\n", message);
+    for (int j=ymax; j>=ymin; j--) {
+        for (int i=xmin; i<=xmax; i++) {
+            printf("%.3e ", M[i][j]);
+        }
+        printf("\n");
+    }
+    printf("--------------------\n");
+}
+

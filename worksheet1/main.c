@@ -60,20 +60,31 @@ int main(int argn, char** args){
 
 
     // Read the problem parameters
-    read_parameters(args[0], &Re, &UI, &VI, &PI, &GX, &GY, &t_end, &xlength, 
+
+    char *filename = "cavity100.dat"; 
+    if (argn == 2) {
+        filename = args[1];
+    }
+           
+    printf("Loading parameters from %s\n",filename);
+    read_parameters(filename, &Re, &UI, &VI, &PI, &GX, &GY, &t_end, &xlength, 
                     &ylength, &dt, &dx, &dy, &imax, &jmax, &alpha, &omg, &tau, 
                     &itermax, &eps, &dt_value); 
+
     n = 0;
     t = 0;
     // Assign initial values to u,v,p
-    U = matrix(0, imax+1, 0, jmax+1); //TODO: Are these the right indices?
+    U = matrix(0, imax+1, 0, jmax+1);
     V = matrix(0, imax+1, 0, jmax+1);
     P = matrix(0, imax+1, 0, jmax+1);
     F = matrix(0, imax+1, 0, jmax+1); //TODO: Definitely not the right indices
     G = matrix(0, imax+1, 0, jmax+1);
     RS = matrix(0, imax+1, 0, jmax+1);
 
-    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
+    print_matrix("Created U", 0, imax+1, 0, jmax+1, U);
+
+    init_uvp(23.2, VI, PI, imax, jmax, U, V, P);
+    print_matrix("Initialized U to 23.2", 0, imax+1, 0, jmax+1, U);
 
     while (t < t_end) {
         calculate_dt(Re,tau,&dt,dx,dy,imax,jmax,U,V); 
@@ -88,7 +99,6 @@ int main(int argn, char** args){
         }
         calculate_uv(dt,dx,dy,imax,jmax,U,V,F,G,P);
         //TODO: Condition this on some parameter
-        //TODO: When do we use this vs the write_matrix()?
         write_vtkFile(args[0], n, xlength, ylength, imax, jmax, dx, dy, U, V, P);
         t += dt;
         n += 1;
@@ -97,7 +107,7 @@ int main(int argn, char** args){
     // TODO: Do we want this?
     
     // Free the matrices we've allocated
-    free_matrix(U, 0, imax+1, 0, jmax+1); //TODO: Are these the right indices?
+    free_matrix(U, 0, imax+1, 0, jmax+1);
     free_matrix(V, 0, imax+1, 0, jmax+1);
     free_matrix(P, 0, imax+1, 0, jmax+1);
     free_matrix(F, 0, imax+1, 0, jmax+1); //TODO: Definitely the wrong indices

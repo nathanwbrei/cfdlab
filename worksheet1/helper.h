@@ -603,5 +603,9 @@ int **read_pgm(const char *filename);
 	   ++nCount; \
         }
 
+
+
+void print_matrix(char *message, int xmin, int xmax, int ymin, int ymax, double **M);
+
 #endif     
 
