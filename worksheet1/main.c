@@ -83,12 +83,17 @@ int main(int argn, char** args){
 
     print_matrix("Created U", 0, imax+1, 0, jmax+1, U);
 
-    init_uvp(23.2, VI, PI, imax, jmax, U, V, P);
+    init_uvp(UI, VI, PI, imax, jmax, U, V, P);
     print_matrix("Initialized U to 23.2", 0, imax+1, 0, jmax+1, U);
 
     while (t < t_end) {
+        t_end = 0;
         calculate_dt(Re,tau,&dt,dx,dy,imax,jmax,U,V); 
+        printf("@t=%f, dt=%f\n", t, dt);
         boundaryvalues(imax,jmax,U,V);
+        print_matrix("Boundaryvals for U", 0, imax+1, 0, jmax+1, U);
+        print_matrix("Boundaryvals for V", 0, imax+1, 0, jmax+1, V);
+        print_matrix("Boundaryvals for P", 0, imax+1, 0, jmax+1, P);
         calculate_fg(Re,GX,GY,alpha,dt,dx,dy,imax,jmax,U,V,F,G);
         calculate_rs(dt,dx,dy,imax,jmax,F,G,RS);
         int it = 0;
