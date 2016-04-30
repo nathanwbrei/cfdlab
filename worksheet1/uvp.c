@@ -75,23 +75,23 @@ void calculate_fg(
             d2uy = (U[i][j - 1] - 2 * U[i][j] + U[i][j + 1]) / (dy * dy);
             
             du2x = (u_frd_sum_i * u_frd_sum_i - u_bkd_sum_i * u_bkd_sum_i) / dx +
-            alpha * (abs(u_frd_sum_i) * (U[i][j] - U[i + 1][j]) / 2 -
-                     abs(u_bkd_sum_i) * (U[i - 1][j] - U[i][j]) / 2) / dx;
+            alpha * (fabs(u_frd_sum_i) * (U[i][j] - U[i + 1][j]) / 2 -
+                     fabs(u_bkd_sum_i) * (U[i - 1][j] - U[i][j]) / 2) / dx;
             
             duvy = (v_frd_sum_i * u_frd_sum_j - (V[i][j - 1] + V[i + 1][j - 1]) / 2 * u_bkd_sum_j) / dy +
-            alpha * (abs(v_frd_sum_i) * (U[i][j] - U[i][j - 1]) / 2 -
-                     abs(V[i][j - 1] + V[i + 1][j - 1]) * (U[i][j - 1] - U[i][j]) / 4) / dy;
+            alpha * (fabs(v_frd_sum_i) * (U[i][j] - U[i][j - 1]) / 2 -
+                     fabs(V[i][j - 1] + V[i + 1][j - 1]) * (U[i][j - 1] - U[i][j]) / 4) / dy;
             
             d2vx = (V[i - 1][j] - 2 * V[i][j] + V[i + 1][j]) / (dx * dx);
             d2vy = (V[i][j - 1] - 2 * V[i][j] + V[i][j + 1]) / (dy * dy);
             
             dv2y = (v_frd_sum_j * v_frd_sum_j - v_bkd_sum_j * v_bkd_sum_j) / dy +
-            alpha * (abs(v_frd_sum_j) * (V[i][j] - V[i][j + 1]) / 2 -
-                     abs(v_bkd_sum_j) * (V[i][j - 1] - V[i][j]) / 2) / dy;
+            alpha * (fabs(v_frd_sum_j) * (V[i][j] - V[i][j + 1]) / 2 -
+                     fabs(v_bkd_sum_j) * (V[i][j - 1] - V[i][j]) / 2) / dy;
             
             duvx = (u_frd_sum_j * v_frd_sum_i - (U[i - 1][j] + U[i - 1][j + 1]) / 2 * v_bkd_sum_i) / dx +
-            alpha * (abs(u_frd_sum_j) * (V[i][j] - V[i + 1][j]) / 2 -
-                     abs(U[i - 1][j] + U[i - 1][j + 1]) * (V[i - 1][j] - V[i][j]) / 4) / dx;
+            alpha * (fabs(u_frd_sum_j) * (V[i][j] - V[i + 1][j]) / 2 -
+                     fabs(U[i - 1][j] + U[i - 1][j + 1]) * (V[i - 1][j] - V[i][j]) / 4) / dx;
             
             F[i][j] = U[i][j] + dt * ((d2ux + d2uy) / Re - du2x - duvy + GX);
             G[i][j] = V[i][j] + dt * ((d2vx + d2vy) / Re - duvx - dv2y + GY);
@@ -109,12 +109,12 @@ void calculate_fg(
         d2uy = (U[i][j - 1] - 2 * U[i][j] + U[i][j + 1]) / (dy * dy);
         
         du2x = (u_frd_sum_i * u_frd_sum_i - u_bkd_sum_i * u_bkd_sum_i) / dx +
-        alpha * (abs(u_frd_sum_i) * (U[i][j] - U[i + 1][j]) / 2 -
-                 abs(u_bkd_sum_i) * (U[i - 1][j] - U[i][j]) / 2) / dx;
+        alpha * (fabs(u_frd_sum_i) * (U[i][j] - U[i + 1][j]) / 2 -
+                 fabs(u_bkd_sum_i) * (U[i - 1][j] - U[i][j]) / 2) / dx;
         
         duvy = (v_frd_sum_i * u_frd_sum_j - (V[i][j - 1] + V[i + 1][j - 1]) / 2 * u_bkd_sum_j) / dy +
-        alpha * (abs(v_frd_sum_i) * (U[i][j] - U[i][j - 1]) / 2 -
-                 abs(V[i][j - 1] + V[i + 1][j - 1]) * (U[i][j - 1] - U[i][j]) / 4) / dy;
+        alpha * (fabs(v_frd_sum_i) * (U[i][j] - U[i][j - 1]) / 2 -
+                 fabs(V[i][j - 1] + V[i + 1][j - 1]) * (U[i][j - 1] - U[i][j]) / 4) / dy;
         
         F[i][j] = U[i][j] + dt * ((d2ux + d2uy) / Re - du2x - duvy + GX);
     }
@@ -134,12 +134,12 @@ void calculate_fg(
         d2vy = (V[i][j - 1] - 2 * V[i][j] + V[i][j + 1]) / (dy * dy);
         
         dv2y = (v_frd_sum_j * v_frd_sum_j - v_bkd_sum_j * v_bkd_sum_j) / dy +
-        alpha * (abs(v_frd_sum_j) * (V[i][j] - V[i][j + 1]) / 2 -
-                 abs(v_bkd_sum_j) * (V[i][j - 1] - V[i][j]) / 2) / dy;
+        alpha * (fabs(v_frd_sum_j) * (V[i][j] - V[i][j + 1]) / 2 -
+                 fabs(v_bkd_sum_j) * (V[i][j - 1] - V[i][j]) / 2) / dy;
         
         duvx = (u_frd_sum_j * v_frd_sum_i - (U[i - 1][j] + U[i - 1][j + 1]) / 2 * v_bkd_sum_i) / dx +
-        alpha * (abs(u_frd_sum_j) * (V[i][j] - V[i + 1][j]) / 2 -
-                 abs(U[i - 1][j] + U[i - 1][j + 1]) * (V[i - 1][j] - V[i][j]) / 4) / dx;
+        alpha * (fabs(u_frd_sum_j) * (V[i][j] - V[i + 1][j]) / 2 -
+                 fabs(U[i - 1][j] + U[i - 1][j + 1]) * (V[i - 1][j] - V[i][j]) / 4) / dx;
         
         G[i][j] = V[i][j] + dt * ((d2vx + d2vy) / Re - duvx - dv2y + GY);
     }
@@ -179,14 +179,17 @@ void calculate_rs(
  */
 void calculate_dt(double Re, double tau, double *dt, double dx, double dy, 
                   int imax, int jmax, double **U, double **V) {
-
+    
     // let u_max = foldr (max . abs) 0 U
     double u_max = 0;
-    double v_max = 0;
-
-    for (int i = 0; i <= imax+1; i++) {
-        for (int j = 0; j <= jmax+1; j++) {
+    for (int i = 1; i <= imax-1; i++) { // Skip boundary
+        for (int j = 1; j <= jmax; j++) {
             u_max = fmax(u_max, fabs(U[i][j]));
+        }
+    }
+    double v_max = 0;
+    for (int i = 1; i <= imax; i++) { // Skip boundary
+        for (int j = 1; j <= jmax-1; j++) {
             v_max = fmax(v_max, fabs(V[i][j]));
         }
     }
