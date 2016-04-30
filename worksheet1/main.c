@@ -43,24 +43,36 @@
  */
 int main(int argn, char** args){
 
-    // Define the problem parameters 
-    // Geometry parameters
+    /*
+     * Define the problem parameters
+     */
+    /*
+     * Geometry parameters
+     */
     double xlength, ylength, dx, dy;
     int imax, jmax;
-    // Timestep parameters
+    /*
+     * Timestep parameters
+     */
     double t, t_end, dt, tau, dt_value;
     int n;
-    // Pressure iteration data
-    double eps, omg, alpha;
-    int itermax;
-    // Problem-dependent quantities
+    /*
+     * Pressure iteration data
+     */
+    double eps, omg, alpha, res;
+    int itermax, it;
+    /*
+     * Problem-dependent quantities
+     */
     double Re, GX, GY, UI, VI, PI;
-    // Data structures
+    /*
+     * Data structures
+     */
     double **U, **V, **P, **RS, **F, **G;
 
-
-    // Read the problem parameters
-
+    /*
+      Read the problem parameters
+    */
     char *filename = "cavity100.dat"; 
     if (argn == 2) {
         filename = args[1];
@@ -73,11 +85,13 @@ int main(int argn, char** args){
 
     n = 0;
     t = 0;
-    // Assign initial values to u,v,p
+    /*
+     * Assign initial values to u,v,p
+     */
     U = matrix(0, imax+1, 0, jmax+1);
     V = matrix(0, imax+1, 0, jmax+1);
     P = matrix(0, imax+1, 0, jmax+1);
-    F = matrix(0, imax+1, 0, jmax+1); //TODO: Definitely not the right indices
+    F = matrix(0, imax+1, 0, jmax+1); /*TODO: Definitely not the right indices*/
     G = matrix(0, imax+1, 0, jmax+1);
     RS = matrix(0, imax+1, 0, jmax+1);
 
@@ -90,30 +104,33 @@ int main(int argn, char** args){
         calculate_dt(Re,tau,&dt,dx,dy,imax,jmax,U,V); 
         printf("@t=%f, dt=%f\n", t, dt);
         boundaryvalues(imax,jmax,U,V);
-        //print_matrix("Boundaryvals for U", 0, imax+1, 0, jmax+1, U);
-        //print_matrix("Boundaryvals for V", 0, imax+1, 0, jmax+1, V);
+        /*print_matrix("Boundaryvals for U", 0, imax+1, 0, jmax+1, U);
+        print_matrix("Boundaryvals for V", 0, imax+1, 0, jmax+1, V); */
         calculate_fg(Re,GX,GY,alpha,dt,dx,dy,imax,jmax,U,V,F,G);
         calculate_rs(dt,dx,dy,imax,jmax,F,G,RS);
-        int it = 0;
-        double res = eps+1; // Residual starts off > eps
+        it = 0;
+        res = eps+1; /* Residual starts off > eps */
         while (it < itermax && res > eps) {
             sor(omg,dx,dy,imax,jmax,P,RS,&res);
             it += 1;
         }
         calculate_uv(dt,dx,dy,imax,jmax,U,V,F,G,P);
-        //TODO: Condition this on some parameter
+        /*TODO: Condition this on some parameter*/
         write_vtkFile(args[0], n, xlength, ylength, imax, jmax, dx, dy, U, V, P);
         t += dt;
         n += 1;
     }
-    // Output u,v,p for visualization
-    // TODO: Do we want this?
-    
-    // Free the matrices we've allocated
+    /*
+      Output u,v,p for visualization
+      TODO: Do we want this?
+    */
+    /*
+     * Free the matrices we've allocated
+     */
     free_matrix(U, 0, imax+1, 0, jmax+1);
     free_matrix(V, 0, imax+1, 0, jmax+1);
     free_matrix(P, 0, imax+1, 0, jmax+1);
-    free_matrix(F, 0, imax+1, 0, jmax+1); //TODO: Definitely the wrong indices
+    free_matrix(F, 0, imax+1, 0, jmax+1); /*TODO: Definitely the wrong indices*/
     free_matrix(G, 0, imax+1, 0, jmax+1);
     free_matrix(RS, 0, imax+1, 0, jmax+1);
      
