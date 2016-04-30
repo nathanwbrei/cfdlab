@@ -93,7 +93,6 @@ int main(int argn, char** args){
         boundaryvalues(imax,jmax,U,V);
         print_matrix("Boundaryvals for U", 0, imax+1, 0, jmax+1, U);
         print_matrix("Boundaryvals for V", 0, imax+1, 0, jmax+1, V);
-        print_matrix("Boundaryvals for P", 0, imax+1, 0, jmax+1, P);
         calculate_fg(Re,GX,GY,alpha,dt,dx,dy,imax,jmax,U,V,F,G);
         calculate_rs(dt,dx,dy,imax,jmax,F,G,RS);
         int it = 0;
