@@ -231,12 +231,10 @@ void calculate_uv(
         
         j = jmax;
         U[i][j] = F[i][j] - dt / dx * (P[i + 1][j] - P[i][j]);
-        V[i][j] = G[i][j] - dt / dy * (P[i][j + 1] - P[i][j]);
     }
     
     i = imax;
     for (j = 1; j < jmax; j++) {
-        U[i][j] = F[i][j] - dt / dx * (P[i + 1][j] - P[i][j]);
         V[i][j] = G[i][j] - dt / dy * (P[i][j + 1] - P[i][j]);
     }
 }
