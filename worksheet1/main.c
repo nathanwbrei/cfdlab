@@ -91,8 +91,8 @@ int main(int argn, char** args){
     U = matrix(0, imax+1, 0, jmax+1);
     V = matrix(0, imax+1, 0, jmax+1);
     P = matrix(0, imax+1, 0, jmax+1);
-    F = matrix(0, imax+1, 0, jmax+1); /*TODO: Definitely not the right indices*/
-    G = matrix(0, imax+1, 0, jmax+1);
+    F = matrix(0, imax, 0, jmax);
+    G = matrix(0, imax, 0, jmax);
     RS = matrix(0, imax+1, 0, jmax+1);
 
     print_matrix("Created U", 0, imax+1, 0, jmax+1, U);
@@ -130,8 +130,8 @@ int main(int argn, char** args){
     free_matrix(U, 0, imax+1, 0, jmax+1);
     free_matrix(V, 0, imax+1, 0, jmax+1);
     free_matrix(P, 0, imax+1, 0, jmax+1);
-    free_matrix(F, 0, imax+1, 0, jmax+1); /*TODO: Definitely the wrong indices*/
-    free_matrix(G, 0, imax+1, 0, jmax+1);
+    free_matrix(F, 0, imax, 0, jmax); 
+    free_matrix(G, 0, imax, 0, jmax);
     free_matrix(RS, 0, imax+1, 0, jmax+1);
      
     return -1;
