@@ -197,8 +197,8 @@ void calculate_dt(double Re, double tau, double *dt, double dx, double dy,
     }
 
     *dt = Re / 2 * (dx2 * dy2) / (dx2 + dy2);
-    *dt = fmin(*dt, dx / u_max);
-    *dt = fmin(*dt, dy / v_max);
+    *dt = u_max == 0 ? *dt : fmin(*dt, dx / u_max);
+    *dt = v_max == 0 ? *dt : fmin(*dt, dy / v_max);
     *dt *= tau;
 }
 
