@@ -74,13 +74,20 @@ int main(int argn, char** args){
     /*
       Read the problem parameters
     */
-    char *filename = "cavity100.dat"; 
-    if (argn == 2) {
-        filename = args[1];
+    char *infile = "cavity100.dat"; 
+    char *outfile = "ws1";
+    if (argn == 3) {
+        infile = args[1];
+        outfile = args[2];
+    }
+    else if (argn != 1) {
+        printf("Usage: ./sim inputfile outputfileprefix");
+        return -1;
     }
            
-    printf("Loading parameters from %s\n",filename);
-    read_parameters(filename, &Re, &UI, &VI, &PI, &GX, &GY, &t_end, &xlength, 
+    printf("Input file: %s\n",infile);
+    printf("Output file: %s\n",outfile);
+    read_parameters(infile, &Re, &UI, &VI, &PI, &GX, &GY, &t_end, &xlength, 
                     &ylength, &dt, &dx, &dy, &imax, &jmax, &alpha, &omg, &tau, 
                     &itermax, &eps, &dt_value); 
 
@@ -96,17 +103,11 @@ int main(int argn, char** args){
     G = matrix(0, imax, 0, jmax);
     RS = matrix(0, imax+1, 0, jmax+1);
 
-    print_matrix("Created U", 0, imax+1, 0, jmax+1, U);
-
     init_uvp(UI, VI, PI, imax, jmax, U, V, P);
-    print_matrix("Initialized U", 0, imax+1, 0, jmax+1, U);
 
     while (t < t_end) {
         calculate_dt(Re,tau,&dt,dx,dy,imax,jmax,U,V); 
-        printf("@t=%f, dt=%f\n", t, dt);
         boundaryvalues(imax,jmax,U,V);
-        /*print_matrix("Boundaryvals for U", 0, imax+1, 0, jmax+1, U);
-        print_matrix("Boundaryvals for V", 0, imax+1, 0, jmax+1, V); */
         calculate_fg(Re,GX,GY,alpha,dt,dx,dy,imax,jmax,U,V,F,G);
         calculate_rs(dt,dx,dy,imax,jmax,F,G,RS);
         it = 0;
@@ -118,8 +119,9 @@ int main(int argn, char** args){
         calculate_uv(dt,dx,dy,imax,jmax,U,V,F,G,P);
 
         if ( ((t+dt)/dt_value) > timeStepNumber ) {
-            write_vtkFile(args[0], timeStepNumber, xlength, ylength, imax, jmax, dx, dy, U, V, P);
-            timeStepNumber = timeStepNumber + 1 ;
+            write_vtkFile(outfile, timeStepNumber, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+            printf("Wrote %s.%d.vtk @t=%f, dt=%f\n", outfile, timeStepNumber, t+dt, dt);
+            timeStepNumber = timeStepNumber + 1;
         }
         t += dt;
         n += 1;
