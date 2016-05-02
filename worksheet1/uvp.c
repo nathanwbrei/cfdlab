@@ -143,8 +143,6 @@ void calculate_fg(
         
         G[i][j] = V[i][j] + dt * ((d2vx + d2vy) / Re - duvx - dv2y + GY);
     }
-
-
 }
 
 
@@ -180,26 +178,27 @@ void calculate_rs(
 void calculate_dt(double Re, double tau, double *dt, double dx, double dy, 
                   int imax, int jmax, double **U, double **V) {
     
-    // let u_max = foldr (max . abs) 0 U
+    /* let u_max = foldr (max . abs) 0 U */
     double u_max = 0;
-    for (int i = 1; i <= imax-1; i++) { // Skip boundary
-        for (int j = 1; j <= jmax; j++) {
+    int i, j;
+    double v_max = 0;
+    double dx2 = dx * dx;
+    double dy2 = dy * dy;
+ 
+    for (i = 1; i <= imax-1; i++) { /* Skip boundary */
+        for (j = 1; j <= jmax; j++) {
             u_max = fmax(u_max, fabs(U[i][j]));
         }
     }
-    double v_max = 0;
-    for (int i = 1; i <= imax; i++) { // Skip boundary
-        for (int j = 1; j <= jmax-1; j++) {
+    for (i = 1; i <= imax; i++) { /* Skip boundary */
+        for (j = 1; j <= jmax-1; j++) {
             v_max = fmax(v_max, fabs(V[i][j]));
         }
     }
 
-    double dx2 = dx * dx;
-    double dy2 = dy * dy;
-    
     *dt = Re / 2 * (dx2 * dy2) / (dx2 + dy2);
-    *dt = fmin(*dt, dx / u_max);
-    *dt = fmin(*dt, dy / v_max);
+    *dt = u_max == 0 ? *dt : fmin(*dt, dx / u_max);
+    *dt = v_max == 0 ? *dt : fmin(*dt, dy / v_max);
     *dt *= tau;
 }
 
@@ -232,12 +231,10 @@ void calculate_uv(
         
         j = jmax;
         U[i][j] = F[i][j] - dt / dx * (P[i + 1][j] - P[i][j]);
-        V[i][j] = G[i][j] - dt / dy * (P[i][j + 1] - P[i][j]);
     }
     
     i = imax;
     for (j = 1; j < jmax; j++) {
-        U[i][j] = F[i][j] - dt / dx * (P[i + 1][j] - P[i][j]);
         V[i][j] = G[i][j] - dt / dy * (P[i][j + 1] - P[i][j]);
     }
 }

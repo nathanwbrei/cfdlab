@@ -506,9 +506,11 @@ int **read_pgm(const char *filename)
 
 
 void print_matrix(char* message, int xmin, int xmax, int ymin, int ymax, double **M) {
+    int i, j;
+
     printf("--------------------\n%s\n--------------------\n", message);
-    for (int j=ymax; j>=ymin; j--) {
-        for (int i=xmin; i<=xmax; i++) {
+    for (j=ymax; j>=ymin; j--) {
+        for (i=xmin; i<=xmax; i++) {
             printf("%.3e ", M[i][j]);
         }
         printf("\n");

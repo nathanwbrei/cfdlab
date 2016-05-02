@@ -30,3 +30,7 @@
 
 # Debug files
 *.dSYM/
+
+# Worksheet 1 generated files
+worksheet1/sim
+worksheet1/*.vtk
