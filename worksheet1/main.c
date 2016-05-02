@@ -55,7 +55,8 @@ int main(int argn, char** args){
      * Timestep parameters
      */
     double t, t_end, dt, tau, dt_value;
-    int n;
+
+    int n, timeStepNumber = 1;
     /*
      * Pressure iteration data
      */
@@ -115,15 +116,15 @@ int main(int argn, char** args){
             it += 1;
         }
         calculate_uv(dt,dx,dy,imax,jmax,U,V,F,G,P);
-        /*TODO: Condition this on some parameter*/
-        write_vtkFile(args[0], n, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+
+        if ( ((t+dt)/dt_value) > timeStepNumber ) {
+            write_vtkFile(args[0], timeStepNumber, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+            timeStepNumber = timeStepNumber + 1 ;
+        }
         t += dt;
         n += 1;
     }
-    /*
-      Output u,v,p for visualization
-      TODO: Do we want this?
-    */
+    
     /*
      * Free the matrices we've allocated
      */
