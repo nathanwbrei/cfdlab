@@ -96,8 +96,8 @@ int main(int argn, char** args){
     /*
      * Assign initial values to u,v,p
      */
-    U = matrix(0, imax+1, 0, jmax+1);
-    V = matrix(0, imax+1, 0, jmax+1);
+    U = matrix(0, imax, 0, jmax+1);
+    V = matrix(0, imax+1, 0, jmax);
     P = matrix(0, imax+1, 0, jmax+1);
     F = matrix(0, imax, 0, jmax);
     G = matrix(0, imax, 0, jmax);
@@ -130,8 +130,8 @@ int main(int argn, char** args){
     /*
      * Free the matrices we've allocated
      */
-    free_matrix(U, 0, imax+1, 0, jmax+1);
-    free_matrix(V, 0, imax+1, 0, jmax+1);
+    free_matrix(U, 0, imax, 0, jmax+1);
+    free_matrix(V, 0, imax+1, 0, jmax);
     free_matrix(P, 0, imax+1, 0, jmax+1);
     free_matrix(F, 0, imax, 0, jmax); 
     free_matrix(G, 0, imax, 0, jmax);
