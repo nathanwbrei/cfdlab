@@ -1,0 +1,11 @@
+xlength                     10
+
+tau                         1
+
+characteristicvelocity_x     1
+characteristicvelocity_y     1
+characteristicvelocity_z     0
+
+timesteps                   100
+
+vtkoutput                   10
