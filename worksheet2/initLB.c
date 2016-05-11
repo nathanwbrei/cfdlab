@@ -24,7 +24,9 @@ int readParameters(
 
     read_int(szFileName, "xlength", xlength);
     read_double(szFileName,"tau", tau);
-    read_double(szFileName, "characteristicvelocity", velocityWall);
+    read_double(szFileName, "characteristicvelocity_x", &velocityWall[0]);
+    read_double(szFileName, "characteristicvelocity_y", &velocityWall[1]);
+    read_double(szFileName, "characteristicvelocity_z", &velocityWall[2]);
     read_int(szFileName, "timesteps", timesteps);
     read_int(szFileName, "vtkoutput", timestepsPerPlotting);
 

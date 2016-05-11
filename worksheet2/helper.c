@@ -190,7 +190,7 @@ void read_int( const char* szFileName, const char* szVarName, int* pVariable)
     if( sscanf( szValue, "%d", pVariable) == 0)
         READ_ERROR("wrong format", szVarName, szFileName, 0);
 
-    printf( "File: %s\t\t%s%s= %d\n", szFileName,
+    printf( "File: %s\t\t%s%s = %d\n", szFileName,
                                       szVarName,
                                       &("               "[min_int( (int)strlen(szVarName), 15)]),
                                       *pVariable );
@@ -212,7 +212,7 @@ void read_double( const char* szFileName, const char* szVarName, double* pVariab
     if( sscanf( szValue, "%lf", pVariable) == 0)
         READ_ERROR("wrong format", szVarName, szFileName, 0);
 
-    printf( "File: %s\t\t%s%s= %f\n", szFileName,
+    printf( "File: %s\t\t%s%s = %f\n", szFileName,
                                       szVarName,
                                       &("               "[min_int( (int)strlen(szVarName), 15)]),
                                       *pVariable );
