@@ -15,7 +15,8 @@ static const double LATTICEWEIGHTS[19] = {
     1.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36
 };
 
-static const double C_S = 1.0 / sqrt(3.0);
+/* Math.sqrt(3.0) = 1.732050807568877 */
+static const double C_S = 1.0 / 1.732050807568877;
 
 #endif
 
