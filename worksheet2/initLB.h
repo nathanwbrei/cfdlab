@@ -19,6 +19,6 @@ int readParameters(
 void initialiseFields(double *collideField, double *streamField,int *flagField, int xlength);
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
-void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z);
+void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag);
 #endif
 
