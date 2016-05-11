@@ -1,11 +1,26 @@
 #include "initLB.h"
 
 int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int argc, char *argv[]){
-  /* TODO */
 
+	char * FileName;
+	
+	if (argc == 2) {
+	    FileName = argv[1];	    
+	}
+	else{
+	    printf("Usage: ./lbsim inputfile \n");
+	    return -1;
+	}
 
+	READ_INT   ( FileName, *xlength );
 
-  return 0;
+	READ_DOUBLE( FileName,  *tau);
+	READ_DOUBLE( FileName,  *velocityWall);
+
+	READ_INT   ( FileName, *timesteps );
+	READ_INT   ( FileName, *timestepsPerPlotting );
+
+	return 0;
 }
 
 
