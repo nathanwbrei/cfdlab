@@ -9,9 +9,12 @@
 
 int main(int argc, char *argv[]){
   /* TODO */
+    int xlength, timesteps, timestepsPerPlotting;
+    double tau, velocityWall;
 
+    readParameters(&xlength, &tau, &velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
 
-  return 0;
+    return 0;
 }
 
 #endif

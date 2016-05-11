@@ -16,6 +16,10 @@
 
 #define FREE_ARG char*
 
+static inline double * getEl(double * array, int x, int y, int z, int i, int xlength) {
+    return array + 19 * (z * xlength * xlength + y * xlength + x) + i;
+}
+
 /**
  * Maximum length of input lines
  */
