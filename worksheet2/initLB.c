@@ -40,6 +40,7 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 	int pos_field = 19 * pos_flag;
 	const double w0=12.0/36.0, w1=2.0/36.0, w2=1.0/36.0;
 	const double moving_add = 2 * (12*w2 + 6*w1 + w0)/(1/sqrt(3))
+	
 	flagField[pos_flag] = flag;
 
 	collideField[pos_field+0] = w2; 
@@ -70,6 +71,8 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 		collideField[pos_field+3] += w2*moving_add; 
 		collideField[pos_field+4] += w2*moving_add; 
 	}
+
+
 }
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
