@@ -11,6 +11,8 @@ int main(int argc, char *argv[]){
   /* TODO */
     int xlength, timesteps, timestepsPerPlotting;
     double tau, velocityWall[3];    
+    int t;
+    double *swap=NULL;
 
     readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
 
@@ -21,7 +23,20 @@ int main(int argc, char *argv[]){
 
     initialiseFields( collideField, streamField, flagField, xlength);
 
-    //treatBoundary(collideField,flagfield,velocityWall,xlength);
+    treatBoundary(collideField, flagField, velocityWall, xlength);
+
+    for (t = 0; t < timesteps; t++) {
+        doStreaming(collideField, streamField, flagField, xlength);
+        swap = collideField;
+        collideField = streamField;
+        streamField = swap;
+        //    doCollision(collideField,flagfield,&tau,xlength);
+        treatBoundary(collideField, flagField, velocityWall, xlength);
+
+        if (t % timestepsPerPlotting == 0) {
+            writeVtkOutput(collideField, flagField, argv, t, xlength);
+        }
+    }
 
     free(collideField);
     free(streamField);
