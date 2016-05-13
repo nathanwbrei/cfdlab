@@ -34,10 +34,12 @@ int readParameters(
     return 0;
 }
 
+void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag){	
+    int i;
 
 	flagField[z * length_tot * length_tot + y * length_tot + x] = flag;
 
-	for (int i = 0; i < 19; ++i){
+	for (i = 0; i < 19; ++i){
 		*getEl(collideField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
 	}
 }
