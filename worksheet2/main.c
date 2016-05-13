@@ -21,17 +21,18 @@ int main(int argc, char *argv[]){
     double  *streamField = (double *)  malloc((size_t)( 19*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     int  *flagField = (int *)  malloc((size_t)( (xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( int ));
 
-    initialiseFields( collideField, streamField, flagField, xlength);
+    initialiseFields(collideField, streamField, flagField, xlength);
 
     treatBoundary(collideField, flagField, velocityWall, xlength);
 
     for (t = 0; t < timesteps; t++) {
-        doStreaming(collideField, streamField, flagField, xlength);
-        swap = collideField;
-        collideField = streamField;
-        streamField = swap;
+      // doStreaming(collideField, streamField, flagField, xlength);
+      // swap = collideField;
+      //  collideField = streamField;
+      //  streamField = swap;
         //    doCollision(collideField,flagfield,&tau,xlength);
-        treatBoundary(collideField, flagField, velocityWall, xlength);
+        //treatBoundary(collideField, flagField, velocityWall, xlength);
+        
 
         if (t % timestepsPerPlotting == 0) {
             writeVtkOutput(collideField, flagField, argv, t, xlength);

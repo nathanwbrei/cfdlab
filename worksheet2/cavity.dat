@@ -1,11 +1,11 @@
-xlength                     10
+xlength                     20
 
 tau                         1
 
 characteristicvelocity_x     1
-characteristicvelocity_y     1
+characteristicvelocity_y     0
 characteristicvelocity_z     0
 
-timesteps                   100
+timesteps                   10
 
-vtkoutput                   10
+vtkoutput                   2
