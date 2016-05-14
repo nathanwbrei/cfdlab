@@ -29,7 +29,7 @@ void boundaryCell(double * collideField, int* flagField, const double * const wa
         }	
         
         computeDensity(getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, length_tot), &density);
-        *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / (C_S*C_S);
+        *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd / (C_S*C_S);
       }
     }
   }
@@ -39,14 +39,14 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
 	int x, y, z;
 
 	z = 0;
-	for (y = 0; y <= xlength+1; ++y){
-	    for (x = 0; x <= xlength+1; ++x){           	        
+	for (y = 1; y <= xlength; ++y){
+	    for (x = 1; x <= xlength; ++x){           	        
 	        boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
 	    }
 	}
 	for (z = 1; z <= xlength; ++z){
 	    y = 0;
-	    for (x = 0; x <= xlength +1; ++x){
+	    for (x = 1; x <= xlength; ++x){
 	        boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
 	    }       
 	    for (y = 1; y <= xlength; ++y){
@@ -56,13 +56,13 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
 	        boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
 	    }
 	    y = xlength+1;
-	    for (x = 0; x <= xlength+1; ++x){
+	    for (x = 1; x <= xlength; ++x){
 	        boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
 	    }
 	}
 	z = xlength+1;
-	for (y = 0; y <= xlength+1; ++y){
-	    for (x = 0; x <= xlength+1; ++x){
+	for (y = 1; y <= xlength; ++y){
+	    for (x = 1; x <= xlength; ++x){
 	        boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
 	    }
 	}

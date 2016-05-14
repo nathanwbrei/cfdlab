@@ -28,16 +28,17 @@ void write_vtkFile(const char *szProblem,
   write_vtkHeader(fp, xlength);
   write_vtkPointCoordinates(fp, xlength);
 
-  fprintf(fp,"POINT_DATA %i \n", n*n*n);
+  fprintf(fp,"POINT_DATA %i \n", (n-2)*(n-2)*(n-2));
   
   fprintf(fp,"\n");
   fprintf(fp, "VECTORS velocity float\n");
-  for(z = 0; z < n; z++) {
-    for(y = 0; y < n; y++) {
-      for(x = 0; x < n; x++) {
+  for(z = 1; z < n-1; z++) {
+    for(y = 1; y < n-1; y++) {
+      for(x = 1; x < n-1; x++) {
         /* TODO compute velocity */
         el = getEl(collideField, x, y, z, 0, n);
         computeDensity(el, &density);
+        /* TODO */
         computeVelocity(el, &density, velocity);
 
         fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
@@ -46,19 +47,19 @@ void write_vtkFile(const char *szProblem,
   }
 
   fprintf(fp,"\n");
-  
-    fprintf(fp, "SCALARS density float 1 \n"); 
-    fprintf(fp, "LOOKUP_TABLE default \n");
-  
-    for(z = 0; z < n; z++) {
-      for(y = 0; y < n; y++) {
-        for(x = 0; x < n; x++) {
-          /* TODO compute density */
-          computeDensity(getEl(collideField, x, y, z, 0, n), &density);
-          fprintf(fp, "%f\n", density);
-        }
+
+  fprintf(fp, "SCALARS density float 1 \n"); 
+  fprintf(fp, "LOOKUP_TABLE default \n");
+
+  for(z = 1; z < n-1; z++) {
+    for(y = 1; y < n-1; y++) {
+      for(x = 1; x < n-1; x++) {
+        /* TODO compute density */
+        computeDensity(getEl(collideField, x, y, z, 0, n), &density);
+        fprintf(fp, "%f\n", density);
       }
     }
+  }
 
   if( fclose(fp) )
     {
@@ -86,8 +87,8 @@ void write_vtkHeader( FILE *fp, int xlength) {
   fprintf(fp,"ASCII\n");
   fprintf(fp,"\n");	
   fprintf(fp,"DATASET STRUCTURED_GRID\n");
-  fprintf(fp,"DIMENSIONS  %i %i %i \n", n, n, n);
-  fprintf(fp,"POINTS %i float\n", n*n*n);
+  fprintf(fp,"DIMENSIONS  %i %i %i \n", n-2, n-2, n-2);
+  fprintf(fp,"POINTS %i float\n", xlength*xlength*xlength);
   fprintf(fp,"\n");
 }
 
@@ -102,9 +103,9 @@ void write_vtkPointCoordinates(FILE *fp, int xlength) {
   int z = 0;
   int n = xlength + 2;
 
-  for(z = 0; z < n; z++) {
-    for(y = 0; y < n; y++) {
-      for(x = 0; x < n; x++) {
+  for(z = 1; z < n-1; z++) {
+    for(y = 1; y < n-1; y++) {
+      for(x = 1; x < n-1; x++) {
         /* dx = dy = dz = 1 */
         fprintf(fp, "%d %d %d\n", originX + x, originY + y, originZ + z);
       }

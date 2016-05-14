@@ -29,11 +29,8 @@ void computeVelocity(const double * const currentCell, const double * const dens
         for (i=0; i<19; i++) {
             velocity[j] += LATTICEVELOCITIES[i][j] * currentCell[i];
         }
-        /* TODO */
-        if (*density != 0) {
-          velocity[j] /= *density;
-        }
-
+        // TODO
+        velocity[j] /= *density;
     }
 }
 
