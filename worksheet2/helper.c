@@ -108,7 +108,8 @@ char* find_string( const char* szFileName, const char *szVarName )
     /* searching */
     while( ! feof(fh) )
     {
-        if(fgets( szLine, MAX_LINE_LENGTH, fh ));
+        if(fgets( szLine, MAX_LINE_LENGTH, fh ))
+            ;
         ++nLine;
 
         /* remove comments */
@@ -304,7 +305,8 @@ void read_matrix( const char* szFileName,     /* filename */
        }
 
 
-   if(fread( tmp, sizeof(float), (size_t)nSize, fh));
+   if(fread( tmp, sizeof(float), (size_t)nSize, fh))
+       ;
 
    for( j = ncl; j <= nch; j++)
        for( i = nrl; i <= nrh; i++)
@@ -448,16 +450,19 @@ int **read_pgm(const char *filename)
 
     /* skip the comments */
     do
-    if(fgets(line,sizeof line,input));
+    if(fgets(line,sizeof line,input))
+        ;
     while(*line=='#');
 
     /* read the width and height */
     sscanf(line,"%d %d\n",&xsize,&ysize);
 
-    printf("Image size: %d x %d\n", xsize,ysize);
+    printf("Image size: %d x %d\n", xsize,ysize)
+        ;
 
     /* read # of gray levels */
-    if(fgets(line,sizeof line,input));
+    if(fgets(line,sizeof line,input))
+        ;
     sscanf(line,"%d\n",&levels);
 
     /* allocate memory for image */
@@ -470,7 +475,8 @@ int **read_pgm(const char *filename)
         for (i1=1; i1 < xsize+1; i1++)
         {
             int byte;
-            if(fscanf(input, "%d", &byte));
+            if(fscanf(input, "%d", &byte))
+                ;
 
             if (byte==EOF)
             {
