@@ -35,7 +35,6 @@ int readParameters(
 }
 
 void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag){  
->>>>>>> 633c556... Branch ready to merge
 
     flagField[z * length_tot * length_tot + y * length_tot + x] = flag;
 
