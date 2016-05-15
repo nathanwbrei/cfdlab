@@ -17,10 +17,10 @@ void computeDensity(const double *const currentCell, double *density){
 }
 
 void computeVelocity(const double * const currentCell, const double * const density, double *velocity){
-  /*
-   * Computes the velocity within currentCell 
-   * u(x,t) = sum(f[i] * c[i] for i in [0:Q-1]) / rho
-   */
+    /*
+     * Computes the velocity within currentCell 
+     * u(x,t) = sum(f[i] * c[i] for i in [0:Q-1]) / rho
+     */
 
     int i,j;
 

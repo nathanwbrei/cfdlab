@@ -1,6 +1,6 @@
-xlength                     5
+xlength                     50
 
-tau                         0.65
+tau                         2.0
 
 characteristicvelocity_x     1
 characteristicvelocity_y     0

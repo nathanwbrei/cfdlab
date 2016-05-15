@@ -31,12 +31,12 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
     // Loop over inner cells: compare to streaming.c
     for (x=1; x<= xlength; x++) {
         for (y=1; y<=xlength; y++) {
-          for (z=1; z<=xlength; z++) {
-              currentCell = getEl(collideField, x, y, z, 0, n);
-              computeDensity(currentCell, &density);
-              computeVelocity(currentCell, &density, velocity);
-              computeFeq(&density, velocity, feq);
-              computePostCollisionDistributions(currentCell, tau, feq);
+            for (z=1; z<=xlength; z++) {
+                currentCell = getEl(collideField, x, y, z, 0, n);
+                computeDensity(currentCell, &density);
+                computeVelocity(currentCell, &density, velocity);
+                computeFeq(&density, velocity, feq);
+                computePostCollisionDistributions(currentCell, tau, feq);
             }
         }
     }
