@@ -60,7 +60,7 @@ void computeFeq(const double * const density, const double * const velocity, dou
         feq[i] = 1;
         feq[i] += ci_dot_u/cs2;
         feq[i] += (ci_dot_u * ci_dot_u) / (2 * cs2 * cs2);
-        feq[i] += u_dot_u / (2 * cs2);
+        feq[i] -= u_dot_u / (2 * cs2);
         feq[i] *= *density;
         feq[i] *= LATTICEWEIGHTS[i];
     }

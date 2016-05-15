@@ -11,7 +11,7 @@ void doStreaming(double * collideField, double * streamField, int * flagField, i
         for (y = 1; y <= xlength; y++) {
             for (z = 1; z <= xlength; z++) {
                 for (i = 0; i < 19; i++) {  //TODO: Shouldn't i start at 0? // TODO: define Q in one place
-                    *getEl(collideField, x, y, z, i, n) = *getEl(streamField, x - LATTICEVELOCITIES[i][0], y - LATTICEVELOCITIES[i][1], z - LATTICEVELOCITIES[i][2], i, n);
+                    *getEl(streamField, x, y, z, i, n) = *getEl(collideField, x - LATTICEVELOCITIES[i][0], y - LATTICEVELOCITIES[i][1], z - LATTICEVELOCITIES[i][2], i, n);
                 }
             }
         }
