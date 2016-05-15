@@ -1,5 +1,6 @@
 #include "helper.h"
 #include "initLB.h"
+#include "LBDefinitions.h"
 
 
 /**
@@ -33,8 +34,50 @@ int readParameters(
     return 0;
 }
 
+void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag){  
+
+    flagField[z * length_tot * length_tot + y * length_tot + x] = flag;
+
+    for (int i = 0; i < 19; ++i){
+        *getEl(collideField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
+    }
+}
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
-  /* TODO */
+
+    int x, y, z, length_tot;
+    length_tot = xlength +2 ;
+
+    z = 0;
+    for (y = 0; y <= xlength+1; ++y){
+        for (x = 0; x <= xlength+1; ++x){
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+        }
+    }
+    for (z = 1; z <= xlength; ++z){
+        y = 0;
+        for (x = 0; x <= xlength +1; ++x){
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+        }       
+        for (y = 1; y <= xlength; ++y){
+            x = 0;
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            for (x = 1; x <= xlength; ++x){
+                initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 0);
+            }
+            x = xlength+1;
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+        }
+        y = xlength+1;
+        for (x = 0; x <= xlength+1; ++x){
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+        }
+    }
+    z = xlength+1;
+    for (y = 0; y <= xlength+1; ++y){
+        for (x = 0; x <= xlength+1; ++x){
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 2);
+        }
+    }
 }
 
