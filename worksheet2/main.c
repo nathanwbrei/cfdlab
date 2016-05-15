@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
         treatBoundary(collideField, flagField, velocityWall, xlength);
 
         if (t % timestepsPerPlotting == 0) {
-            writeVtkOutput(collideField, flagField, argv, t, xlength);
+            writeVtkOutput(collideField, flagField, argv[1], t, xlength);
         }
     }
 

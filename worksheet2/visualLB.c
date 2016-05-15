@@ -113,7 +113,7 @@ void write_vtkPointCoordinates(FILE *fp, int xlength) {
     }
 }
 
-void writeVtkOutput(const double * const collideField, const int * const flagField, const char * filename, unsigned int t, int xlength) {
+void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int xlength) {
     write_vtkFile("ws2", t, xlength, collideField);
 }
 
