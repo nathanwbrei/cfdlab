@@ -10,7 +10,6 @@
 #include "boundary.h"
 
 int main(int argc, char *argv[]){
-    /* TODO */
     int xlength, timesteps, timestepsPerPlotting;
     double tau, velocityWall[3];    
     int t;
@@ -18,10 +17,13 @@ int main(int argc, char *argv[]){
 
     readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
 
-    /* TODO: Add errors to failed allocation */
     double  *collideField = (double *)  malloc((size_t)( 19*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     double  *streamField = (double *)  malloc((size_t)( 19*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     int  *flagField = (int *)  malloc((size_t)( (xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( int ));
+
+    if (collideField == NULL || streamField == NULL || flagField == NULL) {
+        ERROR("Unable to allocate matrices.");
+    } 
 
 
     clock_t start_time = clock();
