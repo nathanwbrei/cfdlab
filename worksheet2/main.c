@@ -14,6 +14,7 @@ int main(int argc, char *argv[]){
     double tau, velocityWall[3];    
     int t;
     double *swap=NULL;
+    clock_t start_time, total_time = 0;
 
     readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
 
@@ -26,12 +27,14 @@ int main(int argc, char *argv[]){
     } 
 
 
-    clock_t start_time = clock();
     initialiseFields(collideField, streamField, flagField, xlength);
 
     treatBoundary(collideField, flagField, velocityWall, xlength);
 
     for (t = 0; t < timesteps; t++) {
+
+        start_time = clock();  // Start the timer for the lattice updates
+
         doStreaming(collideField, streamField, flagField, xlength);
         swap = collideField;
         collideField = streamField;
@@ -39,15 +42,17 @@ int main(int argc, char *argv[]){
         doCollision(collideField,flagField,&tau,xlength);
         treatBoundary(collideField, flagField, velocityWall, xlength);
 
+        total_time += clock() - start_time; // Add elapsed ticks to total_time
+
         if (t % timestepsPerPlotting == 0) {
             writeVtkOutput(collideField, flagField, argv[1], t, xlength);
         }
     }
 
     // Compute average mega-lattice-updates-per-second in order to judge performance
-    float elapsed_time = (clock() - start_time)/((float)CLOCKS_PER_SEC);
+    float elapsed_time = total_time/((float)CLOCKS_PER_SEC);
     float mlups = ((xlength+2) * (xlength+2) * (xlength+2) * timesteps) / (elapsed_time * 1000000);
-    printf("Elapsed time=%f\nAverage MLUPS=%f\n", elapsed_time, mlups);
+    printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
 
     free(collideField);
     free(streamField);
