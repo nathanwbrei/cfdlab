@@ -35,12 +35,9 @@ void write_vtkFile(const char *szProblem,
     for(z = 1; z  <= xlength; z++) {
         for(y = 1; y  <= xlength; y++) {
             for(x = 1; x  <= xlength; x++) {
-                /* TODO compute velocity */
                 el = getEl(collideField, x, y, z, 0, n);
                 computeDensity(el, &density);
-                /* TODO */
                 computeVelocity(el, &density, velocity);
-
                 fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
             }
         }
@@ -54,7 +51,6 @@ void write_vtkFile(const char *szProblem,
     for(z = 1; z  <= xlength; z++) {
         for(y = 1; y  <= xlength; y++) {
             for(x = 1; x  <= xlength; x++) {
-                /* TODO compute density */
                 computeDensity(getEl(collideField, x, y, z, 0, n), &density);
                 fprintf(fp, "%f\n", density);
             }

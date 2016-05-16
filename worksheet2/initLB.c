@@ -50,7 +50,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     length_tot = xlength + 2;
 
     /* Definition of the fields */
-    /* TODO: There are some overkills or cells not written in the code, think carefully in the boundaries*/
     z = 0;
     for (y = 0; y < length_tot; ++y){
         for (x = 0; x < length_tot; ++x){			
