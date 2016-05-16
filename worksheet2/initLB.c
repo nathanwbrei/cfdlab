@@ -39,7 +39,7 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 
     flagField[z * length_tot * length_tot + y * length_tot + x] = flag;
 
-        for (i = 0; i < 19; ++i){
+        for (i = 0; i < Q; ++i){
             *getEl(streamField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
             *getEl(collideField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
         }

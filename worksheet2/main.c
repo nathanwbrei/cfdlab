@@ -8,6 +8,7 @@
 #include "initLB.h"
 #include "visualLB.h"
 #include "boundary.h"
+#include "LBDefinitions.h"
 
 int main(int argc, char *argv[]){
     int xlength, timesteps, timestepsPerPlotting;
@@ -18,8 +19,8 @@ int main(int argc, char *argv[]){
 
     readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
 
-    double  *collideField = (double *)  malloc((size_t)( 19*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
-    double  *streamField = (double *)  malloc((size_t)( 19*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
+    double  *collideField = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
+    double  *streamField  = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     int  *flagField = (int *)  malloc((size_t)( (xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( int ));
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {

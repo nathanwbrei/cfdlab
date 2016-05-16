@@ -7,7 +7,7 @@ void computePostCollisionDistributions(double *currentCell, const double * const
     int i;
     double fi;
 
-    for (i=0; i<19; i++) {
+    for (i=0; i<Q; i++) {
         fi = currentCell[i];
         currentCell[i] = fi - (fi - feq[i]) / *tau;
     }
@@ -20,8 +20,8 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
      */
  
     double density;
-    double velocity[3];
-    double feq[19];
+    double velocity[D];
+    double feq[Q];
 
     double * currentCell;
 
@@ -40,7 +40,5 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
             }
         }
     }
-    // TODO: Consider iterating over non-flagged boundaries-- How
-    // general do we want this?
 }
 

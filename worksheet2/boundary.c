@@ -10,7 +10,7 @@ void boundaryCell(double * collideField, int* flagField, const double * const wa
     double density;
     int length_tot = xlength + 2;
 
-    for (i = 0; i < 19; i++){
+    for (i = 0; i < Q; i++){
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];

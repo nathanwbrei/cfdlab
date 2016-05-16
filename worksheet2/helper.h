@@ -9,6 +9,7 @@
 #include <string.h>
 #include <float.h>
 #include <time.h>
+#include "LBDefinitions.h"
 
 #ifdef PI
 #undef PI
@@ -17,7 +18,7 @@
 #define FREE_ARG char*
 
 static inline double * getEl(double * array, int x, int y, int z, int i, int n) {
-    return array + 19 * (z * n * n + y * n + x) + i;
+    return array + Q * (z * n * n + y * n + x) + i;
 }
 
 /**
