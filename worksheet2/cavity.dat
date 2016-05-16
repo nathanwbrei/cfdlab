@@ -1,11 +1,11 @@
-xlength                     10
+xlength                     50
 
 tau                         2
 
-characteristicvelocity_x     0.05
-characteristicvelocity_y     0
-characteristicvelocity_z     0
+characteristicvelocity_x    0.001
+characteristicvelocity_y    0
+characteristicvelocity_z    0
 
 timesteps                   100
 
-vtkoutput                   1
+vtkoutput                   10
