@@ -1,0 +1,24 @@
+xlength                     10
+ylength                     10
+zlength                     10
+
+tau                         2
+
+characteristicvelocity_x    0.001
+characteristicvelocity_y    0
+characteristicvelocity_z    0
+
+timesteps                   100
+
+vtkoutput                   10
+
+problem						constant
+ro_ref						1
+ro_in						1
+
+wallup						1
+walldown					1
+wallback					1
+wallfront					1
+wallleft					4
+wallright					3

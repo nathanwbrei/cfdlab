@@ -1,0 +1,15 @@
+P2
+# Cavity of 10x10 with two small obstacles
+# Important!!! The size of the cavity has to coincide with the problem
+10 10
+15
+0 0 0 0 0 0 0 0 0 0
+0 0 4 0 0 0 0 0 0 0
+0 0 4 0 0 0 0 0 0 0
+0 0 4 0 0 0 0 0 0 0
+0 0 4 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 4 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0

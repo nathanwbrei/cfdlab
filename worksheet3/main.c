@@ -11,50 +11,66 @@
 #include "LBDefinitions.h"
 
 int main(int argc, char *argv[]){
-    int xlength, timesteps, timestepsPerPlotting;
-    double tau, velocityWall[3];    
-    int t;
-    double *swap=NULL;
-    clock_t start_time, total_time = 0;
-
-    readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
-
-    double  *collideField = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
-    double  *streamField  = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
-    int  *flagField = (int *)  malloc((size_t)( (xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( int ));
+    int length[3], timesteps, timestepsPerPlotting, boundaries[6];
+    double tau, velocityWall[3], ro_in, ro_ref;    
+    //int t;
+    //double *swap=NULL;
+    //clock_t start_time, total_time = 0;
+    char problem [10];
+    /* Read the file of parameters */
+    readParameters(length, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
+    /* Allocate memory */
+    double  *collideField = (double *)  malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
+    double  *streamField  = (double *)  malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
+    int  *flagField = (int *)  malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
     } 
+    
+    initialiseFields(collideField, streamField, flagField, length, boundaries, argv);
 
-
-    initialiseFields(collideField, streamField, flagField, xlength);
-
-    treatBoundary(collideField, flagField, velocityWall, xlength);
+    /* This is only for debugging reasons, errase (comment) it when you don't need it */
+    int a=0;
+    for (int z = 0; z <= length[0]+1; ++z)
+    {
+        for (int y = 0; y <= length[1]+1; ++y)
+        {
+            for (int x = 0; x <= length[2]+1; ++x)
+            {
+                printf("%d ", flagField[a]);
+                a++;
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
+/*
+    treatBoundary(collideField, flagField, velocityWall, length);
 
     for (t = 0; t < timesteps; t++) {
 
         start_time = clock();  // Start the timer for the lattice updates
 
-        doStreaming(collideField, streamField, flagField, xlength);
+        doStreaming(collideField, streamField, flagField, length);
         swap = collideField;
         collideField = streamField;
         streamField = swap;
-        doCollision(collideField,flagField,&tau,xlength);
-        treatBoundary(collideField, flagField, velocityWall, xlength);
+        doCollision(collideField,flagField,&tau,length);
+        treatBoundary(collideField, flagField, velocityWall, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
-            writeVtkOutput(collideField, flagField, argv[1], t, xlength);
+            writeVtkOutput(collideField, flagField, argv[1], t, length);
         }
     }
 
     // Compute average mega-lattice-updates-per-second in order to judge performance
     float elapsed_time = total_time/((float)CLOCKS_PER_SEC);
-    float mlups = ((xlength+2) * (xlength+2) * (xlength+2) * timesteps) / (elapsed_time * 1000000);
+    float mlups = ((length[0]+2) * (length[1]+2) * (length[2]+2) * timesteps) / (elapsed_time * 1000000);
     printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
-
+*/
     free(collideField);
     free(streamField);
     free(flagField);

@@ -17,8 +17,8 @@
 
 #define FREE_ARG char*
 
-static inline double * getEl(double * array, int x, int y, int z, int i, int n) {
-    return array + Q * (z * n * n + y * n + x) + i;
+static inline double * getEl(double * array, int x, int y, int z, int i, int *n) {
+    return array + Q * (z * n[0] * n[0] + y * n[1] + x) + i;
 }
 
 /**
