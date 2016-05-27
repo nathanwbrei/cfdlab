@@ -22,7 +22,7 @@ void boundaryCell(double * collideField, int* flagField, const double * const wa
             cell_ptr = getEl(collideField, x, y, z, i, length_tot);
             *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, length_tot);
 
-            if (flagField[length_tot*length_tot*z+length_tot*y+x] == 2 ) {
+            if (flagField[length_tot*length_tot*z+length_tot*y+x] == MOVING_WALL) {
                 dotProd = 0;
                 for (int j = 0; j < 3; ++j)	{
                     dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];

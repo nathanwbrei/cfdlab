@@ -21,5 +21,13 @@ static const double LATTICEWEIGHTS[Q] = {
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const double C_S = 1.0 / 1.732050807568877;
 
+static const int FLUID = 0;
+static const int NOSLIP = 1;
+static const int MOVING_WALL = 2;
+static const int INFLOW = 3;
+static const int OUTFLOW = 4;
+static const int PRESSURE_IN = 5;
+static const int OBSTACLE = 6;
+
 #endif
 
