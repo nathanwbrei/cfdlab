@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     
     initialiseFields(collideField, streamField, flagField, length, boundaries, argv);
 
-    /* This is only for debugging reasons, errase (comment) it when you don't need it */
+    /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
     int a=0;
     for (int z = 0; z <= length[0]+1; ++z)
     {
