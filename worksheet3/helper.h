@@ -17,9 +17,22 @@
 
 #define FREE_ARG char*
 
+/**
+ * Return pointer to i-th lattice in (x, y, z) cell
+ */
+/** TODO pass coordinates as a array [x, y, z] */
 static inline double * getEl(double * array, int x, int y, int z, int i, int *n) {
     return array + Q * (z * n[0] * n[0] + y * n[1] + x) + i;
 }
+
+/**
+ * Return pointer to (x,y,z) element
+ */
+/** TODO pass coordinates as a array [x, y, z] */
+static inline int * getFlag(int * array, int x, int y, int z, int *n) {
+    return array + z * n[0] * n[0] + y * n[1] + x;
+}
+
 
 /**
  * Maximum length of input lines
