@@ -12,10 +12,11 @@
 
 int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6];
-    double tau, velocityWall[3], ro_in, ro_ref;    
-    //int t;
-    //double *swap=NULL;
-    //clock_t start_time, total_time = 0;
+    /* TODO do we need inVelocity? */
+    double tau, velocityWall[3], ro_in, ro_ref, inVelocity[3] = {0.005, 0, 0};    
+    int t;
+    double *swap=NULL;
+    clock_t start_time, total_time = 0;
     char problem [10];
     /* Read the file of parameters */
     readParameters(length, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
@@ -45,8 +46,8 @@ int main(int argc, char *argv[]){
         }
         printf("\n");
     }
-/*
-    treatBoundary(collideField, flagField, velocityWall, length);
+
+    treatBoundary(collideField, flagField, &ro_ref, inVelocity, velocityWall, length);
 
     for (t = 0; t < timesteps; t++) {
 
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]){
         collideField = streamField;
         streamField = swap;
         doCollision(collideField,flagField,&tau,length);
-        treatBoundary(collideField, flagField, velocityWall, length);
+        treatBoundary(collideField, flagField, &ro_ref, inVelocity, velocityWall, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
@@ -70,7 +71,7 @@ int main(int argc, char *argv[]){
     float elapsed_time = total_time/((float)CLOCKS_PER_SEC);
     float mlups = ((length[0]+2) * (length[1]+2) * (length[2]+2) * timesteps) / (elapsed_time * 1000000);
     printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
-*/
+
     free(collideField);
     free(streamField);
     free(flagField);
