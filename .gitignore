@@ -37,5 +37,5 @@
 # Worksheet 1 generated files
 worksheet1/sim
 
-# Worksheet 2 generated files
-worksheet2/lbsim
+# Worksheet 2 & 3 generated files
+worksheet[23]/lbsim
