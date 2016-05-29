@@ -42,12 +42,13 @@ int readParameters(
     read_string(szFileName, "problem", problem);
     read_double(szFileName,"ro_ref", ro_ref);
     read_double(szFileName,"ro_in", ro_in);
-    read_int(szFileName, "wallup", &boundaries[0]);
-    read_int(szFileName, "walldown", &boundaries[1]);
-    read_int(szFileName, "wallleft", &boundaries[2]);
-    read_int(szFileName, "wallright", &boundaries[3]);
-    read_int(szFileName, "wallback", &boundaries[4]);
-    read_int(szFileName, "wallfront", &boundaries[5]);
+
+    read_int(szFileName, "wall_x0", &boundaries[0]);
+    read_int(szFileName, "wall_xmax", &boundaries[1]);
+    read_int(szFileName, "wall_y0", &boundaries[2]);
+    read_int(szFileName, "wall_ymax", &boundaries[3]);
+    read_int(szFileName, "wall_z0", &boundaries[4]);
+    read_int(szFileName, "wall_zmax", &boundaries[5]);
 
     if (strcmp(problem, PARABOLIC_SCENARIO) != 0 && strcmp(problem, CONSTANT_SCENARIO) != 0) {
         ERROR("Unrecognized scenario");
@@ -85,36 +86,36 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     z = 0;
     for (y = 0; y <= length[1]+1; ++y){
         for (x = 0; x <= length[2]+1; ++x){			
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[1]);   /* Loop for the down wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[4]);   /* Loop for the down wall of the cavity*/
         }
     }
     
     for (z = 1; z <= length[0]; ++z){
         y = 0;
         for (x = 0; x <= length[2]+1; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[5]);   /* Loop for the front wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[2]);   /* Loop for the front wall of the cavity*/
         }
 
         for (y = 1; y <= length[1]; ++y){
             x = 0;
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[2]);   /* Loop for the left wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[0]);   /* Loop for the left wall of the cavity*/
             for (x = 1; x <= length[2]; ++x){				
                 initialiseCell(collideField, streamField, flagField, length, x, y, z, image[x][z]);           /* Loop for the interior points*/
             }
             x = length[2]+1;
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[3]);   /* Loop for the right wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[1]);   /* Loop for the right wall of the cavity*/
         }
 
         y = length[1]+1;
         for (x = 0; x <= length[2]+1; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[4]);   /* Loop for the back wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[3]);   /* Loop for the back wall of the cavity*/
         }
     }
 
     z = length[0]+1;
     for (y = 0; y <= length[1]+1; ++y){
         for (x = 0; x < length[2]+2; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[0]);   /* Loop for the up wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[5]);   /* Loop for the up wall of the cavity*/
         }
     }
     free_imatrix( image, 0, length[0]+2,0,length[2]+2);
