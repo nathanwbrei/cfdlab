@@ -74,13 +74,12 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
 /**
  * Set OUTFLOW condition
  */
-void setOutflow(double * collideField, int * flagField, int x, int y, int z, int * n) {
+void setOutflow(double * collideField, int * flagField, const double * const ro_ref, int x, int y, int z, int * n) {
     int i, coord_dest[3];
     double * cell_ptr;
     double feq[Q];
     double velocity[D];
     double * fluidCell;
-    double density_ref = 1;
 
     /* for each lattice */
     for (i = 0; i < Q; i++) {
@@ -95,10 +94,10 @@ void setOutflow(double * collideField, int * flagField, int x, int y, int z, int
             fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
 
             /* compute velocity of the fluid cell */
-            computeVelocity(fluidCell, &density_ref, velocity);
+            computeVelocity(fluidCell, ro_ref, velocity);
             
             /* compute f-equilibrium of the fluid cell */
-            computeFeq(&density_ref, velocity, feq);
+            computeFeq(ro_ref, velocity, feq);
 
             /* pointer to the i-th lattice of the boundary cell */
             cell_ptr = getEl(collideField, x, y, z, i, n);
@@ -112,7 +111,7 @@ void setOutflow(double * collideField, int * flagField, int x, int y, int z, int
 /**
  * Set INFLOW condition
  */
-void setInflow(double * collideField, int * flagField, const double * const inVelocity, const double * const ro_ref, int x, int y, int z, int * n) {
+void setInflow(double * collideField, int * flagField, const double * const ro_ref, const double * const inVelocity, int x, int y, int z, int * n) {
     int i, coord_dest[3];
     double * cell_ptr;
     double feq[Q];
@@ -129,7 +128,7 @@ void setInflow(double * collideField, int * flagField, const double * const inVe
         if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
             fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
         
-            computeFeq(&ro_ref, inVelocity, feq);
+            computeFeq(ro_ref, inVelocity, feq);
 
             cell_ptr = getEl(collideField, x, y, z, i, n);
 
@@ -155,9 +154,9 @@ void boundaryCell(double * collideField,
     } else if (flag == MOVING_WALL) {
         setMovingWall(collideField, flagField, wallVelocity, x, y, z, n);
     } else if (flag == INFLOW) {
-        setInflow(collideField, flagField, inVelocity, ro_ref, x, y, z, n);
+        setInflow(collideField, flagField, ro_ref, inVelocity, x, y, z, n);
     } else if (flag == OUTFLOW) {
-        setOutflow(collideField, flagField, x, y, z, n);
+        setOutflow(collideField, flagField, ro_ref, x, y, z, n);
     }
 }
 
