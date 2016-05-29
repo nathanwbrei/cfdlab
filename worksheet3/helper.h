@@ -22,7 +22,7 @@
  */
 /** TODO pass coordinates as a array [x, y, z] */
 static inline double * getEl(double * array, int x, int y, int z, int i, int *n) {
-    return array + Q * (z * n[0] * n[0] + y * n[1] + x) + i;
+    return array + Q * (z * n[2] * n[1] + y * n[2] + x) + i;
 }
 
 /**
@@ -30,7 +30,7 @@ static inline double * getEl(double * array, int x, int y, int z, int i, int *n)
  */
 /** TODO pass coordinates as a array [x, y, z] */
 static inline int * getFlag(int * array, int x, int y, int z, int *n) {
-    return array + z * n[0] * n[0] + y * n[1] + x;
+    return array + z * n[2] * n[1] + y * n[2] + x;
 }
 
 

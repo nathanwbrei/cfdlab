@@ -90,6 +90,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             x = 0;
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[2]);   /* Loop for the left wall of the cavity*/
             for (x = 1; x <= length[2]; ++x){				
+                /** TODO is it correct plane for image ? Not XY ?*/
                 initialiseCell(collideField, streamField, flagField, length, x, y, z, image[x][z]);           /* Loop for the interior points*/
             }
             x = length[2]+1;

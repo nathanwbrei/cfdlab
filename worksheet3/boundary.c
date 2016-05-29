@@ -16,7 +16,8 @@ void setNoSlip(double * collideField, int * flagField, int x, int y, int z, int 
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
-        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
             // TODO printf("%d %d %d \n",coord_dest[0],coord_dest[1],coord_dest[2] );
             /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
             /* if pointed cell is FLUID */
@@ -26,7 +27,7 @@ void setNoSlip(double * collideField, int * flagField, int x, int y, int z, int 
     
                 /* NOSLIP */
                 /* set i-th lattice to inverse lattice of the computed inner cell */
-                *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, n);
+                *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], Q-1-i, n);
             }
         }
     }
@@ -47,8 +48,9 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
-
-        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
+       
             /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
             /* if pointed cell is FLUID */
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
@@ -92,8 +94,9 @@ void setOutflow(double * collideField, int * flagField, const double * const ro_
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
-
-        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
+       
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
                 /* get pointer to the fluid cell */
                 fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
@@ -131,7 +134,9 @@ void setInflow(double * collideField, int * flagField, const double * const ro_r
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
-       if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
+       
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
                 fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
             
