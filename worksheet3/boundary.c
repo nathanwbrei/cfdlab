@@ -151,6 +151,82 @@ void setInflow(double * collideField, int * flagField, const double * const ro_r
     }
 }
 
+void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, int * n) {
+    int i, j,k, coord_dest[3], sum;
+    double * cell_ptr;
+
+    for (i = 0; i < Q; i++) {
+        /* Initialize the cell with a flag, that will later make possible to know if some lattice was modifided*/
+        *getEl(collideField, x, y, z, i, n) = 0;    
+    }
+    for (i = 0; i < Q; i++) {
+        sum = abs(LATTICEVELOCITIES[i][0])+abs(LATTICEVELOCITIES[i][1])+abs(LATTICEVELOCITIES[i][2]);
+        /* In this part we are interested only in the face of the cell, thus the lattice has just one component */
+        if (sum == 1){
+            coord_dest[0] = x + LATTICEVELOCITIES[i][0];
+            coord_dest[1] = y + LATTICEVELOCITIES[i][1];
+            coord_dest[2] = z + LATTICEVELOCITIES[i][2];
+            /* If the pointed cell does not fall out of bounds */
+            if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0) {            
+                /* if pointed cell is FLUID */
+                if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {    
+                    for (j = 0; j < Q; j++) {
+                        /* looking for a direction with one of the components inverse to the direction of the face */
+                        if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1 ||
+                                LATTICEVELOCITIES[i][1]*LATTICEVELOCITIES[j][1] == -1 ||
+                                LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1){
+                            /* If the selected direction of the fluid cell falls on another fluid cell, they will interact in the streaming step */
+                            if (*getFlag(flagField, coord_dest[0]+LATTICEVELOCITIES[j][0], coord_dest[1]+LATTICEVELOCITIES[j][1], coord_dest[2]+LATTICEVELOCITIES[j][0], n) != FLUID) {
+                                for (k = 0; k < Q; k++) {
+                                    /* Search for a (unique) direcrion in the boundary cell which is the reflection of the fluid cell */
+                                    if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1 || 
+                                            LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[i][1] == 1 || 
+                                            LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[i][2] == 1 ) &&
+                                            ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1 || 
+                                            LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1 || 
+                                            LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1 )) {
+                                        //printf("IN %d %d %d, direction %d %d %d vector reflected from %d %d %d to  %d %d %d \n",z,x,y,LATTICEVELOCITIES[i][0],LATTICEVELOCITIES[i][1],LATTICEVELOCITIES[i][2],LATTICEVELOCITIES[j][0],LATTICEVELOCITIES[j][1],LATTICEVELOCITIES[j][2],LATTICEVELOCITIES[k][0],LATTICEVELOCITIES[k][1],LATTICEVELOCITIES[k][2] );                                        
+                                        cell_ptr = getEl(collideField, x, y, z, k, n);
+                                        *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], j, n);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /* for each lattice */
+    for (i = 0; i < Q; i++) {
+        /*  If the lattice was not modifided in the previous process, this happens for the inverse direction of the latice going out of the face
+        *   is also possible that the boundary does not share a fece with the fluid but it shares an edge or vertex.
+        *   In those cases the boundary behabes as non slip, bouncing back everything*/
+        if (*getEl(collideField, x, y, z, i, n) == 0){
+            /* compute a cell where lattice is pointing*/
+            coord_dest[0] = x + LATTICEVELOCITIES[i][0];
+            coord_dest[1] = y + LATTICEVELOCITIES[i][1];
+            coord_dest[2] = z + LATTICEVELOCITIES[i][2];
+    
+            if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0) {            
+                /* if pointed cell is FLUID */
+                if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
+                    /* get pointer to the i-th lattice of boundary cell */
+                    cell_ptr = getEl(collideField, x, y, z, i, n);
+        
+                    /* NOSLIP */
+                    /* set i-th lattice to inverse lattice of the computed inner cell */
+                    *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], Q-1-i, n);
+                    //printf("IN %d %d %d, direction %d %d %d vector rebound \n",z,x,y,LATTICEVELOCITIES[i][0],LATTICEVELOCITIES[i][1],LATTICEVELOCITIES[i][2]);
+                }
+            }
+        }
+    }
+}
+
 void boundaryCell(double * collideField,
                   int * flagField,
                   const double * const ro_ref,
@@ -170,6 +246,8 @@ void boundaryCell(double * collideField,
         setInflow(collideField, flagField, ro_ref, velocity, x, y, z, n);
     } else if (flag == OUTFLOW) {
         setOutflow(collideField, flagField, ro_ref, x, y, z, n);
+    } else if (flag == FREESLIP) {
+        setFreeSlip(collideField, flagField, x, y, z, n);
     }
 }
 

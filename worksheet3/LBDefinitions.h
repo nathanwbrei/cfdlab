@@ -28,6 +28,7 @@ static const int INFLOW = 3;
 static const int OUTFLOW = 4;
 static const int PRESSURE_IN = 5;
 static const int OBSTACLE = 6;
+static const int FREESLIP = 7;
 
 #endif
 
