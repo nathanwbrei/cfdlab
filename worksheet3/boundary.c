@@ -17,6 +17,7 @@ void setNoSlip(double * collideField, int * flagField, int x, int y, int z, int 
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
+        /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0) {
             // TODO printf("%d %d %d \n",coord_dest[0],coord_dest[1],coord_dest[2] );
@@ -49,6 +50,8 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
+
+        /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
        
@@ -81,7 +84,11 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
 /**
  * Set OUTFLOW condition
  */
-void setOutflow(double * collideField, int * flagField, const double * const ro_ref, int x, int y, int z, int * n) {
+void setOutflow(double * collideField,
+                int * flagField,
+                const double * const ro_ref,
+                int x, int y, int z,
+                int * n) {
     int i, coord_dest[3];
     double * cell_ptr;
     double feq[Q];
@@ -95,8 +102,10 @@ void setOutflow(double * collideField, int * flagField, const double * const ro_
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
+
+        /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
-            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0 ) {
        
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
                 /* get pointer to the fluid cell */
@@ -121,11 +130,27 @@ void setOutflow(double * collideField, int * flagField, const double * const ro_
 /**
  * Set INFLOW condition
  */
-void setInflow(double * collideField, int * flagField, const double * const ro_ref, const double * const inVelocity, int x, int y, int z, int * n) {
+void setInflow(double * collideField,
+               int * flagField,
+               const char * const scenario,
+               const double * const Re,
+               const double * const ro_ref,
+               const double * const ro_in,
+               const double * const inVelocity,
+               int x, int y, int z,
+               int * n) {
     int i, coord_dest[3];
     double * cell_ptr;
     double feq[Q];
     double * fluidCell;
+    double velocity[3];
+
+    /* If scenario is parabolic */
+    if (strcmp(scenario, PARABOLIC_SCENARIO) == 0) {
+        velocity[0] = 0;
+        velocity[1] = 0;
+        velocity[2] = - 0.5 * (*Re) * (*ro_in - *ro_in) / 1 * y * (y - 1);
+    }
 
     /* for each lattice */
     for (i = 0; i < Q; i++) {
@@ -135,6 +160,7 @@ void setInflow(double * collideField, int * flagField, const double * const ro_r
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
+        /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
        
@@ -229,7 +255,10 @@ void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, in
 
 void boundaryCell(double * collideField,
                   int * flagField,
+                  const char * const scenario,
+                  const double * const Re,
                   const double * const ro_ref,
+                  const double * const ro_in,
                   const double * const velocity,
                   int x, int y, int z,
                   int * n) {
@@ -243,7 +272,7 @@ void boundaryCell(double * collideField,
     } else if (flag == MOVING_WALL) {
         setMovingWall(collideField, flagField, velocity, x, y, z, n);
     } else if (flag == INFLOW) {
-        setInflow(collideField, flagField, ro_ref, velocity, x, y, z, n);
+        setInflow(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, x, y, z, n);
     } else if (flag == OUTFLOW) {
         setOutflow(collideField, flagField, ro_ref, x, y, z, n);
     } else if (flag == FREESLIP) {
@@ -251,7 +280,14 @@ void boundaryCell(double * collideField,
     }
 }
 
-void treatBoundary(double *collideField, int *flagField, const double * const ro_ref, const double * const velocity, int * length){
+void treatBoundary(double *collideField,
+                   int *flagField,
+                   const char * const scenario,
+                   const double * const Re,
+                   const double * const ro_ref,
+                   const double * const ro_in,
+                   const double * const velocity,
+                   int * length) {
     int x, y, z, flag;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
@@ -261,7 +297,7 @@ void treatBoundary(double *collideField, int *flagField, const double * const ro
                 flag = *getFlag(flagField, x, y, z, n);
                 if (flag != FLUID && flag != OBSTACLE) {
                     //printf("Debug: started boundaryCell %d %d %d\n", z,y,x);
-                    boundaryCell(collideField, flagField, ro_ref, velocity, x, y, z, n);
+                    boundaryCell(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, x, y, z, n);
                 }
             }
         }

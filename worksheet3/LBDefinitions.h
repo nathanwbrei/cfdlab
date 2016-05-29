@@ -30,5 +30,8 @@ static const int PRESSURE_IN = 5;
 static const int OBSTACLE = 6;
 static const int FREESLIP = 7;
 
+static const char * const PARABOLIC_SCENARIO = "parabolic";
+static const char * const CONSTANT_SCENARIO = "constant";
+
 #endif
 

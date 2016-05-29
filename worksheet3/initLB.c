@@ -41,7 +41,7 @@ int readParameters(
     read_int(szFileName, "vtkoutput", timestepsPerPlotting);
     read_string(szFileName, "problem", problem);
     read_double(szFileName,"ro_ref", ro_ref);
-    //   read_double(szFileName,"ro_in", ro_in);
+    read_double(szFileName,"ro_in", ro_in);
     read_int(szFileName, "wallup", &boundaries[0]);
     read_int(szFileName, "walldown", &boundaries[1]);
     read_int(szFileName, "wallleft", &boundaries[2]);
@@ -49,6 +49,9 @@ int readParameters(
     read_int(szFileName, "wallback", &boundaries[4]);
     read_int(szFileName, "wallfront", &boundaries[5]);
 
+    if (strcmp(problem, PARABOLIC_SCENARIO) != 0 && strcmp(problem, CONSTANT_SCENARIO) != 0) {
+        ERROR("Unrecognized scenario");
+    }
 
     return 0;
 }

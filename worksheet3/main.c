@@ -25,6 +25,11 @@ int main(int argc, char *argv[]){
     double  *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
     int  *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
 
+    double viscosity = C_S * C_S * (tau - 0.5);
+    /* TODO From where ? */
+    double v_max = 0.035;
+    double Re = v_max * length[0] / viscosity;
+
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
     } 
@@ -47,8 +52,7 @@ int main(int argc, char *argv[]){
 //        printf("\n");
 //    }
 
-    treatBoundary(collideField, flagField, &ro_ref, velocity, length);
-    t=0;
+    treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
     for (t = 0; t < timesteps; t++) {
 
@@ -59,7 +63,7 @@ int main(int argc, char *argv[]){
         collideField = streamField;
         streamField = swap;
         doCollision(collideField,flagField,&tau,length);
-        treatBoundary(collideField, flagField, &ro_ref, velocity, length);
+        treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
