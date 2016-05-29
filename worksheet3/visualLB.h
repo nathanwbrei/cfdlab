@@ -26,7 +26,7 @@
  */
 void write_vtkFile(const char *szProblem,
                    int    t,
-                   double xlength,
+                   int * length,
                    double * collideField);
 
 /**
@@ -40,7 +40,7 @@ void write_vtkFile(const char *szProblem,
  * 
  * @author Tobias Neckel
  */
-void write_vtkHeader(FILE *fp, int xlength);
+void write_vtkHeader(FILE *fp, int * length);
 
 /**
  * Method for writing grid coordinate information in vtk format. 
@@ -53,13 +53,13 @@ void write_vtkHeader(FILE *fp, int xlength);
  * 
  * @author Tobias Neckel
  */
-void write_vtkPointCoordinates(FILE *fp, int xlength); 
+void write_vtkPointCoordinates(FILE *fp, int * length); 
 
 /** writes the density and velocity field (derived from the distributions in collideField)
  *  to a file determined by 'filename' and timestep 't'. You can re-use parts of the code
  *  from visual.c (VTK output for Navier-Stokes solver) and modify it for 3D datasets.
  */
-void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int xlength);
+void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int * length);
 
 #endif
 

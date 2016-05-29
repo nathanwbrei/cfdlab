@@ -16,16 +16,18 @@ void setNoSlip(double * collideField, int * flagField, int x, int y, int z, int 
         coord_dest[0] = x + LATTICEVELOCITIES[i][0];
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
-
-        /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
-        /* if pointed cell is FLUID */
-        if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
-            /* get pointer to the i-th lattice of boundary cell */
-            cell_ptr = getEl(collideField, x, y, z, i, n);
-
-            /* NOSLIP */
-            /* set i-th lattice to inverse lattice of the computed inner cell */
-            *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, n);
+        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+            // TODO printf("%d %d %d \n",coord_dest[0],coord_dest[1],coord_dest[2] );
+            /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
+            /* if pointed cell is FLUID */
+            if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
+                /* get pointer to the i-th lattice of boundary cell */
+                cell_ptr = getEl(collideField, x, y, z, i, n);
+    
+                /* NOSLIP */
+                /* set i-th lattice to inverse lattice of the computed inner cell */
+                *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, n);
+            }
         }
     }
 }
@@ -46,27 +48,29 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
-        /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
-        /* if pointed cell is FLUID */
-        if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
-            /* get pointer to the i-th lattice of boundary cell */
-            cell_ptr = getEl(collideField, x, y, z, i, n);
+        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+            /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
+            /* if pointed cell is FLUID */
+            if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
+                /* get pointer to the i-th lattice of boundary cell */
+                cell_ptr = getEl(collideField, x, y, z, i, n);
 
-            /* NOSLIP */
-            /* set i-th lattice to inverse lattice of the computed inner cell */
-            *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, n);
+                /* NOSLIP */
+                /* set i-th lattice to inverse lattice of the computed inner cell */
+                *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, n);
 
-            dotProd = 0;
+                dotProd = 0;
 
-            /* compute inner product of wall velocity and i-th lattice velocity */
-            for (int j = 0; j < 3; ++j)	{
-                dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];
+                /* compute inner product of wall velocity and i-th lattice velocity */
+                for (int j = 0; j < 3; ++j)	{
+                    dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];
+                }
+
+                computeDensity(getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n), &density);
+
+                /* Set boundary i-th lattice with respect to the formula for MOVING_WALL */
+                *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / (C_S*C_S);
             }
-
-            computeDensity(getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n), &density);
-
-            /* Set boundary i-th lattice with respect to the formula for MOVING_WALL */
-            *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / (C_S*C_S);
         }
     }
 }
@@ -90,21 +94,23 @@ void setOutflow(double * collideField, int * flagField, int x, int y, int z, int
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
-        if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
-            /* get pointer to the fluid cell */
-            fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
+        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+            if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
+                /* get pointer to the fluid cell */
+                fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
 
-            /* compute velocity of the fluid cell */
-            computeVelocity(fluidCell, &density_ref, velocity);
-            
-            /* compute f-equilibrium of the fluid cell */
-            computeFeq(&density_ref, velocity, feq);
+                /* compute velocity of the fluid cell */
+                computeVelocity(fluidCell, &density_ref, velocity);
+                
+                /* compute f-equilibrium of the fluid cell */
+                computeFeq(&density_ref, velocity, feq);
 
-            /* pointer to the i-th lattice of the boundary cell */
-            cell_ptr = getEl(collideField, x, y, z, i, n);
+                /* pointer to the i-th lattice of the boundary cell */
+                cell_ptr = getEl(collideField, x, y, z, i, n);
 
-            /* set boundary */
-            *cell_ptr = feq[Q - i -1] + feq[i] - fluidCell[Q - 1 - i];
+                /* set boundary */
+                *cell_ptr = feq[Q - i -1] + feq[i] - fluidCell[Q - 1 - i];
+            }
         }
     }
 }
@@ -126,14 +132,16 @@ void setInflow(double * collideField, int * flagField, const double * const inVe
         coord_dest[1] = y + LATTICEVELOCITIES[i][1];
         coord_dest[2] = z + LATTICEVELOCITIES[i][2];
 
-        if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
-            fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
-        
-            computeFeq(&ro_ref, inVelocity, feq);
+        if (coord_dest[0]<n[0] && coord_dest[1]<n[1] && coord_dest[2]<n[2] && coord_dest[0]>=0 && coord_dest[1]>=0 && coord_dest[2]>=0){
+            if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
+                fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
+            
+                computeFeq(ro_ref, inVelocity, feq);
 
-            cell_ptr = getEl(collideField, x, y, z, i, n);
+                cell_ptr = getEl(collideField, x, y, z, i, n);
 
-            *cell_ptr = feq[i];
+                *cell_ptr = feq[i];
+            }
         }
     }
 }
@@ -170,11 +178,13 @@ void treatBoundary(double *collideField, int *flagField, const double * const ro
             for (x = 0; x < n[2]; x++) {
                 flag = *getFlag(flagField, x, y, z, n);
                 if (flag != FLUID && flag != OBSTACLE) {
+                    //printf("Debug: started boundaryCell %d %d %d\n", z,y,x);
                     boundaryCell(collideField, flagField, ro_ref, inVelocity, wallVelocity, x, y, z, n);
                 }
             }
         }
     }
+    printf("Debug: ended treatBoundary\n");
 
 //    
 ///*
