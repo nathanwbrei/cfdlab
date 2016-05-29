@@ -10,7 +10,7 @@
 int readParameters(
     int *length,                        /* reads domain size. Parameter name: "xlength" */
     double *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
-    double *velocityWall,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
+    double *velocity,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
     int *timesteps,                     /* number of timesteps. Parameter name: "timesteps" */
     int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
     int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
@@ -32,14 +32,16 @@ int readParameters(
     read_int(szFileName, "ylength", &length[1]);
     read_int(szFileName, "xlength", &length[2]);
     read_double(szFileName,"tau", tau);
-    read_double(szFileName, "characteristicvelocity_x", &velocityWall[0]);
-    read_double(szFileName, "characteristicvelocity_y", &velocityWall[1]);
-    read_double(szFileName, "characteristicvelocity_z", &velocityWall[2]);
+
+    read_double(szFileName, "velocity_x", &velocity[0]);
+    read_double(szFileName, "velocity_y", &velocity[1]);
+    read_double(szFileName, "velocity_z", &velocity[2]);
+    
     read_int(szFileName, "timesteps", timesteps);
     read_int(szFileName, "vtkoutput", timestepsPerPlotting);
     read_string(szFileName, "problem", problem);
     read_double(szFileName,"ro_ref", ro_ref);
-    read_double(szFileName,"ro_in", ro_in);
+    //   read_double(szFileName,"ro_in", ro_in);
     read_int(szFileName, "wallup", &boundaries[0]);
     read_int(szFileName, "walldown", &boundaries[1]);
     read_int(szFileName, "wallleft", &boundaries[2]);
@@ -54,11 +56,13 @@ int readParameters(
 void initialiseCell(double *collideField, double *streamField, int *flagField, int *length, int x, int y, int z, int flag) {	
     int i;
 
-    flagField[z * (length[0]+2) * (length[0]+2) + y * (length[1]+2) + x] = flag;    /*asigns the flag to the specified cell */
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+
+    *getFlag(flagField, x, y, z, n) = flag;    /*asigns the flag to the specified cell */
 
     for (i = 0; i < Q; ++i){
-        *getEl(streamField, x, y, z, i, length) = LATTICEWEIGHTS[i];    /*Insert on each cell the initial value */
-        *getEl(collideField, x, y, z, i, length) = LATTICEWEIGHTS[i];
+        *getEl(streamField, x, y, z, i, n) = LATTICEWEIGHTS[i];    /*Insert on each cell the initial value */
+        *getEl(collideField, x, y, z, i, n) = LATTICEWEIGHTS[i];
     }
 }
 
@@ -81,26 +85,29 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[1]);   /* Loop for the down wall of the cavity*/
         }
     }
+    
     for (z = 1; z <= length[0]; ++z){
         y = 0;
         for (x = 0; x <= length[2]+1; ++x){
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[5]);   /* Loop for the front wall of the cavity*/
         }
+
         for (y = 1; y <= length[1]; ++y){
             x = 0;
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[2]);   /* Loop for the left wall of the cavity*/
             for (x = 1; x <= length[2]; ++x){				
-                /** TODO is it correct plane for image ? Not XY ?*/
                 initialiseCell(collideField, streamField, flagField, length, x, y, z, image[x][z]);           /* Loop for the interior points*/
             }
             x = length[2]+1;
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[3]);   /* Loop for the right wall of the cavity*/
-        }    
+        }
+
         y = length[1]+1;
         for (x = 0; x <= length[2]+1; ++x){
             initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[4]);   /* Loop for the back wall of the cavity*/
         }
     }
+
     z = length[0]+1;
     for (y = 0; y <= length[1]+1; ++y){
         for (x = 0; x < length[2]+2; ++x){

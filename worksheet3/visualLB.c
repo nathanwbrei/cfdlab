@@ -17,7 +17,7 @@ void write_vtkFile(const char *szProblem,
 
     sprintf( szFileName, "%s.%i.vtk", szProblem, t );
     fp = fopen( szFileName, "w");
-    if( fp == NULL )		       
+    if( fp == NULL )
     {
         char szBuff[80];
         sprintf( szBuff, "Failed to open %s", szFileName );
@@ -81,7 +81,7 @@ void write_vtkHeader( FILE *fp, int * length) {
     fprintf(fp,"ASCII\n");
     fprintf(fp,"\n");	
     fprintf(fp,"DATASET STRUCTURED_GRID\n");
-    fprintf(fp,"DIMENSIONS  %i %i %i \n", length[0], length[1], length[2]);
+    fprintf(fp,"DIMENSIONS  %i %i %i \n", length[2], length[1], length[0]);
     fprintf(fp,"POINTS %i float\n", length[0]*length[1]*length[2]);
     fprintf(fp,"\n");
 }

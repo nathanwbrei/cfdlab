@@ -5,8 +5,7 @@
 void treatBoundary(double * collideField,
                    int * flagField,
                    const double * const ro_ref,
-                   const double * const wallVelocity,
-                   const double * const inVelocity,
+                   const double * const velocity,
                    int * length);
 
 #endif

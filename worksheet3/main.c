@@ -13,17 +13,17 @@
 int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6];
     /* TODO do we need inVelocity? */
-    double tau, velocityWall[3], ro_in, ro_ref, inVelocity[3] = {0.005, 0, 0};    
+    double tau, velocity[3], ro_in, ro_ref;
     int t;
     double *swap=NULL;
     clock_t start_time, total_time = 0;
     char problem [10];
     /* Read the file of parameters */
-    readParameters(length, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
+    readParameters(length, &tau, velocity, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
     /* Allocate memory */
-    double  *collideField = (double *)  malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
-    double  *streamField  = (double *)  malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
-    int  *flagField = (int *)  malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
+    double  *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
+    double  *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
+    int  *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
@@ -32,22 +32,23 @@ int main(int argc, char *argv[]){
     initialiseFields(collideField, streamField, flagField, length, boundaries, argv);
 
     /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
-    int a=0;
-    for (int z = 0; z <= length[0]+1; ++z)
-    {
-        for (int y = 0; y <= length[1]+1; ++y)
-        {
-            for (int x = 0; x <= length[2]+1; ++x)
-            {
-                printf("%d ", flagField[a]);
-                a++;
-            }
-            printf("\n");
-        }
-        printf("\n");
-    }
+//    int a=0;
+//    for (int z = 0; z <= length[0]+1; ++z)
+//    {
+//        for (int y = 0; y <= length[1]+1; ++y)
+//        {
+//            for (int x = 0; x <= length[2]+1; ++x)
+//            {
+//                printf("%d ", flagField[a]);
+//                a++;
+//            }
+//            printf("\n");
+//        }
+//        printf("\n");
+//    }
 
-    treatBoundary(collideField, flagField, &ro_ref, inVelocity, velocityWall, length);
+    treatBoundary(collideField, flagField, &ro_ref, velocity, length);
+    t=0;
 
     for (t = 0; t < timesteps; t++) {
 
@@ -58,12 +59,13 @@ int main(int argc, char *argv[]){
         collideField = streamField;
         streamField = swap;
         doCollision(collideField,flagField,&tau,length);
-        treatBoundary(collideField, flagField, &ro_ref, inVelocity, velocityWall, length);
+        treatBoundary(collideField, flagField, &ro_ref, velocity, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
             writeVtkOutput(collideField, flagField, argv[1], t, length);
+            printf("Time step %i finished, vtk file was created\n", t);
         }
     }
 
