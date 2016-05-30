@@ -70,14 +70,44 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
     }
 }
 
+/**
+ * Checks that in input image there was no too thin boundaries
+ */
+void checkForbiddenPatterns(int ** image, int * length) {
+    int x, z;
+    int c1, c2, c3, c4, result;
+
+    for (x = 0; x <= length[2]; x++) {
+        for (z = 0; z <= length[0]; z++) {
+            c1 = image[x][z] == FLUID;
+            c2 = image[x + 1][z] == FLUID;
+            c3 = image[x][z + 1] == FLUID;
+            c4 = image[x + 1][z + 1] == FLUID;
+            result = c1 << 3 | c2 << 2 | c3 << 1 | c4;
+
+            if (result == 0b0110 || result == 0b1001) {
+                ERROR("forbidden boundary");
+            }
+        }
+    }
+}
+
 void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * boundaries, char *argv[]){
     int x, y, z;
     int ** image;
-    char filename[20] ;    
+    char filename[20] ;
 
     strcpy(filename,argv[1]);                   /*Copy the value from argv to filename to not modify the original one*/ 
     strcat( filename,".pgm");
-    image = read_pgm(filename);/* Concatenate .pgm so the imput is independent of extesion*/
+    image = read_pgm(filename);/* Concatenate .pgm so the imput is independent of extension*/
+    checkForbiddenPatterns(image, length);
+
+    for (z = 0; z <= length[0]; z++) {
+        for (x = 0; x <= length[2]; x++) {
+            printf("%d ", image[x][z]);
+        }
+        printf("\n");
+    }
 
     /* 
     *   Definition of the fields 

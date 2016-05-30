@@ -181,7 +181,7 @@ void setInflow(double * collideField,
 }
 
 void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, int * n) {
-    int i, j,k, coord_dest[3], sum;
+    int i, j, k, coord_dest[3], sum;
     double * cell_ptr;
 
     for (i = 0; i < Q; i++) {
@@ -205,6 +205,7 @@ void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, in
                         if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1 ||
                                 LATTICEVELOCITIES[i][1]*LATTICEVELOCITIES[j][1] == -1 ||
                                 LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1){
+                            
                             /* If the selected direction of the fluid cell falls on another fluid cell, they will interact in the streaming step */
                             if (*getFlag(flagField, coord_dest[0]+LATTICEVELOCITIES[j][0], coord_dest[1]+LATTICEVELOCITIES[j][1], coord_dest[2]+LATTICEVELOCITIES[j][0], n) != FLUID) {
                                 for (k = 0; k < Q; k++) {
@@ -215,7 +216,6 @@ void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, in
                                             ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1 || 
                                             LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1 || 
                                             LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1 )) {
-                                        //printf("IN %d %d %d, direction %d %d %d vector reflected from %d %d %d to  %d %d %d \n",z,x,y,LATTICEVELOCITIES[i][0],LATTICEVELOCITIES[i][1],LATTICEVELOCITIES[i][2],LATTICEVELOCITIES[j][0],LATTICEVELOCITIES[j][1],LATTICEVELOCITIES[j][2],LATTICEVELOCITIES[k][0],LATTICEVELOCITIES[k][1],LATTICEVELOCITIES[k][2] );                                        
                                         cell_ptr = getEl(collideField, x, y, z, k, n);
                                         *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], j, n);
                                         break;
@@ -228,6 +228,7 @@ void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, in
             }
         }
     }
+    
     /* for each lattice */
     for (i = 0; i < Q; i++) {
         /*  If the lattice was not modifided in the previous process, this happens for the inverse direction of the latice going out of the face
@@ -249,7 +250,6 @@ void setFreeSlip(double * collideField, int * flagField, int x, int y, int z, in
                     /* NOSLIP */
                     /* set i-th lattice to inverse lattice of the computed inner cell */
                     *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], Q-1-i, n);
-                    //printf("IN %d %d %d, direction %d %d %d vector rebound \n",z,x,y,LATTICEVELOCITIES[i][0],LATTICEVELOCITIES[i][1],LATTICEVELOCITIES[i][2]);
                 }
             }
         }
@@ -299,62 +299,9 @@ void treatBoundary(double *collideField,
             for (x = 0; x < n[2]; x++) {
                 flag = *getFlag(flagField, x, y, z, n);
                 if (flag != FLUID && flag != OBSTACLE) {
-                    //printf("Debug: started boundaryCell %d %d %d\n", z,y,x);
                     boundaryCell(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, x, y, z, n);
                 }
             }
         }
     }
-    // printf("Debug: ended treatBoundary\n");
-
-//    
-///*
-//  /** TODO maybe it is more convenient to use length[0] for x and length[2] for z, and not vice versa */
-//
-//    /* Left boundary for Y */
-//    z = 0;
-//    /* All cells on XY plane */
-//    for (y = 0; y < n[1]; ++y){
-//        for (x = 0; x < n[2]; ++x) {
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//        }
-//    }
-//
-//    /* Inner cells for Z-axis */
-//    for (z = 1; z <= length[0]; ++z) {
-//        /* Left boundary for Y */
-//        y = 0;
-//        /* All cells on X axis */
-//        for (x = 0; x < n[2]; ++x) {
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//        }
-//
-//        /* Inner cells for Y-axis */
-//        for (y = 1; y <= length[1]; ++y){
-//            /* Left boundary for X */
-//            x = 0;
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//            
-//            /* Right boundary for X */
-//            x = length+1;
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//        }
-//        
-//        /* Right boundary for Y */
-//        y = length+1;
-//        /* All cells on X axis */
-//        for (x = 0; x < n[2]; ++x){
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//        }
-//    }
-//    
-//    /* Right boundary for Z */
-//    z = length+1;
-//    /* All cells on XY plane */
-//    for (y = 0; y < n[1]; ++y){
-//        for (x = 0; x < n[2]; ++x){
-//            boundaryCell(collideField, flagField, wallVelocity, length, x, y, z);
-//        }
-//    }
-    
 }
