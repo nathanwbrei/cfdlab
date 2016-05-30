@@ -10,8 +10,10 @@ void doStreaming(double * collideField, double * streamField, int * flagField, i
     for (z = 1; z <= length[0]; z++) {
         for (y = 1; y <= length[1]; y++) {
             for (x = 1; x <= length[2]; x++) {
-                for (i = 0; i < Q; i++) {
-                    *getEl(streamField, x, y, z, i, n) = *getEl(collideField, x - LATTICEVELOCITIES[i][0], y - LATTICEVELOCITIES[i][1], z - LATTICEVELOCITIES[i][2], i, n);
+                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                    for (i = 0; i < Q; i++) {
+                        *getEl(streamField, x, y, z, i, n) = *getEl(collideField, x - LATTICEVELOCITIES[i][0], y - LATTICEVELOCITIES[i][1], z - LATTICEVELOCITIES[i][2], i, n);
+                    }
                 }
             }
         }

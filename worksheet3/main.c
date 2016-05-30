@@ -52,24 +52,25 @@ int main(int argc, char *argv[]){
 
     treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
-    for (t = 0; t < timesteps; t++) {
-
-        start_time = clock();  // Start the timer for the lattice updates
-
-        doStreaming(collideField, streamField, flagField, length);
-        swap = collideField;
-        collideField = streamField;
-        streamField = swap;
-        doCollision(collideField,flagField,&tau,length);
-        treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
-
-        total_time += clock() - start_time; // Add elapsed ticks to total_time
+    t = 0;
+//    for (t = 0; t < timesteps; t++) {
+//
+//        start_time = clock();  // Start the timer for the lattice updates
+//
+//        doStreaming(collideField, streamField, flagField, length);
+//        swap = collideField;
+//        collideField = streamField;
+//        streamField = swap;
+//        doCollision(collideField,flagField,&tau,length);
+//        treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
+//
+//        total_time += clock() - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
             writeVtkOutput(collideField, flagField, argv[1], t, length);
             printf("Time step %i finished, vtk file was created\n", t);
         }
-    }
+        //   }
 
     // Compute average mega-lattice-updates-per-second in order to judge performance
     float elapsed_time = total_time/((float)CLOCKS_PER_SEC);

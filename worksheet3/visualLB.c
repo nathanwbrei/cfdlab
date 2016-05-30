@@ -1,11 +1,13 @@
 #include "visualLB.h"
 #include "computeCellValues.h"
 #include "helper.h"
+#include "LBDefinitions.h"
 
 void write_vtkFile(const char *szProblem,
                    int    t,
                    int * length,
-                   double *collideField) {
+                   double *collideField,
+                   int * flagField) {
   
     int x, y, z;
     char szFileName[80];
@@ -35,10 +37,14 @@ void write_vtkFile(const char *szProblem,
     for(z = 1; z  <= length[0]; z++) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[2]; x++) {
-                el = getEl(collideField, x, y, z, 0, n);
-                computeDensity(el, &density);
-                computeVelocity(el, &density, velocity);
-                fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
+                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                    el = getEl(collideField, x, y, z, 0, n);
+                    computeDensity(el, &density);
+                    computeVelocity(el, &density, velocity);
+                    fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
+                } else {
+                    fprintf(fp, "%f %f %f\n", 0, 0, 0); 
+                }
             }
         }
     }
@@ -51,8 +57,12 @@ void write_vtkFile(const char *szProblem,
     for(z = 1; z  <= length[0]; z++) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[2]; x++) {
-                computeDensity(getEl(collideField, x, y, z, 0, n), &density);
-                fprintf(fp, "%f\n", density);
+                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                    computeDensity(getEl(collideField, x, y, z, 0, n), &density);
+                    fprintf(fp, "%f\n", density);
+                } else {
+                    fprintf(fp, "%f\n", 0);
+                }
             }
         }
     }
@@ -107,6 +117,6 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
 }
 
 void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int * length) {
-    write_vtkFile(filename, t, length, collideField);
+    write_vtkFile(filename, t, length, collideField, flagField);
 }
 
