@@ -12,7 +12,7 @@ timesteps     	5000
 
 vtkoutput     	50
 
-problem		constant
+problem   parabolic
 ro_ref		1
 ro_in		1.005
 

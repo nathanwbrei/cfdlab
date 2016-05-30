@@ -19,9 +19,8 @@ void setNoSlip(double * collideField, int * flagField, int x, int y, int z, int 
 
         /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
-            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0) {
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
             // TODO printf("%d %d %d \n",coord_dest[0],coord_dest[1],coord_dest[2] );
-            /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
             /* if pointed cell is FLUID */
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
                 /* get pointer to the i-th lattice of boundary cell */
@@ -149,7 +148,11 @@ void setInflow(double * collideField,
     if (strcmp(scenario, PARABOLIC_SCENARIO) == 0) {
         velocity[0] = 0;
         velocity[1] = 0;
-        velocity[2] = - 0.5 * (*Re) * (*ro_in - *ro_in) / n[0] * y * (y - n[2]);
+        velocity[2] = - 0.5 * (*Re) * (*ro_in - *ro_ref) / n[0] * x * (x - n[2]);
+    } else {
+        velocity[0] = inVelocity[0];
+        velocity[1] = inVelocity[1];
+        velocity[2] = inVelocity[2];
     }
 
     /* for each lattice */
@@ -167,7 +170,7 @@ void setInflow(double * collideField,
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
                 fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
             
-                computeFeq(ro_ref, inVelocity, feq);
+                computeFeq(ro_ref, velocity, feq);
 
                 cell_ptr = getEl(collideField, x, y, z, i, n);
 

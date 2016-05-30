@@ -31,13 +31,12 @@ void write_vtkFile(const char *szProblem,
     write_vtkPointCoordinates(fp, length);
 
     fprintf(fp,"POINT_DATA %i \n", length[0]*length[1]*length[2]);
-  
     fprintf(fp,"\n");
     fprintf(fp, "VECTORS velocity float\n");
     for(z = 1; z  <= length[0]; z++) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[2]; x++) {
-                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                if (*getFlag(flagField, x, y, z, n) != OBSTACLE) {
                     el = getEl(collideField, x, y, z, 0, n);
                     computeDensity(el, &density);
                     computeVelocity(el, &density, velocity);
@@ -57,11 +56,11 @@ void write_vtkFile(const char *szProblem,
     for(z = 1; z  <= length[0]; z++) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[2]; x++) {
-                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                if (*getFlag(flagField, x, y, z, n) != OBSTACLE) {
                     computeDensity(getEl(collideField, x, y, z, 0, n), &density);
                     fprintf(fp, "%f\n", density);
                 } else {
-                    fprintf(fp, "%f\n", 0);
+                    fprintf(fp, "%f\n", 1);
                 }
             }
         }
