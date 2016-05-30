@@ -280,6 +280,8 @@ void boundaryCell(double * collideField,
         setOutflow(collideField, flagField, ro_ref, x, y, z, n);
     } else if (flag == FREESLIP) {
         setFreeSlip(collideField, flagField, x, y, z, n);
+    } else if (flag == PRESSURE_IN) {
+        setOutflow(collideField, flagField, ro_in, x, y, z, n);
     }
 }
 
