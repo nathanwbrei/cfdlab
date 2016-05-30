@@ -149,7 +149,7 @@ void setInflow(double * collideField,
     if (strcmp(scenario, PARABOLIC_SCENARIO) == 0) {
         velocity[0] = 0;
         velocity[1] = 0;
-        velocity[2] = - 0.5 * (*Re) * (*ro_in - *ro_in) / 1 * y * (y - 1);
+        velocity[2] = - 0.5 * (*Re) * (*ro_in - *ro_in) / n[0] * y * (y - n[2]);
     }
 
     /* for each lattice */

@@ -26,9 +26,7 @@ int main(int argc, char *argv[]){
     int  *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
 
     double viscosity = C_S * C_S * (tau - 0.5);
-    /* TODO From where ? */
-    double v_max = 0.035;
-    double Re = v_max * length[0] / viscosity;
+    double Re = 1 / viscosity;
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
