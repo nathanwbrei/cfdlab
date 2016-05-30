@@ -43,7 +43,7 @@ void write_vtkFile(const char *szProblem,
                     computeVelocity(el, &density, velocity);
                     fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
                 } else {
-                    fprintf(fp, "%f %f %f\n", 0, 0, 0); 
+                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0); 
                 }
             }
         }
@@ -61,7 +61,7 @@ void write_vtkFile(const char *szProblem,
                     computeDensity(getEl(collideField, x, y, z, 0, n), &density);
                     fprintf(fp, "%f\n", density);
                 } else {
-                    fprintf(fp, "%f\n", 0);
+                    fprintf(fp, "%f\n", 0.0);
                 }
             }
         }
@@ -116,7 +116,7 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
     }
 }
 
-void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int * length) {
+void writeVtkOutput(double * collideField, int * flagField, const char * filename, unsigned int t, int * length) {
     write_vtkFile(filename, t, length, collideField, flagField);
 }
 
