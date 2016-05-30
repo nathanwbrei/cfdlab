@@ -27,7 +27,8 @@
 void write_vtkFile(const char *szProblem,
                    int    t,
                    int * length,
-                   double * collideField);
+                   double * collideField,
+                   int * flagField);
 
 /**
  * Method for writing header information in vtk format. 

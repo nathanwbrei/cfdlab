@@ -32,11 +32,13 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
     for (z=1; z<=length[0]; z++) {
         for (y=1; y<=length[1]; y++) {
             for (x=1; x<=length[2]; x++) {
-                currentCell = getEl(collideField, x, y, z, 0, n);
-                computeDensity(currentCell, &density);
-                computeVelocity(currentCell, &density, velocity);
-                computeFeq(&density, velocity, feq);
-                computePostCollisionDistributions(currentCell, tau, feq);
+                if (*getFlag(flagField, x, y, z, n) == FLUID) {
+                    currentCell = getEl(collideField, x, y, z, 0, n);
+                    computeDensity(currentCell, &density);
+                    computeVelocity(currentCell, &density, velocity);
+                    computeFeq(&density, velocity, feq);
+                    computePostCollisionDistributions(currentCell, tau, feq);
+                }
             }
         }
     }
