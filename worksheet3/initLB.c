@@ -85,7 +85,7 @@ void checkForbiddenPatterns(int ** image, int * length) {
             c4 = image[x + 1][z + 1] == FLUID;
             result = c1 << 3 | c2 << 2 | c3 << 1 | c4;
 
-            if (result == 0b0110 || result == 0b1001) {
+            if (result == 6 || result == 9) {  // result == 0b0110 or 0b1001
                 ERROR("forbidden boundary");
             }
         }

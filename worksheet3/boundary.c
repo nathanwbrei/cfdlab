@@ -141,7 +141,6 @@ void setInflow(double * collideField,
     int i, coord_dest[3];
     double * cell_ptr;
     double feq[Q];
-    double * fluidCell;
     double velocity[3];
 
     /* If scenario is parabolic */
@@ -168,7 +167,6 @@ void setInflow(double * collideField,
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
        
             if (*getFlag(flagField, coord_dest[0], coord_dest[1], coord_dest[2], n) == FLUID) {
-                fluidCell = getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, n);
             
                 computeFeq(ro_ref, velocity, feq);
 
