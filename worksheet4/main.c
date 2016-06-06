@@ -11,14 +11,16 @@
 #include "LBDefinitions.h"
 
 int main(int argc, char *argv[]){
-    int xlength, timesteps, timestepsPerPlotting;
+    int xlength, timesteps, timestepsPerPlotting, Proc[3];
     double tau, velocityWall[3];    
     int t;
     double *swap=NULL;
     clock_t start_time, total_time = 0;
+    double *sendBuffer[6];// [0:left,1:right,2:top,3:bottom,4:front,5:back]
+    double *readBuffer[6];
 
-    readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv);
-
+    readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv, Proc);
+/*
     double  *collideField = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     double  *streamField  = (double *)  malloc((size_t)( Q*(xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( double ));
     int  *flagField = (int *)  malloc((size_t)( (xlength+2)*(xlength+2)*(xlength+2) ) * sizeof( int ));
@@ -58,7 +60,7 @@ int main(int argc, char *argv[]){
     free(collideField);
     free(streamField);
     free(flagField);
-    
+*/    
     return 0;
 }
 

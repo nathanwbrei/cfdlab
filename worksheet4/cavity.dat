@@ -9,3 +9,7 @@ characteristicvelocity_z    0
 timesteps                   100
 
 vtkoutput                   10
+
+iProc						2
+jProc						2
+kProc						2
