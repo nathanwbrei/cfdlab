@@ -12,7 +12,8 @@ int readParameters(
     int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
     int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
     char *argv[],                       /* argv[1] shall contain the path to the config file */
-    int *Proc                           /* Array whit the number of processors per dimention */
+    int *Proc,                          /* Array whit the number of processors per dimention */
+    int my_rank
 );
 
 
@@ -21,5 +22,15 @@ void initialiseFields(double *collideField, double *streamField,int *flagField, 
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
 void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag);
+
+/* Initializes the MPI Porcess, also obtains the total number of ranks and the process assigned */
+void initializeMPI(int * my_rank,int *number_of_ranks,int argc, char *argv[]);
+
+/* Obtain the position in the D dimentional space my_pos, given the process number rank amd the number of process per dimention (Proc)*/
+void get_rank_pos(int * my_pos, int rank, int *Proc);
+
+/* Obtain the size of the prtion assigned to the procces my_lengths, using the length of the cavity xlength, the position on each dimetion y the total number of processes per dimention*/
+void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc);
+
 #endif
 

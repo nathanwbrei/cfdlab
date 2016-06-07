@@ -105,9 +105,9 @@ void  errhandler( int nLine, const char *szFile, const char *szString );
  */
 #define READ_STRING( szFileName, VarName) read_string( szFileName, #VarName,  (VarName) )
 
-void read_string( const char* szFilename, const char* szName, char*  sValue);
-void read_int   ( const char* szFilename, const char* szName, int*    nValue);
-void read_double( const char* szFilename, const char* szName, double*  Value);
+void read_string( const char* szFilename, const char* szName, char*  sValue, int my_rank);
+void read_int   ( const char* szFilename, const char* szName, int*    nValue, int my_rank);
+void read_double( const char* szFilename, const char* szName, double*  Value, int my_rank);
 
 
 /**

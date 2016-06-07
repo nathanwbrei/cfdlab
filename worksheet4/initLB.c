@@ -1,7 +1,7 @@
 #include "helper.h"
 #include "initLB.h"
 #include "LBDefinitions.h"
-
+#include "mpi.h"
 
 /**
  * Reads the parameters for the lid driven cavity scenario from a config file.
@@ -15,7 +15,8 @@ int readParameters(
     int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
     int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
     char *argv[],                       /* argv[1] shall contain the path to the config file */
-    int *Proc                           /* Array whit the number of processors per dimention */
+    int *Proc,                          /* Array whit the number of processors per dimention */
+    int my_rank                         /* Indicates the process number to allow print, if is not pararlel here goes a 0*/
     ){
 
     const char *szFileName = argv[1];
@@ -24,16 +25,16 @@ int readParameters(
         ERROR("number of arguments is incorrect");
     }
 
-    read_int(szFileName, "xlength", xlength);
-    read_double(szFileName,"tau", tau);
-    read_double(szFileName, "characteristicvelocity_x", &velocityWall[0]);
-    read_double(szFileName, "characteristicvelocity_y", &velocityWall[1]);
-    read_double(szFileName, "characteristicvelocity_z", &velocityWall[2]);
-    read_int(szFileName, "timesteps", timesteps);
-    read_int(szFileName, "vtkoutput", timestepsPerPlotting);
-    read_int(szFileName, "iProc", &Proc[0]);
-    read_int(szFileName, "jProc", &Proc[1]);
-    read_int(szFileName, "kProc", &Proc[2]);
+    read_int(szFileName, "xlength", xlength, my_rank);
+    read_double(szFileName,"tau", tau, my_rank);
+    read_double(szFileName, "characteristicvelocity_x", &velocityWall[0], my_rank);
+    read_double(szFileName, "characteristicvelocity_y", &velocityWall[1], my_rank);
+    read_double(szFileName, "characteristicvelocity_z", &velocityWall[2], my_rank);
+    read_int(szFileName, "timesteps", timesteps, my_rank);
+    read_int(szFileName, "vtkoutput", timestepsPerPlotting, my_rank);
+    read_int(szFileName, "iProc", &Proc[0], my_rank);
+    read_int(szFileName, "jProc", &Proc[1], my_rank);
+    read_int(szFileName, "kProc", &Proc[2], my_rank);
 
     return 0;
 }
@@ -89,3 +90,26 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     }
 }
 
+void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
+    MPI_Init( &argc, &argv );
+    MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
+    MPI_Comm_rank( MPI_COMM_WORLD, my_rank );
+}
+
+void get_rank_pos(int * my_pos, int rank, int *Proc){
+    int i;
+    int aux_rank = rank;
+    for ( i = 0; i < D; ++i){
+        my_pos[i] = aux_rank % Proc[i];
+        aux_rank = (aux_rank- my_pos[i]) / Proc[i] ;
+    }
+}
+
+void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
+    int i;
+    for (i = 0; i < D; ++i){
+        my_lengths[i] = (int) (1.0*xlength / Proc[i]);  /*Divides the length of the cavity betwen the number of sections in that dimention (takes the floor)*/
+        if ((xlength % Proc[i]) > my_pos[i])    /*If the number of sections is not a divisor of the number of cells then an extra cell is assigned to the first processes*/
+            my_lengths[i] ++;
+    }
+}

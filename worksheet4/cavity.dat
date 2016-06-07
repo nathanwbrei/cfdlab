@@ -1,4 +1,4 @@
-xlength                     50
+xlength                     49
 
 tau                         2
 
@@ -12,4 +12,4 @@ vtkoutput                   10
 
 iProc						2
 jProc						2
-kProc						2
+kProc						3
