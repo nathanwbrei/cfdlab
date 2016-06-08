@@ -17,7 +17,7 @@ int readParameters(
     char *argv[],                       /* argv[1] shall contain the path to the config file */
     int *Proc,                          /* Array whit the number of processors per dimention */
     int my_rank                         /* Indicates the process number to allow print, if is not pararlel here goes a 0*/
-    ){
+    ) {
 
     const char *szFileName = argv[1];
 
@@ -50,11 +50,26 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
     }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int * length){
-    int x, y, z;
-    int node[3];
+    void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * my_pos, int* Proc) {
+    int x, y, z, i;
+    int node[3], walls[6];
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+
+    for (i = 0; i < D; ++i) {
+        if (my_pos[i] == 0)
+            walls[2 * i] = NOSLIP;
+        else
+            walls[2 * i] = PARALLEL;
+        if (my_pos[i] == (Proc[i] - 1))
+            walls[2 * i + 1] = NOSLIP;
+        else
+            walls[2 * i + 1] = PARALLEL;
+    }
+    
+    if(my_pos[3] == (Proc[3] - 1)) {
+        walls[5] = MOVING_WALL;
+    }
 
     /* Definition of the fields */
     /* z = 0 */
@@ -63,7 +78,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         node[1] = y;
         for (x = 0; x < n[0]; ++x) {
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[4]);
         }
     }
 
@@ -75,31 +90,31 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
         for (x = 0; x < n[0]; ++x) {
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[2]);
         }
 
-        for (y = 1; y <= length; ++y){
+        for (y = 1; y <= length[1]; ++y){
             node[1] = y;
 
             /* x = 0 */
             node[0] = 0;
-            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[0]);
 
             for (x = 1; x <= length[0]; ++x){
                 node[0] = x;
                 initialiseCell(collideField, streamField, flagField, n, node, FLUID);
             }
             
-            /* x = length+1 */
+            /* x = length+1 */ 
             node[0] = length[0] + 1;;
-            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[1]);
         }
     
         /* y = length+1; */
         node[1] = length[1] + 1;
         for (x = 0; x < n[0]; ++x){
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[3]);
         }
     }
 
@@ -109,7 +124,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         node[1] = y;
         for (x = 0; x < n[0]; ++x){
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, n, node, MOVING_WALL);
+            initialiseCell(collideField, streamField, flagField, n, node, walls[5]);
         }
     }
 }
