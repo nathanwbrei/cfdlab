@@ -58,34 +58,34 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     z = 0;
     for (y = 0; y < length_tot; ++y){
         for (x = 0; x < length_tot; ++x){			
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
         }
     }
     for (z = 1; z <= xlength; ++z){
         y = 0;
         for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
         }
 
         for (y = 1; y <= xlength; ++y){
             x = 0;
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
             for (x = 1; x <= xlength; ++x){				
-                initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 0);
+                initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, FLUID);
             }
             x = xlength+1;
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
         }
     
         y = xlength+1;
         for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 1);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
         }
     }
     z = xlength+1;
     for (y = 0; y < length_tot; ++y){
         for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, 2);
+            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, MOVING_WALL);
         }
     }
 }

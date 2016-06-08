@@ -21,5 +21,9 @@ static const double C_S = 1.0 / 1.732050807568877;
 /* C_S * C_S */
 static const double C_S_2 = 1.0 / 3;
 
+static const int FLUID = 0;
+static const int NOSLIP = 1;
+static const int MOVING_WALL = 2;
+
 #endif
 
