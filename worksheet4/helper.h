@@ -17,8 +17,16 @@
 
 #define FREE_ARG char*
 
-static inline double * getEl(double * array, int x, int y, int z, int i, int n) {
-    return array + Q * (z * n * n + y * n + x) + i;
+/* Returns pointer to the i-th lattice of provided point */
+static inline double * getEl(double * array, int * node, int i, int * n) {
+    return array + Q * (node[2] * n[1] * n[0] + node[1] * n[0] + node[0]) + i;
+}
+
+/**
+ * Return pointer to (x,y,z) element
+ */
+static inline int * getFlag(int * array, int * node, int * n) {
+    return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 
 /**

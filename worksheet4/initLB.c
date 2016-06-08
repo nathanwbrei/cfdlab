@@ -39,57 +39,80 @@ int readParameters(
     return 0;
 }
 
-void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag) {	
+void initialiseCell(double *collideField, double *streamField, int *flagField, int * n, int * node, int flag) {	
     int i;
 
-    flagField[z * length_tot * length_tot + y * length_tot + x] = flag;
+    *getFlag(flagField, node, n) = flag;
 
-        for (i = 0; i < Q; ++i){
-            *getEl(streamField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
-            *getEl(collideField, x, y, z, i, length_tot) = LATTICEWEIGHTS[i];
-        }
+    for (i = 0; i < Q; ++i){
+        *getEl(streamField, node, i, n) = LATTICEWEIGHTS[i];
+        *getEl(collideField, node, i, n) = LATTICEWEIGHTS[i];
+    }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
-    int x, y, z, length_tot;
-    length_tot = xlength + 2;
+void initialiseFields(double *collideField, double *streamField, int *flagField, int * length){
+    int x, y, z;
+    int node[3];
+
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     /* Definition of the fields */
-    z = 0;
-    for (y = 0; y < length_tot; ++y){
-        for (x = 0; x < length_tot; ++x){			
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
+    /* z = 0 */
+    node[2] = 0;
+    for (y = 0; y < n[1]; ++y){
+        node[1] = y;
+        for (x = 0; x < n[0]; ++x) {
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
         }
     }
-    for (z = 1; z <= xlength; ++z){
-        y = 0;
-        for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
+
+    for (z = 1; z <= length[2]; ++z){
+        node[2] = z;
+
+        /* y = 0 */
+        node[1] = 0;
+
+        for (x = 0; x < n[0]; ++x) {
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
         }
 
-        for (y = 1; y <= xlength; ++y){
-            x = 0;
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
-            for (x = 1; x <= xlength; ++x){				
-                initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, FLUID);
+        for (y = 1; y <= length; ++y){
+            node[1] = y;
+
+            /* x = 0 */
+            node[0] = 0;
+            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
+
+            for (x = 1; x <= length[0]; ++x){
+                node[0] = x;
+                initialiseCell(collideField, streamField, flagField, n, node, FLUID);
             }
-            x = xlength+1;
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
+            
+            /* x = length+1 */
+            node[0] = length[0] + 1;;
+            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
         }
     
-        y = xlength+1;
-        for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, NOSLIP);
+        /* y = length+1; */
+        node[1] = length[1] + 1;
+        for (x = 0; x < n[0]; ++x){
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, n, node, NOSLIP);
         }
     }
-    z = xlength+1;
-    for (y = 0; y < length_tot; ++y){
-        for (x = 0; x < length_tot; ++x){
-            initialiseCell(collideField, streamField, flagField, length_tot, x, y, z, MOVING_WALL);
+
+    /* z = length + 1 */
+    node[2] = length[2] + 1;
+    for (y = 0; y < n[1]; ++y){
+        node[1] = y;
+        for (x = 0; x < n[0]; ++x){
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, n, node, MOVING_WALL);
         }
     }
 }
-
 
 void get_rank_pos(int * my_pos, int rank, int *Proc){
     int i;

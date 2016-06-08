@@ -13,7 +13,7 @@ void computePostCollisionDistributions(double *currentCell, const double * const
     }
 }
 
-void doCollision(double *collideField, int *flagField,const double * const tau,int xlength){
+void doCollision(double *collideField, int *flagField, const double * const tau, int * length){
     /* 
      * For each inner grid cell in collideField, compute the post-collide
      * distribution
@@ -26,13 +26,19 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
     double * currentCell;
 
     int x,y,z;
-    int n = xlength + 2;
+    int node[3];
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     // Loop over inner cells: compare to streaming.c
-    for (z=1; z<=xlength; z++) {
-        for (y=1; y<=xlength; y++) {
-            for (x=1; x<=xlength; x++) {
-                currentCell = getEl(collideField, x, y, z, 0, n);
+    for (z = 1; z <= length[2]; z++) {
+        node[2] = z;
+        for (y = 1; y <= length[1]; y++) {
+            node[1] = y;
+            for (x = 1; x <= length[0]; x++) {
+                node[0] = x;
+
+                currentCell = getEl(collideField, node, 0, n);
+
                 computeDensity(currentCell, &density);
                 computeVelocity(currentCell, &density, velocity);
                 computeFeq(&density, velocity, feq);

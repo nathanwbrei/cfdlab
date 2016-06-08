@@ -3,68 +3,86 @@
 #include "helper.h"
 #include "computeCellValues.h"
 
-void boundaryCell(double * collideField, int* flagField, const double * const wallVelocity, int xlength, int x, int y, int z){
+void boundaryCell(double * collideField, int* flagField, const double * const wallVelocity, int * n, int * node){
     int i, coord_dest[3];
     double * cell_ptr;
     double dotProd;
     double density;
-    int length_tot = xlength + 2;
 
-    for (i = 0; i < Q; i++){
-        coord_dest[0] = x + LATTICEVELOCITIES[i][0];
-        coord_dest[1] = y + LATTICEVELOCITIES[i][1];
-        coord_dest[2] = z + LATTICEVELOCITIES[i][2];
+    for (i = 0; i < Q; i++) {
+        coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
+        coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
+        coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
     
-        if (coord_dest[0] > 0 && coord_dest[0] <= xlength &&
-            coord_dest[1] > 0 && coord_dest[1] <= xlength &&
-            coord_dest[2] > 0 && coord_dest[2] <= xlength) {
+        if (coord_dest[0] > 0 && coord_dest[0] < n[0] &&
+            coord_dest[1] > 0 && coord_dest[1] < n[1] &&
+            coord_dest[2] > 0 && coord_dest[2] < n[2]) {
       
-            cell_ptr = getEl(collideField, x, y, z, i, length_tot);
-            *cell_ptr= *getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 18-i, length_tot);
+            cell_ptr = getEl(collideField, node , i, n);
+            *cell_ptr= *getEl(collideField, coord_dest, 18-i, n);
 
-            if (flagField[length_tot*length_tot*z+length_tot*y+x] == MOVING_WALL) {
+            if (*getFlag(flagField, node, n) == MOVING_WALL) {
                 dotProd = 0;
+                
                 for (int j = 0; j < 3; ++j)	{
                     dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];
                 }	
         
-                computeDensity(getEl(collideField, coord_dest[0], coord_dest[1], coord_dest[2], 0, length_tot), &density);
-                *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / (C_S*C_S);
+                computeDensity(getEl(collideField, coord_dest, 0, n), &density);
+                *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / C_S_2;
             }
         }
     }
 }
 
-void treatBoundary(double *collideField, int *flagField, const double * const wallVelocity, int xlength){
+void treatBoundary(double *collideField, int *flagField, const double * const wallVelocity, int * length){
     int x, y, z;
-    int n = xlength + 2;
+    int node[3];
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-    z = 0;
-    for (y = 0; y < n; ++y){
-        for (x = 0; x < n; ++x){           	        
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
+    /* z = 0 */
+    node[2] = 0;
+    for (y = 0; y < n[1]; ++y){
+        node[1] = y;
+        for (x = 0; x < n[0]; ++x){           	        
+            node[0] = x;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
         }
     }
-    for (z = 1; z <= xlength; ++z){
-        y = 0;
-        for (x = 0; x < n; ++x){
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
-        }       
-        for (y = 1; y <= xlength; ++y){
-            x = 0;
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
-            x = xlength+1;
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
+
+    for (z = 1; z <= length[2]; ++z){
+        /* y = 0 */
+        node[1] = 0;
+        for (x = 0; x < n[0]; ++x){
+            node[0] = x;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
         }
-        y = xlength+1;
-        for (x = 0; x < n; ++x){
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
+
+        for (y = 1; y <= length[1]; ++y){
+            node[1] = y;
+            // x = 0;
+            node[0] = 0;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
+            // x = length[0] + 1;
+            node[0] = length[0] + 1;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
+        }
+
+        y = length[1] + 1;
+        node[1] = y;
+        for (x = 0; x < n[0]; ++x){
+            node[0] = x;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
         }
     }
-    z = xlength+1;
-    for (y = 0; y < n; ++y){
-        for (x = 0; x < n; ++x){
-            boundaryCell(collideField, flagField, wallVelocity, xlength, x, y, z);
+
+    /* z = length[2] + 1; */
+    node[2] = length[2] + 1;
+    for (y = 0; y < n[1]; ++y){
+        node[1] = y;
+        for (x = 0; x < n[0]; ++x){
+            node[0] = x;
+            boundaryCell(collideField, flagField, wallVelocity, n, node);
         }
     }
 }

@@ -18,10 +18,10 @@ int readParameters(
 
 
 /* initialises the particle distribution functions and the flagfield */
-void initialiseFields(double *collideField, double *streamField,int *flagField, int xlength);
+void initialiseFields(double *collideField, double *streamField,int *flagField, int * length);
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
-void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag);
+void initialiseCell(double *collideField, double *streamField, int *flagField, int * n, int * node, int flag);
 
 /* Obtain the position in the D dimentional space my_pos, given the process number rank amd the number of process per dimention (Proc)*/
 void get_rank_pos(int * my_pos, int rank, int *Proc);
