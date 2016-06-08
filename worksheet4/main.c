@@ -12,6 +12,35 @@
 #include "boundary.h"
 #include "LBDefinitions.h"
 
+
+
+// TODO: Move these to their own file
+
+typedef enum {LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK} face_t;
+
+
+void extract(face_t face, double * field, double * sendBuffer) {
+    // Copy the cells of `field` along `face` into corresponding slot of `sendBuffer`
+}
+
+void swap(face_t face, double * sendBuffer, double * receiveBuffer) {
+    // MPI send to neighboring process, block until receives 
+    // TODO: Needs to know who its neighbors are / whether they exist
+}
+
+void inject(face_t face, double * receiveBuffer, double * field) {
+    // Copy the contents of the received buffer into the field along the corresponding face
+}
+
+void exchange(face_t face, double * field, double * sendBuffer, double * receiveBuffer) {
+
+    extract(face, sendBuffer, field);  
+    swap(face, sendBuffer, receiveBuffer);
+    inject(face, field, receiveBuffer);
+}
+
+
+
 int main(int argc, char *argv[]){
     int xlength, timesteps, timestepsPerPlotting;
     int my_rank, number_of_ranks, Proc[3], my_pos[3], my_lengths[3];
@@ -59,10 +88,20 @@ int main(int argc, char *argv[]){
 
         start_time = clock();  // Start the timer for the lattice updates
 
+        exchange(RIGHT, collideField, sendBuffer, receiveBuffer);
+        exchange(LEFT, collideField, sendBuffer, receiveBuffer);
+        exchange(BACK, collideField, sendBuffer, receiveBuffer);
+        exchange(FRONT, collideField, sendBuffer, receiveBuffer);
+        exchange(BOTTOM, collideField, sendBuffer, receiveBuffer);
+        exchange(TOP, collideField, sendBuffer, receiveBuffer);
+        // TODO: Is this ordering correct? Remember that we send the RIGHT face to the right
+
         doStreaming(collideField, streamField, flagField, xlength);
-        swap = collideField;
+
+        double * swap = collideField;
         collideField = streamField;
         streamField = swap;
+
         doCollision(collideField,flagField,&tau,xlength);
         treatBoundary(collideField, flagField, velocityWall, xlength);
 
