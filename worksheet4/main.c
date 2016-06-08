@@ -5,7 +5,6 @@
 #include <time.h>
 #include <mpi.h>
 
-
 #include "collision.h"
 #include "streaming.h"
 #include "initLB.h"
@@ -23,7 +22,6 @@ int main(int argc, char *argv[]){
     double * sendBuffer[6]; /* [0:left,1:right,2:top,3:bottom,4:front,5:back] */
     double * readBuffer[6];
 
-    
     initializeMPI(&my_rank, &number_of_ranks, argc, argv);
     /* initializeMPI */
     //MPI_Init( &argc, &argv );
@@ -39,8 +37,9 @@ int main(int argc, char *argv[]){
 
     get_rank_pos(my_pos, my_rank, Proc);
     get_my_lengths(my_pos, xlength, my_lengths, Proc);
+    initBuffers(readBuffer, sendBuffer, my_lengths);
 
-    MPI_Barrier(MPI_COMM_WORLD ); /* Barrier to get order in the output, just for thebug */
+    MPI_Barrier(MPI_COMM_WORLD); /* Barrier to get order in the output, just for thebug */
     printf("Debug: Process %2d: Position x, y, z %d %d %d ; lenghts %d %d %d \n", my_rank, my_pos[0], my_pos[1], my_pos[2], my_lengths[0], my_lengths[1], my_lengths[2]);
 
     double *collideField = (double *) malloc((size_t)(Q*(my_lengths[0]+2)*(my_lengths[1]+2)*(my_lengths[2]+2)) * sizeof(double));
@@ -49,14 +48,13 @@ int main(int argc, char *argv[]){
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
-    } 
+    }
 
+    initialiseFields(collideField, streamField, flagField, my_lengths, my_pos, Proc);
 
-/*
-    initialiseFields(collideField, streamField, flagField, my_lengths);
+    treatBoundary(collideField, flagField, velocityWall, my_lengths);
 
-    treatBoundary(collideField, flagField, velocityWall, xlength);
-
+    /*
     for (t = 0; t < timesteps; t++) {
 
         start_time = clock();  // Start the timer for the lattice updates

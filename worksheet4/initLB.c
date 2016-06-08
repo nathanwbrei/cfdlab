@@ -146,3 +146,23 @@ void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
             my_lengths[i] ++;
     }
 }
+
+void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+
+    /* [0:left,1:right,2:top,3:bottom,4:front,5:back] */
+    readBuffer[0] = (double *)malloc(sizeof(double) * n[0] * n[2] * Q);
+    readBuffer[1] = (double *)malloc(sizeof(double) * n[0] * n[2] * Q);
+    readBuffer[2] = (double *)malloc(sizeof(double) * n[0] * n[1] * Q);
+    readBuffer[3] = (double *)malloc(sizeof(double) * n[0] * n[1] * Q);
+    readBuffer[4] = (double *)malloc(sizeof(double) * n[1] * n[2] * Q);
+    readBuffer[5] = (double *)malloc(sizeof(double) * n[1] * n[2] * Q);
+    
+    /* [0:left,1:right,2:top,3:bottom,4:front,5:back] */
+    sendBuffer[0] = (double *)malloc(sizeof(double) * n[0] * n[2] * Q);
+    sendBuffer[1] = (double *)malloc(sizeof(double) * n[0] * n[2] * Q);
+    sendBuffer[2] = (double *)malloc(sizeof(double) * n[0] * n[1] * Q);
+    sendBuffer[3] = (double *)malloc(sizeof(double) * n[0] * n[1] * Q);
+    sendBuffer[4] = (double *)malloc(sizeof(double) * n[1] * n[2] * Q);
+    sendBuffer[5] = (double *)malloc(sizeof(double) * n[1] * n[2] * Q);
+}
