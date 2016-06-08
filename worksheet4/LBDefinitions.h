@@ -1,5 +1,3 @@
-#include <math.h>
-
 #ifndef _LBDEFINITIONS_H_
 #define _LBDEFINITIONS_H_
 
@@ -20,6 +18,8 @@ static const double LATTICEWEIGHTS[Q] = {
 
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const double C_S = 1.0 / 1.732050807568877;
+/* C_S * C_S */
+static const double C_S_2 = 1.0 / 3;
 
 #endif
 
