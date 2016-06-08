@@ -18,4 +18,7 @@ void Programm_Sync(char *txt);
 void Programm_Stop(char *txt);
 /* all processes will produce a text output, be synchronized and finished */
 
+void initializeMPI(int * my_rank,int *number_of_ranks,int argc, char *argv[]);
+/* Initializes the MPI Porcess, also obtains the total number of ranks and the process assigned */
+
 #endif

@@ -43,3 +43,9 @@ void Programm_Stop(char *txt)
    MPI_Finalize();
    exit(1);
 }
+
+void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
+    MPI_Init( &argc, &argv );
+    MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
+    MPI_Comm_rank( MPI_COMM_WORLD, my_rank );
+}

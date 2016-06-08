@@ -23,9 +23,6 @@ void initialiseFields(double *collideField, double *streamField,int *flagField, 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
 void initialiseCell(double *collideField, double *streamField, int *flagField, int length_tot, int x, int y, int z, int flag);
 
-/* Initializes the MPI Porcess, also obtains the total number of ranks and the process assigned */
-void initializeMPI(int * my_rank,int *number_of_ranks,int argc, char *argv[]);
-
 /* Obtain the position in the D dimentional space my_pos, given the process number rank amd the number of process per dimention (Proc)*/
 void get_rank_pos(int * my_pos, int rank, int *Proc);
 

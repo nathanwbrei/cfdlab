@@ -90,11 +90,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     }
 }
 
-void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
-    MPI_Init( &argc, &argv );
-    MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
-    MPI_Comm_rank( MPI_COMM_WORLD, my_rank );
-}
 
 void get_rank_pos(int * my_pos, int rank, int *Proc){
     int i;
