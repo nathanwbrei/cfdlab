@@ -50,7 +50,7 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
     }
 }
 
-    void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * my_pos, int* Proc) {
+void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * my_pos, int* Proc) {
     int x, y, z, i;
     int node[3], walls[6];
 
@@ -132,9 +132,10 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 void get_rank_pos(int * my_pos, int rank, int *Proc){
     int i;
     int aux_rank = rank;
-    for ( i = 0; i < D; ++i){
+
+    for (i = 0; i < D; ++i){
         my_pos[i] = aux_rank % Proc[i];
-        aux_rank = (aux_rank- my_pos[i]) / Proc[i] ;
+        aux_rank = (aux_rank - my_pos[i]) / Proc[i];
     }
 }
 
