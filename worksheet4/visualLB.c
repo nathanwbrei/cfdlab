@@ -2,7 +2,7 @@
 #include "computeCellValues.h"
 #include "helper.h"
 
-void write_vtkFile(const char *szProblem, int t, int * length, double * collideField) {
+void write_vtkFile(const char *szProblem, int t, int * length, double * collideField, int * my_pos, int my_rank) {
     char szFileName[80];
     FILE *fp=NULL;
  
@@ -13,7 +13,7 @@ void write_vtkFile(const char *szProblem, int t, int * length, double * collideF
     double density;
     double * el = NULL;
 
-    sprintf( szFileName, "%s.%i.vtk", szProblem, t );
+    sprintf( szFileName, "%s_%i.%i.vtk", szProblem, my_rank, t);
     fp = fopen( szFileName, "w");
     if( fp == NULL )		       
     {
@@ -24,7 +24,7 @@ void write_vtkFile(const char *szProblem, int t, int * length, double * collideF
     }
 
     write_vtkHeader(fp, length);
-    write_vtkPointCoordinates(fp, length);
+    write_vtkPointCoordinates(fp, length, my_pos);
 
     fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
   
@@ -92,14 +92,14 @@ void write_vtkHeader( FILE *fp, int * length) {
 }
 
 
-void write_vtkPointCoordinates(FILE *fp, int * length) {
+void write_vtkPointCoordinates(FILE *fp, int * length, int * my_pos) {
     int originX = 0;
     int originY = 0;
     int originZ = 0;
 
-    int x = 0;
-    int y = 0;
-    int z = 0;
+    int x = my_pos[0] * length[0];
+    int y = my_pos[1] * length[1];
+    int z = my_pos[2] * length[2];
 
     for(z = 1; z  <= length[2]; z++) {
         for(y = 1; y  <= length[1]; y++) {
@@ -111,7 +111,13 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
     }
 }
 
-void writeVtkOutput(double * collideField, const int * const flagField, const char * filename, unsigned int t, int * length) {
-    write_vtkFile(filename, t, length, collideField);
+void writeVtkOutput(double * collideField,
+                    const int * const flagField,
+                    const char * filename,
+                    unsigned int t,
+                    int * length,
+                    int * my_pos,
+                    int my_rank) {
+    write_vtkFile(filename, t, length, collideField, my_pos, my_rank);
 }
 

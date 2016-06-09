@@ -82,7 +82,8 @@ int main(int argc, char *argv[]){
     initialiseFields(collideField, streamField, flagField, my_lengths, my_pos, Proc);
 
     treatBoundary(collideField, flagField, velocityWall, my_lengths);
-
+    
+    writeVtkOutput(collideField, flagField, argv[1], t, my_lengths, my_pos, my_rank);
     /*
     for (t = 0; t < timesteps; t++) {
 
