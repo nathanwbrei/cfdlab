@@ -31,5 +31,7 @@ void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc);
 
 void initBuffers(double ** readBuffer, double ** sendBuffer, int * length);
 
+int get_rank(int px, int py, int pz,  int * Proc);
+
 #endif
 

@@ -1,4 +1,4 @@
-xlength                     64
+xlength                     4
 
 tau                         0.596
 
@@ -6,10 +6,10 @@ characteristicvelocity_x    0.05
 characteristicvelocity_y    0
 characteristicvelocity_z    0
 
-timesteps                   100
+timesteps                   1
 
-vtkoutput                   10
+vtkoutput                   1
 
-iProc						1
+iProc						2
 jProc						1
 kProc						1
