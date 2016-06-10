@@ -140,6 +140,10 @@ void get_rank_pos(int * my_pos, int rank, int *Proc){
     }
 }
 
+int get_rank(int * my_pos, int * Proc) {
+    return my_pos[2] * Proc[1] * Proc[0] + my_pos[1] * Proc[0] + my_pos[0];
+}
+
 void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
     int i;
     for (i = 0; i < D; ++i){
