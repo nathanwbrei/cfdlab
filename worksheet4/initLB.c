@@ -66,8 +66,9 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         else
             walls[2 * i + 1] = PARALLEL;
     }
-    
-    if(my_pos[3] == (Proc[3] - 1)) {
+
+    if(my_pos[2] == (Proc[2] - 1)) {
+        printf("It is the wall!\n");
         walls[5] = MOVING_WALL;
     }
 

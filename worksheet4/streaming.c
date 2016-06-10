@@ -9,18 +9,21 @@ void doStreaming(double * collideField, double * streamField, int * flagField, i
 
 
     /* Loop for inner cells */
-    for (z = 1; z <= length[2]; z++) {
-        for (y = 1; y <= length[1]; y++) {
-            for (x = 1; x <= length[0]; x++) {
-                for (i = 0; i < Q; i++) {
-                    source_node[0] = x - LATTICEVELOCITIES[i][0];
-                    source_node[1] = y - LATTICEVELOCITIES[i][1];
-                    source_node[2] = z - LATTICEVELOCITIES[i][2];
+     for (z = 1; z <= length[2]; z++) {
+         node[2] = z;
+         for (y = 1; y <= length[1]; y++) {
+             node[1] = y;
+             for (x = 1; x <= length[0]; x++) {
+                 node[0] = x;
+                 for (i = 0; i < Q; i++) {
+                     source_node[0] = x - LATTICEVELOCITIES[i][0];
+                     source_node[1] = y - LATTICEVELOCITIES[i][1];
+                     source_node[2] = z - LATTICEVELOCITIES[i][2];
 
-                    *getEl(streamField, node, i, n) = *getEl(collideField, source_node, i, n);
-                }
-            }
-        }
-    }
+                     *getEl(streamField, node, i, n) = *getEl(collideField, source_node, i, n);
+                 }
+             }
+         }
+     }
 }
 
