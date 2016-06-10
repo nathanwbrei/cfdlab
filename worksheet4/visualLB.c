@@ -93,15 +93,13 @@ void write_vtkHeader( FILE *fp, int * length) {
 
 
 void write_vtkPointCoordinates(FILE *fp, int * length, int * my_pos) {
-    int originX = 0;
-    int originY = 0;
-    int originZ = 0;
+    int originX = my_pos[0] * length[0];
+    int originY = my_pos[1] * length[1];
+    int originZ = my_pos[2] * length[2];
 
-    int x = my_pos[0] * length[0];
-    int y = my_pos[1] * length[1];
-    int z = my_pos[2] * length[2];
+    int x, y, z;
 
-    for(z = 1; z  <= length[2]; z++) {
+    for(z = 1; z <= length[2]; z++) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[0]; x++) {
                 /* dx = dy = dz = 1 */
