@@ -151,7 +151,6 @@ void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
 
 void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
-    int q = Q;
 
     /* TODO think about sizes carefully */
     /* LEFT: YZ */

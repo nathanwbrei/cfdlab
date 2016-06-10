@@ -16,121 +16,108 @@
 
 typedef enum {LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK} face_t;
 
-double * getBufferEl(double * buffer, int m, int n, int i, int * length) {
-    return buffer + n * length[0] * Q + m * Q + i;
+double * getBufferEl(double * buffer, int k, int l, int i, int n_k) {
+    return buffer + l * n_k * q + k * q + i;
 }
 
-void extract_z(double * field,  double ** sendBuffer, int * node, int * length, int * n) {
-    int x, y, i, bufferLength[2];
+void extract_z(double * field,  double ** sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int x, y, i, index;
 
-    bufferLength[0] = length[0];
-    bufferLength[1] = length[1];
-
-    for (y = 1; y <= length[1]; y++) {
+    for (y = 1; y <= bufferLength[1]; y++) {
         node[1] = y;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
-            for (i = 1; i < Q; i++) {
-                *getBufferEl(sendBuffer[0], x, y, i, bufferLength) = *getEl(field, node, i, n);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getBufferEl(sendBuffer[0], x, y, i, n[0]) = *getEl(field, node, index, n);
             }
         }
     }
 }
 
-void extract_y(double * field,  double ** sendBuffer, int * node, int * length, int * n) {
-    int x, z, i, bufferLength[2];
+void extract_y(double * field,  double ** sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int x, z, i, index;
 
-    bufferLength[0] = length[0];
-    bufferLength[1] = length[2];
- 
     for (z = 0; z < n[2]; z++) {
         node[2] = z;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
-            for (i = 1; i < Q; i++) {
-                *getBufferEl(sendBuffer[0], x, z, i, bufferLength) = *getEl(field, node, i, n);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getBufferEl(sendBuffer[0], x, z, i, n[0]) = *getEl(field, node, index, n);
             }
         }
     }
 }
 
-void extract_x(double * field,  double ** sendBuffer, int * node, int * length, int * n) {
-    int y, z, i, bufferLength[2];
+void extract_x(double * field,  double ** sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int y, z, i, index;
 
-    bufferLength[0] = length[1];
-    bufferLength[1] = length[2];
- 
-    for (z = 1; z <= length[2]; z++) {
+    for (z = 1; z <= bufferLength[1]; z++) {
         node[2] = z;
-        for (y = 1; y <= length[1]; y++) {
+        for (y = 1; y <= bufferLength[0]; y++) {
             node[1] = y;
-            for (i = 1; i < Q; i++) {
-                *getBufferEl(sendBuffer[0], y, z, i, bufferLength) = *getEl(field, node, i, n);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getBufferEl(sendBuffer[0], y, z, i, n[1]) = *getEl(field, node, index, n);
             }
         }
     }
 }
 
-void swap(face_t face, double ** sendBuffer, double ** readBuffer) {
+void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int destination) {
     // MPI send to neighboring process, block until receives 
     // TODO: Needs to know who its neighbors are / whether they exist
-    readBuffer = sendBuffer;
+
+    MPI_Status status;
+
+    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD);
+    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD, &status);
 }
 
-void inject_z(double * field,  double ** readBuffer, int * node, int * length, int * n) {
-    int x, y, i, bufferLength[2];
+void inject_z(double * field,  double ** readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int x, y, i, index;
 
-    bufferLength[0] = length[0];
-    bufferLength[1] = length[1];
- 
-    for (y = 1; y <= length[1]; y++) {
+    for (y = 1; y <= bufferLength[1]; y++) {
         node[1] = y;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
-            for (i = 1; i < Q; i++) {
-                *getEl(field, node, i, n) = *getBufferEl(readBuffer[0], x, y, i, bufferLength);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getEl(field, node, index, n) = *getBufferEl(readBuffer[0], x, y, i, n[0]);
             }
         }
     }
 }
 
-void inject_y(double * field,  double ** readBuffer, int * node, int * length, int * n) {
-    int x, z, i, bufferLength[2];
+void inject_y(double * field,  double ** readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int x, z, i, index;
 
-    bufferLength[0] = length[0];
-    bufferLength[1] = length[2];
- 
     for (z = 0; z < n[2]; z++) {
         node[2] = z;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
-            for (i = 1; i < Q; i++) {
-                *getEl(field, node, i, n) = *getBufferEl(readBuffer[0], x, z, i, bufferLength);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getEl(field, node, index, n) = *getBufferEl(readBuffer[0], x, z, i, n[0]);
             }
         }
     }
 }
 
-void inject_x(double * field,  double ** readBuffer, int * node, int * length, int * n) {
-    int y, z, i, bufferLength[2];
+void inject_x(double * field,  double ** readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+    int y, z, i, index;
 
-    bufferLength[0] = length[1];
-    bufferLength[1] = length[2];
- 
-    for (z = 1; z <= length[2]; z++) {
+    for (z = 1; z <= bufferLength[1]; z++) {
         node[2] = z;
-        for (y = 1; y <= length[1]; y++) {
+        for (y = 1; y <= bufferLength[0]; y++) {
             node[1] = y;
-            for (i = 1; i < Q; i++) {
-                *getEl(field, node, i, n) = *getBufferEl(readBuffer[0], y, z, i, bufferLength);
+            for (i = 1; i < q; i++) {
+                index = lattices[i];
+                *getEl(field, node, index, n) = *getBufferEl(readBuffer[0], y, z, i, n[1]);
             }
         }
     }
-}
-
-void inject(face_t face, double * field, double ** readBuffer, int * length, int * my_pos, int * Proc) {
-    // Copy the contents of the received buffer into the field along the corresponding face
-
 }
 
 void exchange(face_t face,
@@ -142,65 +129,93 @@ void exchange(face_t face,
               int * Proc) {
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     int node[3];
+    int bufferLength[2];
+    int count;
+    int destination;
 
     if (face == LEFT) {
         if (my_pos[0] != 0) {
+            bufferLength[0] = length[1];
+            bufferLength[1] = length[2];
+            count = n[1] * n[2];
+ 
             node[0] = 1;
-            extract_x(field, sendBuffer, node, length, n);
-            swap(face, sendBuffer, readBuffer);
+            extract_x(field, sendBuffer, left_lattices, bufferLength, node, n);
+            
+            swap(face, sendBuffer, readBuffer, count, destination);
+
             node[0] = 0;
-            inject_x(field, readBuffer, node, length, n);
+            inject_x(field, readBuffer, left_lattices, bufferLength, node, n);
        }
     } else if (face == RIGHT) {
         if (my_pos[0] != Proc[0] - 1) {
-
+            bufferLength[0] = length[1];
+            bufferLength[1] = length[2];
+            count = n[1] * n[2];
+ 
             node[0] = length[0];
-            extract_x(field, sendBuffer, node, length, n);
+            extract_x(field, sendBuffer, right_lattices, bufferLength, node, n);
 
-            swap(face, sendBuffer, readBuffer);
+            swap(face, sendBuffer, readBuffer, count, destination);
 
             node[0] = length[0] + 1;
-            inject_x(field, readBuffer, node, length, n);
+            inject_x(field, readBuffer, right_lattices, bufferLength, node, n);
         }
     } else if (face == TOP) {
         if (my_pos[2] != Proc[2] - 1) {
+            bufferLength[0] = length[0];
+            bufferLength[1] = length[1];
+            count = n[0] * n[1];
+
             node[2] = length[2];
-            extract_z(field, sendBuffer, node, length, n);
+            extract_z(field, sendBuffer, top_lattices, bufferLength, node, n);
  
-            swap(face, sendBuffer, readBuffer);
+            swap(face, sendBuffer, readBuffer, count, destination);
             
             node[2] = length[2] + 1;
-            inject_z(field, readBuffer, node, length, n);
+            inject_z(field, readBuffer, top_lattices, bufferLength, node, n);
         }
     } else if (face == BOTTOM) {
         if (my_pos[2] != 0) {
+            bufferLength[0] = length[0];
+            bufferLength[1] = length[1];
+            count = n[0] * n[1];
+            
             node[2] = 1;
-            extract_z(field, sendBuffer, node, length, n);
+            extract_z(field, sendBuffer, bottom_lattices, bufferLength, node, n);
  
-            swap(face, sendBuffer, readBuffer);
+            swap(face, sendBuffer, readBuffer, count, destination);
 
             node[2] = 0;
-            inject_z(field, readBuffer, node, length, n);
+            inject_z(field, readBuffer, bottom_lattices, bufferLength, node, n);
         }
     } else if (face == FRONT) {
         if (my_pos[1] != 0) {
-            node[1] = 1;
-            extract_y(field, sendBuffer, node, length, n);
+            bufferLength[0] = length[0];
+            bufferLength[1] = length[2];
+            count = n[0] * n[2];
  
-            swap(face, sendBuffer, readBuffer);
+            node[1] = 1;
+            extract_y(field, sendBuffer, front_lattices, bufferLength, node, n);
+ 
+            swap(face, sendBuffer, readBuffer, count, destination);
 
             node[1] = 0;
-            inject_y(field, readBuffer, node, length, n);
+            inject_y(field, readBuffer, front_lattices, bufferLength, node, n);
         }
     } else if (face == BACK) {
         if (my_pos[1] != Proc[1] - 1) {
-            node[1] = length[1];
-            extract_y(field, sendBuffer, node, length, n);
+            bufferLength[0] = length[0];
+            bufferLength[1] = length[2];
+            count = n[0] * n[2];
  
-            swap(face, sendBuffer, readBuffer);
+            node[1] = length[1];
+            extract_y(field, sendBuffer, back_lattices, bufferLength, node, n);
+ 
+            swap(face, sendBuffer, readBuffer, count, destination);
 
             node[1] = length[1] + 1;
-            inject_y(field, readBuffer, node, length, n);
+            inject_y(field, readBuffer, back_lattices, bufferLength, node, n);
         }
     }
 }
