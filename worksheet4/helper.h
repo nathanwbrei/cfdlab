@@ -29,6 +29,10 @@ static inline int * getFlag(int * array, int * node, int * n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 
+/* Get lattice from read or send buffer */
+inline double * getBufferEl(double * buffer, int k, int l, int i, int n_k) {
+    return buffer + q * (l * n_k + k) + i;
+}
 /**
  * Maximum length of input lines
  */
