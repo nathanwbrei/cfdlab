@@ -158,11 +158,11 @@ void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
 
     /* TODO think about sizes carefully */
     /* LEFT: YZ */
-    readBuffer[0] = (double *)malloc(sizeof(double) * n[1] * n[2] * q);
-    sendBuffer[0] = (double *)malloc(sizeof(double) * n[1] * n[2] * q);
+    readBuffer[0] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
+    sendBuffer[0] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
     /* RIGHT: YZ */
-    readBuffer[1] = (double *)malloc(sizeof(double) * n[1] * n[2] * q);
-    sendBuffer[1] = (double *)malloc(sizeof(double) * n[1] * n[2] * q);
+    readBuffer[1] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
+    sendBuffer[1] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
 
     /* TOP: XY */
     readBuffer[2] = (double *)malloc(sizeof(double) * n[0] * n[1] * q);

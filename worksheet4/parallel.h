@@ -25,11 +25,13 @@ typedef enum {LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK} face_t;
 
 void exchange(face_t face,
               double * field,
-              double ** sendBuffer,
-              double ** readBuffer,
+              double * sendBuffer,
+              double * readBuffer,
               int * length,
               int * my_pos,
               int * Proc,
               int my_rank
 );
+
+void printBuffer(double * buffer, int n1, int n2);
 #endif

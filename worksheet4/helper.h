@@ -30,7 +30,7 @@ static inline int * getFlag(int * array, int * node, int * n) {
 }
 
 /* Get lattice from read or send buffer */
-inline double * getBufferEl(double * buffer, int k, int l, int i, int n_k) {
+static inline double * getBufferEl(double * buffer, int k, int l, int i, int n_k) {
     return buffer + q * (l * n_k + k) + i;
 }
 /**

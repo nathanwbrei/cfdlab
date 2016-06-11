@@ -40,10 +40,11 @@ int main(int argc, char *argv[]){
 
     get_rank_pos(my_pos, my_rank, Proc);
     get_my_lengths(my_pos, xlength, my_lengths, Proc);
+
     initBuffers(readBuffer, sendBuffer, my_lengths);
 
     MPI_Barrier(MPI_COMM_WORLD); /* Barrier to get order in the output, just for thebug */
-    printf("Debug: Process %2d: Position x, y, z %d %d %d ; lenghts %d %d %d \n", my_rank, my_pos[0], my_pos[1], my_pos[2], my_lengths[0], my_lengths[1], my_lengths[2]);
+    //   printf("Debug: Process %2d: Position x, y, z %d %d %d ; lenghts %d %d %d \n", my_rank, my_pos[0], my_pos[1], my_pos[2], my_lengths[0], my_lengths[1], my_lengths[2]);
 
     double *collideField = (double *) malloc((size_t)(Q*(my_lengths[0]+2)*(my_lengths[1]+2)*(my_lengths[2]+2)) * sizeof(double));
     double *streamField = (double *) malloc((size_t)(Q*(my_lengths[0]+2)*(my_lengths[1]+2)*(my_lengths[2]+2)) * sizeof(double));
@@ -60,8 +61,8 @@ int main(int argc, char *argv[]){
     for (t = 0; t < timesteps; t++) {
         start_time = clock();  // Start the timer for the lattice updates
 
-        exchange(RIGHT, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc, my_rank);
-        exchange(LEFT, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc, my_rank);
+        exchange(LEFT, collideField, sendBuffer[0], readBuffer[0], my_lengths, my_pos, Proc, my_rank);
+        exchange(RIGHT, collideField, sendBuffer[1], readBuffer[1], my_lengths, my_pos, Proc, my_rank);
         //exchange(BACK, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
         //exchange(FRONT, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
         //exchange(BOTTOM, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
@@ -93,6 +94,8 @@ int main(int argc, char *argv[]){
     free(collideField);
     free(streamField);
     free(flagField);
+
+    /* TODO free buffers */
 
     Programm_Stop("End");
     

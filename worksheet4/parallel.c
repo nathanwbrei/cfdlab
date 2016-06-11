@@ -3,7 +3,42 @@
 
 #include "LBDefinitions.h"
 #include "initLB.h"
+#include "computeCellValues.h"
 
+void printXZvelocities(double * collideField, double y, int * n) {
+    int x, z, node[3];
+    double density, velocity[3], * el;
+
+    node[1] = y;
+
+    for(z = 0; z < n[2]; z++) {
+        node[2] = z;
+        for(x = 0; x < n[0]; x++) {
+            node[0] = x;
+            el = getEl(collideField, node, 0, n);
+            computeDensity(el, &density);
+            computeVelocity(el, &density, velocity);
+            printf("(%f %f %f) ", velocity[0], velocity[1], velocity[2]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void printBuffer(double * buffer, int n1, int n2) {
+    int i, j;
+
+    for (int k = 0; k < q; k++) {
+    for (j = 0; j < n2; j++) {
+        for (i = 0; i < n1; i++) {
+            printf("%f ", *getBufferEl(buffer, i, j, k, n1));
+        }
+        printf("\n");
+    }
+    printf("\n");
+    }
+    printf("\n");
+}
 
 void Program_Message(char *txt)
 /* produces a stderr text output  */
@@ -55,10 +90,18 @@ void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
     MPI_Comm_rank( MPI_COMM_WORLD, my_rank );
 }
 
-void extract_z(double * field,  double * sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Extraction for TOP & BOTTOM
+  node[2] = 0 || length[2] + 1
+*/
+void extract_z(double * field,
+               double * sendBuffer,
+               const int * lattices, /* lattices which will be sent */
+               int * node,
+               int * n) {
     int x, y, i, index;
 
-    for (y = 1; y <= bufferLength[1]; y++) {
+    for (y = 1; y <= n[1] - 2; y++) {
         node[1] = y;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
@@ -70,7 +113,15 @@ void extract_z(double * field,  double * sendBuffer, const int * lattices, int *
     }
 }
 
-void extract_y(double * field,  double * sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Extraction for FRONT & BACK
+  node[1] = 0 || length[1] + 1
+*/
+void extract_y(double * field,
+               double * sendBuffer,
+               const int * lattices, /* lattices which will be sent */
+               int * node,
+               int * n) {
     int x, z, i, index;
 
     for (z = 0; z < n[2]; z++) {
@@ -85,12 +136,22 @@ void extract_y(double * field,  double * sendBuffer, const int * lattices, int *
     }
 }
 
-void extract_x(double * field,  double * sendBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Extraction for LEFT & RIGHT
+  node[0] = 0 || length[0] + 1
+*/
+void extract_x(double * field,
+               double * sendBuffer,
+               const int * lattices, /* lattices which will be sent */
+               int * node,
+               int * n
+    ) {
     int y, z, i, index;
+    int yLength = n[1] - 2;
 
-    for (z = 1; z <= bufferLength[1]; z++) {
+    for (z = 1; z <= n[2] - 2; z++) {
         node[2] = z;
-        for (y = 1; y <= bufferLength[0]; y++) {
+        for (y = 1; y <= yLength; y++) {
             node[1] = y;
             for (i = 0; i < q; i++) {
                 index = lattices[i];
@@ -103,16 +164,20 @@ void extract_x(double * field,  double * sendBuffer, const int * lattices, int *
 void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int destination, int my_rank) {
     // MPI send to neighboring process, block until receives 
     // TODO: Needs to know who its neighbors are / whether they exist
+    MPI_Status status;
 
-
-//    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD);
-//    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
+    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD);
+    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
 }
 
-void inject_z(double * field,  double * readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Injection for TOP & BOTTOM
+  node[2] = 1 || length[2]
+*/
+void inject_z(double * field,  double * readBuffer, const int * lattices, int * node, int * n) {
     int x, y, i, index;
 
-    for (y = 1; y <= bufferLength[1]; y++) {
+    for (y = 1; y <= n[1] - 2; y++) {
         node[1] = y;
         for (x = 0; x < n[0]; x++) {
             node[0] = x;
@@ -124,7 +189,11 @@ void inject_z(double * field,  double * readBuffer, const int * lattices, int * 
     }
 }
 
-void inject_y(double * field,  double * readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Injection for FRONT & BACK
+  node[1] = 1 || length[1]
+*/
+void inject_y(double * field,  double * readBuffer, const int * lattices, int * node, int * n) {
     int x, z, i, index;
 
     for (z = 0; z < n[2]; z++) {
@@ -139,12 +208,17 @@ void inject_y(double * field,  double * readBuffer, const int * lattices, int * 
     }
 }
 
-void inject_x(double * field,  double * readBuffer, const int * lattices, int * bufferLength, int * node, int * n) {
+/*
+  Injection for LEFT & RIGHT
+  node[0] = 1 || length[0]
+*/
+void inject_x(double * field,  double * readBuffer, const int * lattices, int * node, int * n) {
     int y, z, i, index;
+    int yLength = n[1] - 2;
 
-    for (z = 1; z <= bufferLength[1]; z++) {
+    for (z = 1; z <= n[2] - 2; z++) {
         node[2] = z;
-        for (y = 1; y <= bufferLength[0]; y++) {
+        for (y = 1; y <= yLength; y++) {
             node[1] = y;
             for (i = 0; i < q; i++) {
                 index = lattices[i];
@@ -156,8 +230,8 @@ void inject_x(double * field,  double * readBuffer, const int * lattices, int * 
 
 void exchange(face_t face,
               double * field,
-              double ** sendBuffer,
-              double ** readBuffer,
+              double * sendBuffer,
+              double * readBuffer,
               int * length,
               int * my_pos,
               int * Proc,
@@ -165,101 +239,105 @@ void exchange(face_t face,
     ) {
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     int node[3];
-    int bufferLength[2];
     int count;
     int destination;
 
     if (face == LEFT) {
+        /* check existance of a neighbor */
         if (my_pos[0] != 0) {
-            printf("%i Left\n", my_rank);
-            bufferLength[0] = length[1];
-            bufferLength[1] = length[2];
+            /* Number of elements in a buffer */
             count = n[1] * n[2] * q;
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0] - 1, my_pos[1], my_pos[2], Proc);
  
             node[0] = 1;
-            extract_x(field, sendBuffer[0], left_lattices, bufferLength, node, n);
-            
-            swap(face, sendBuffer[0], readBuffer[0], count, destination, my_rank);
-
+            extract_x(field, sendBuffer, left_lattices, node, n);
+           
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
+            printBuffer(readBuffer, n[1], n[2]);
+ 
             node[0] = 0;
-            inject_x(field, readBuffer[0], left_lattices, bufferLength, node, n);
+            inject_x(field, readBuffer, left_lattices, node, n);
        }
     } else if (face == RIGHT) {
+        /* check existance of a neighbor */
         if (my_pos[0] != Proc[0] - 1) {
-            printf("%i Right\n", my_rank);
-            bufferLength[0] = length[1];
-            bufferLength[1] = length[2];
+            /* Number of elements in a buffer */
             count = n[1] * n[2] * q;
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0] + 1, my_pos[1], my_pos[2], Proc);
  
             node[0] = length[0];
-            extract_x(field, sendBuffer[1], right_lattices, bufferLength, node, n);
+            extract_x(field, sendBuffer, right_lattices, node, n);
 
-            swap(face, sendBuffer[1], readBuffer[1], count, destination, my_rank);
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[0] = length[0] + 1;
-            inject_x(field, readBuffer[1], right_lattices, bufferLength, node, n);
+            inject_x(field, readBuffer, right_lattices, node, n);
         }
     } else if (face == TOP) {
+        /* check existance of a neighbor */
         if (my_pos[2] != Proc[2] - 1) {
-            bufferLength[0] = length[0];
-            bufferLength[1] = length[1];
+            /* Number of elements in a buffer */
             count = n[0] * n[1];
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1], my_pos[2] + 1, Proc);
 
             node[2] = length[2];
-            extract_z(field, sendBuffer[2], top_lattices, bufferLength, node, n);
+            extract_z(field, sendBuffer, top_lattices, node, n);
  
-            swap(face, sendBuffer[2], readBuffer[2], count, destination, my_rank);
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
             
             node[2] = length[2] + 1;
-            inject_z(field, readBuffer[2], top_lattices, bufferLength, node, n);
+            inject_z(field, readBuffer, top_lattices, node, n);
         }
     } else if (face == BOTTOM) {
+        /* check existance of a neighbor */
         if (my_pos[2] != 0) {
-            bufferLength[0] = length[0];
-            bufferLength[1] = length[1];
+            /* Number of elements in a buffer */
             count = n[0] * n[1];
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1], my_pos[2] - 1, Proc);
             
             node[2] = 1;
-            extract_z(field, sendBuffer[3], bottom_lattices, bufferLength, node, n);
+            extract_z(field, sendBuffer, bottom_lattices, node, n);
  
-            swap(face, sendBuffer[3], readBuffer[3], count, destination, my_rank);
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[2] = 0;
-            inject_z(field, readBuffer[3], bottom_lattices, bufferLength, node, n);
+            inject_z(field, readBuffer, bottom_lattices, node, n);
         }
     } else if (face == FRONT) {
+        /* check existance of a neighbor */
         if (my_pos[1] != 0) {
-            bufferLength[0] = length[0];
-            bufferLength[1] = length[2];
+            /* Number of elements in a buffer */
             count = n[0] * n[2];
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1] - 1, my_pos[2], Proc);
  
             node[1] = 1;
-            extract_y(field, sendBuffer[4], front_lattices, bufferLength, node, n);
+            extract_y(field, sendBuffer, front_lattices, node, n);
  
-            swap(face, sendBuffer[4], readBuffer[4], count, destination, my_rank);
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[1] = 0;
-            inject_y(field, readBuffer[4], front_lattices, bufferLength, node, n);
+            inject_y(field, readBuffer, front_lattices, node, n);
         }
     } else if (face == BACK) {
+        /* check existance of a neighbor */
         if (my_pos[1] != Proc[1] - 1) {
-            bufferLength[0] = length[0];
-            bufferLength[1] = length[2];
+            /* Number of elements in a buffer */
             count = n[0] * n[2];
+            /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1] + 1, my_pos[2], Proc);
  
             node[1] = length[1];
-            extract_y(field, sendBuffer[5], back_lattices, bufferLength, node, n);
+            extract_y(field, sendBuffer, back_lattices, node, n);
  
-            swap(face, sendBuffer[5], readBuffer[5], count, destination, my_rank);
+            swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[1] = length[1] + 1;
-            inject_y(field, readBuffer[5], back_lattices, bufferLength, node, n);
+            inject_y(field, readBuffer, back_lattices, node, n);
         }
     }
 }
