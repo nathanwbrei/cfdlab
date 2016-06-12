@@ -32,7 +32,7 @@ static const double C_S_2 = 1.0 / 3;
 static const int FLUID = 0;
 static const int NOSLIP = 1;
 static const int MOVING_WALL = 2;
-static const int PARALLEL = 10;
+static const int PARALLEL = 3;
 
 #endif
 

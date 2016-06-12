@@ -52,19 +52,21 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * my_pos, int* Proc) {
     int x, y, z, i;
-    int node[3], walls[6];
+    int node[3], walls[6]; /* WALLS : */
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     for (i = 0; i < D; ++i) {
         if (my_pos[i] == 0)
             walls[2 * i] = NOSLIP;
-        else
+        else {
             walls[2 * i] = PARALLEL;
+        }
         if (my_pos[i] == (Proc[i] - 1))
             walls[2 * i + 1] = NOSLIP;
-        else
+        else {
             walls[2 * i + 1] = PARALLEL;
+        }
     }
 
     if(my_pos[2] == (Proc[2] - 1)) {

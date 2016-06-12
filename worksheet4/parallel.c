@@ -166,8 +166,8 @@ void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int 
     // TODO: Needs to know who its neighbors are / whether they exist
     MPI_Status status;
 
-    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD);
-    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
+    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD);
+    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD, &status);
 }
 
 /*
@@ -254,10 +254,10 @@ void exchange(face_t face,
             extract_x(field, sendBuffer, left_lattices, node, n);
            
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
-            printBuffer(readBuffer, n[1], n[2]);
  
             node[0] = 0;
             inject_x(field, readBuffer, left_lattices, node, n);
+            //printXZvelocities(field, 2, n);
        }
     } else if (face == RIGHT) {
         /* check existance of a neighbor */

@@ -1,14 +1,14 @@
-xlength                     4
+xlength                     8
 
-tau                         0.506
+tau                         0.596
 
 characteristicvelocity_x    0.05
 characteristicvelocity_y    0
 characteristicvelocity_z    0
 
-timesteps                   1
+timesteps                   1000
 
-vtkoutput                   1
+vtkoutput                   10
 
 iProc						2
 jProc						1

@@ -3,7 +3,26 @@
 #include "helper.h"
 #include "computeCellValues.h"
 
-void boundaryCell(double * collideField, int* flagField, const double * const wallVelocity, int * n, int * node){
+void setNoslip(double * collideField, int * n, int * node) {
+    int i, coord_dest[3];
+    double * cell_ptr;
+    
+    for (i = 0; i < Q; i++) {
+        coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
+        coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
+        coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
+    
+        if (coord_dest[0] > 0 && coord_dest[0] < n[0] &&
+            coord_dest[1] > 0 && coord_dest[1] < n[1] &&
+            coord_dest[2] > 0 && coord_dest[2] < n[2]) {
+      
+            cell_ptr = getEl(collideField, node , i, n);
+            *cell_ptr= *getEl(collideField, coord_dest, 18-i, n);
+        }
+    }
+}
+
+void setMovingWall(double * collideField, const double * const wallVelocity, int * n, int * node) {
     int i, coord_dest[3];
     double * cell_ptr;
     double dotProd;
@@ -21,17 +40,33 @@ void boundaryCell(double * collideField, int* flagField, const double * const wa
             cell_ptr = getEl(collideField, node , i, n);
             *cell_ptr= *getEl(collideField, coord_dest, 18-i, n);
 
-            if (*getFlag(flagField, node, n) == MOVING_WALL) {
-                dotProd = 0;
+            dotProd = 0;
                 
-                for (int j = 0; j < 3; ++j)	{
-                    dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];
-                }	
+            for (int j = 0; j < 3; ++j)	{
+                dotProd += LATTICEVELOCITIES[i][j] * wallVelocity[j];
+            }	
         
-                computeDensity(getEl(collideField, coord_dest, 0, n), &density);
-                *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / C_S_2;
-            }
+            computeDensity(getEl(collideField, coord_dest, 0, n), &density);
+            *cell_ptr += 2.0 * LATTICEWEIGHTS[i] * dotProd * density / C_S_2;
         }
+    }
+}
+
+void boundaryCell(double * collideField, int* flagField, const double * const wallVelocity, int * n, int * node){
+    int flag = *getFlag(flagField, node, n);
+
+    if (flag == PARALLEL) {
+        return;
+    }
+
+    if (flag == NOSLIP) {
+        setNoslip(collideField, n, node);
+        return;
+    }
+
+    if (flag == MOVING_WALL) {
+        setMovingWall(collideField, wallVelocity, n, node);
+        return;
     }
 }
 
@@ -39,6 +74,17 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
     int x, y, z;
     int node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+
+    node[2] = 2;
+    for (y = 0; y< n[1]; y++){
+        node[1] = y;
+        for (x = 0; x < n[0]; x++) {
+            node[0] = x;
+            printf("%i ", *getFlag(flagField, node, n));
+        }
+        printf("\n");
+    }
+    printf("\n");
 
     /* z = 0 */
     node[2] = 0;
@@ -51,6 +97,7 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
     }
 
     for (z = 1; z <= length[2]; ++z){
+        node[2] = z;
         /* y = 0 */
         node[1] = 0;
         for (x = 0; x < n[0]; ++x){
