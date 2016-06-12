@@ -3,7 +3,6 @@
 
 #define Q 19
 #define q 5
-//#define q 19
 #define D 3
 
 static const int LATTICEVELOCITIES[Q][D] = {

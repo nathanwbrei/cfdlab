@@ -53,6 +53,7 @@ int main(int argc, char *argv[]){
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
     }
+    int n[3] = { my_lengths[0] + 2, my_lengths[1] + 2, my_lengths[2] + 2 };
 
     initialiseFields(collideField, streamField, flagField, my_lengths, my_pos, Proc);
 
@@ -70,6 +71,8 @@ int main(int argc, char *argv[]){
  
         // TODO: Is this ordering correct? Remember that we send the RIGHT face to the right
 
+        if (my_rank == 0)
+            printXZvelocities(collideField, 2, n);
         doStreaming(collideField, streamField, flagField, my_lengths);
 
         s = collideField;

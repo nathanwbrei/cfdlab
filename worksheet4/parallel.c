@@ -7,7 +7,7 @@
 
 /* Debugging printing for velocities */
 /* TODO move to helper */
-void printXZvelocities(double * collideField, double y, int * n) {
+void printXZvelocities(double * collideField, int y, int * n) {
     int x, z, node[3];
     double density, velocity[3], * el;
 
@@ -21,6 +21,7 @@ void printXZvelocities(double * collideField, double y, int * n) {
             computeDensity(el, &density);
             computeVelocity(el, &density, velocity);
             printf("(%f %f %f) ", velocity[0], velocity[1], velocity[2]);
+            //printf("%f ", el[2]);
         }
         printf("\n");
     }
@@ -178,7 +179,7 @@ void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int 
   Injection for TOP & BOTTOM
   node[2] = 1 || length[2]
 */
-void inject_z(double * field,  double * readBuffer, const int * lattices, int * node, int * n) {
+void inject_z(double * field,  double * readBuffer, const int * lattices, int * node, int * n, int my_rank) {
     int x, y, i, index;
 
     for (y = 1; y <= n[1] - 2; y++) {
@@ -187,10 +188,14 @@ void inject_z(double * field,  double * readBuffer, const int * lattices, int * 
             node[0] = x;
             for (i = 0; i < q; i++) {
                 index = lattices[i];
+                if (my_rank ==0) {
+                    printf("(%i %i %i) %f -> %f \n",node[0], node[1], node[2], *getEl(field, node, index, n), *getBufferEl(readBuffer, x, y, i, n[0]));
+                }
                 *getEl(field, node, index, n) = *getBufferEl(readBuffer, x, y, i, n[0]);
             }
         }
     }
+    printf("\n");
 }
 
 /*
@@ -261,7 +266,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
  
             node[0] = 0;
-            inject_x(field, readBuffer, left_lattices, node, n);
+            inject_x(field, readBuffer, right_lattices, node, n);
             //printXZvelocities(field, 2, n);
        }
     } else if (face == RIGHT) {
@@ -278,7 +283,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[0] = length[0] + 1;
-            inject_x(field, readBuffer, right_lattices, node, n);
+            inject_x(field, readBuffer, left_lattices, node, n);
         }
     } else if (face == TOP) {
         /* check existance of a neighbor */
@@ -287,7 +292,6 @@ void exchange(face_t face,
             count = n[0] * n[1] * q;
             /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1], my_pos[2] + 1, Proc);
-            printXZvelocities(field, 2, n);
 
             node[2] = length[2];
             extract_z(field, sendBuffer, top_lattices, node, n);
@@ -295,7 +299,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
             
             node[2] = length[2] + 1;
-            inject_z(field, readBuffer, top_lattices, node, n);
+            inject_z(field, readBuffer, bottom_lattices, node, n, my_rank);
         }
     } else if (face == BOTTOM) {
         /* check existance of a neighbor */
@@ -311,7 +315,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[2] = 0;
-            inject_z(field, readBuffer, bottom_lattices, node, n);
+            inject_z(field, readBuffer, top_lattices, node, n, my_rank);
         }
     } else if (face == FRONT) {
         /* check existance of a neighbor */
@@ -327,7 +331,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[1] = 0;
-            inject_y(field, readBuffer, front_lattices, node, n);
+            inject_y(field, readBuffer, back_lattices, node, n);
         }
     } else if (face == BACK) {
         /* check existance of a neighbor */
@@ -343,7 +347,7 @@ void exchange(face_t face,
             swap(face, sendBuffer, readBuffer, count, destination, my_rank);
 
             node[1] = length[1] + 1;
-            inject_y(field, readBuffer, back_lattices, node, n);
+            inject_y(field, readBuffer, front_lattices, node, n);
         }
     }
 }
