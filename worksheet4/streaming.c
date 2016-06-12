@@ -8,7 +8,7 @@ void doStreaming(double * collideField, double * streamField, int * flagField, i
     int node[3], source_node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-    printXZvelocities(collideField, 2, n);
+    //printXZvelocities(collideField, 2, n);
 
     /* Loop for inner cells */
      for (z = 1; z <= length[2]; z++) {
