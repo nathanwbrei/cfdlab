@@ -168,11 +168,10 @@ void extract_x(double * field,
 
 void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int destination, int my_rank) {
     // MPI send to neighboring process, block until receives 
-    // TODO: Needs to know who its neighbors are / whether they exist
     MPI_Status status;
 
-    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD);
-    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
+    MPI_Sendrecv(sendBuffer, count, MPI_DOUBLE, destination, 0,
+                 readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
 }
 
 /*
@@ -188,14 +187,10 @@ void inject_z(double * field,  double * readBuffer, const int * lattices, int * 
             node[0] = x;
             for (i = 0; i < q; i++) {
                 index = lattices[i];
-                if (my_rank ==0) {
-                    printf("(%i %i %i) %f -> %f \n",node[0], node[1], node[2], *getEl(field, node, index, n), *getBufferEl(readBuffer, x, y, i, n[0]));
-                }
                 *getEl(field, node, index, n) = *getBufferEl(readBuffer, x, y, i, n[0]);
             }
         }
     }
-    printf("\n");
 }
 
 /*

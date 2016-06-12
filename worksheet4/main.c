@@ -71,8 +71,6 @@ int main(int argc, char *argv[]){
  
         // TODO: Is this ordering correct? Remember that we send the RIGHT face to the right
 
-        if (my_rank == 0)
-            printXZvelocities(collideField, 2, n);
         doStreaming(collideField, streamField, flagField, my_lengths);
 
         s = collideField;
@@ -85,6 +83,7 @@ int main(int argc, char *argv[]){
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
+            printf("Process %i finished step %i\n", my_rank, t);
             writeVtkOutput(collideField, flagField, argv[1], t, my_lengths, my_pos, my_rank);
         }
     }
