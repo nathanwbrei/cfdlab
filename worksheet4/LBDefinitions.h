@@ -17,12 +17,12 @@ static const double LATTICEWEIGHTS[Q] = {
     1.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36
 };
 
-static const int right_lattices[q] = { 1, 7, 9, 11, 13 };
-static const int left_lattices[q] = { 2, 8, 10, 12, 14 };
-static const int top_lattices[q] = { 3, 5, 7, 8, 17 };
-static const int bottom_lattices[q] = { 4, 9, 10, 16, 18 };
-static const int front_lattices[q] = { 6, 13, 14, 17, 18 };
-static const int back_lattices[q] = { 5, 11, 12, 15, 16 };
+static const int right_lattices[q] = { 3, 7, 10, 13, 17};
+static const int left_lattices[q] =  { 1, 5, 8, 11, 15 };
+static const int top_lattices[q] = { 14, 15, 16, 17, 18 };
+static const int bottom_lattices[q] = { 0, 1, 2, 3, 4 };
+static const int front_lattices[q] = { 0, 5, 6, 7, 14 };
+static const int back_lattices[q] = { 4, 11, 12, 13, 18 };
 
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const double C_S = 1.0 / 1.732050807568877;
