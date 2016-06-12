@@ -33,5 +33,6 @@ void exchange(face_t face,
               int my_rank
 );
 
+/* Debugging printing for buffer */
 void printBuffer(double * buffer, int n1, int n2);
 #endif

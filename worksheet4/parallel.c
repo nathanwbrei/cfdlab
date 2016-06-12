@@ -5,6 +5,8 @@
 #include "initLB.h"
 #include "computeCellValues.h"
 
+/* Debugging printing for velocities */
+/* TODO move to helper */
 void printXZvelocities(double * collideField, double y, int * n) {
     int x, z, node[3];
     double density, velocity[3], * el;
@@ -25,6 +27,7 @@ void printXZvelocities(double * collideField, double y, int * n) {
     printf("\n");
 }
 
+/* Debugging printing for buffer */
 void printBuffer(double * buffer, int n1, int n2) {
     int i, j;
 
@@ -67,7 +70,6 @@ void Programm_Sync(char *txt)
    MPI_Barrier(MPI_COMM_WORLD);
 }
 
-
 void Programm_Stop(char *txt)
 /* all processes will produce a text output, be synchronized and finished */
 
@@ -84,6 +86,7 @@ void Programm_Stop(char *txt)
    exit(1);
 }
 
+/* Initializes the MPI Porcess, also obtains the total number of ranks and the process assigned */
 void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
     MPI_Init( &argc, &argv );
     MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
@@ -94,6 +97,7 @@ void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
   Extraction for TOP & BOTTOM
   node[2] = 0 || length[2] + 1
 */
+/* TODO Extract_<direction> is also too copy-paste */
 void extract_z(double * field,
                double * sendBuffer,
                const int * lattices, /* lattices which will be sent */
@@ -242,6 +246,7 @@ void exchange(face_t face,
     int count;
     int destination;
 
+    /* TODO It would be really cool to get rig of this copy-paste */
     if (face == LEFT) {
         /* check existance of a neighbor */
         if (my_pos[0] != 0) {

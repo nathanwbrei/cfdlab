@@ -17,6 +17,9 @@ static const double LATTICEWEIGHTS[Q] = {
     1.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36
 };
 
+/*
+  Lattices which will be sent to corresponding neighbor
+ */
 static const int right_lattices[q] = { 3, 7, 10, 13, 17};
 static const int left_lattices[q] =  { 1, 5, 8, 11, 15 };
 static const int top_lattices[q] = { 14, 15, 16, 17, 18 };

@@ -39,6 +39,7 @@ int readParameters(
     return 0;
 }
 
+/* Initialize flagField, streamField and collideField for passed node */
 void initialiseCell(double *collideField, double *streamField, int *flagField, int * n, int * node, int flag) {	
     int i;
 
@@ -52,10 +53,11 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * my_pos, int* Proc) {
     int x, y, z, i;
-    int node[3], walls[6]; /* WALLS : */
+    int node[3], walls[6]; /* WALLS : LEFT RIGHT FRONT BACK BOTTOM TOP */
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
+    /* Determine which type each boundary has */
     for (i = 0; i < D; ++i) {
         if (my_pos[i] == 0)
             walls[2 * i] = NOSLIP;
@@ -69,8 +71,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         }
     }
 
+    /* Set TOP boundary to MOVING_WALL */
     if(my_pos[2] == (Proc[2] - 1)) {
-        printf("It is the wall!\n");
         walls[5] = MOVING_WALL;
     }
 
@@ -85,6 +87,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         }
     }
 
+    /* Z inner */
     for (z = 1; z <= length[2]; ++z){
         node[2] = z;
 
@@ -96,6 +99,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             initialiseCell(collideField, streamField, flagField, n, node, walls[2]);
         }
 
+        /* Y inner */
         for (y = 1; y <= length[1]; ++y){
             node[1] = y;
 
@@ -103,6 +107,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             node[0] = 0;
             initialiseCell(collideField, streamField, flagField, n, node, walls[0]);
 
+            /* X inner */
             for (x = 1; x <= length[0]; ++x){
                 node[0] = x;
                 initialiseCell(collideField, streamField, flagField, n, node, FLUID);
@@ -132,6 +137,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     }
 }
 
+/* Get 3D rank */
 void get_rank_pos(int * my_pos, int rank, int *Proc){
     int i;
     int aux_rank = rank;
@@ -142,10 +148,12 @@ void get_rank_pos(int * my_pos, int rank, int *Proc){
     }
 }
 
+/* By 3D rank get normal rank */
 int get_rank(int px, int py, int pz,  int * Proc) {
     return pz * Proc[1] * Proc[0] + py * Proc[0] + px;
 }
 
+/* Compute number of elements in each direction within subdomain */
 void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
     int i;
     for (i = 0; i < D; ++i){
@@ -155,6 +163,7 @@ void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
     }
 }
 
+/* Allocate memory for sendBuffer and readBuffer */
 void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 

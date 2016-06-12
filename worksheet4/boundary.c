@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "computeCellValues.h"
 
+/* set NOSLIP conditions */
 void setNoslip(double * collideField, int * n, int * node) {
     int i, coord_dest[3];
     double * cell_ptr;
@@ -22,6 +23,7 @@ void setNoslip(double * collideField, int * n, int * node) {
     }
 }
 
+/* set MOVING_WALL conditions */
 void setMovingWall(double * collideField, const double * const wallVelocity, int * n, int * node) {
     int i, coord_dest[3];
     double * cell_ptr;
@@ -55,6 +57,7 @@ void setMovingWall(double * collideField, const double * const wallVelocity, int
 void boundaryCell(double * collideField, int* flagField, const double * const wallVelocity, int * n, int * node){
     int flag = *getFlag(flagField, node, n);
 
+    /* if boundary is parallel do not do anything */
     if (flag == PARALLEL) {
         return;
     }
@@ -76,15 +79,6 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     node[2] = 2;
-    for (y = 0; y< n[1]; y++){
-        node[1] = y;
-        for (x = 0; x < n[0]; x++) {
-            node[0] = x;
-            printf("%i ", *getFlag(flagField, node, n));
-        }
-        printf("\n");
-    }
-    printf("\n");
 
     /* z = 0 */
     node[2] = 0;
@@ -110,6 +104,7 @@ void treatBoundary(double *collideField, int *flagField, const double * const wa
             // x = 0;
             node[0] = 0;
             boundaryCell(collideField, flagField, wallVelocity, n, node);
+
             // x = length[0] + 1;
             node[0] = length[0] + 1;
             boundaryCell(collideField, flagField, wallVelocity, n, node);
