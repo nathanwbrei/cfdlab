@@ -35,4 +35,6 @@ void exchange(face_t face,
 
 /* Debugging printing for buffer */
 void printBuffer(double * buffer, int n1, int n2);
+
+void printXZvelocities(double * field, int y, int * n);
 #endif

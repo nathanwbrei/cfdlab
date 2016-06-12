@@ -3,6 +3,7 @@
 
 #define Q 19
 #define q 5
+//#define q 19
 #define D 3
 
 static const int LATTICEVELOCITIES[Q][D] = {
@@ -26,6 +27,14 @@ static const int top_lattices[q] = { 14, 15, 16, 17, 18 };
 static const int bottom_lattices[q] = { 0, 1, 2, 3, 4 };
 static const int front_lattices[q] = { 0, 5, 6, 7, 14 };
 static const int back_lattices[q] = { 4, 11, 12, 13, 18 };
+
+//static const int right_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }; 
+//static const int left_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+//static const int top_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+//static const int bottom_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+//static const int front_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+//static const int back_lattices[q] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+
 
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const double C_S = 1.0 / 1.732050807568877;

@@ -170,8 +170,8 @@ void swap(face_t face, double * sendBuffer, double * readBuffer, int count, int 
     // TODO: Needs to know who its neighbors are / whether they exist
     MPI_Status status;
 
-    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD);
-    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 1, MPI_COMM_WORLD, &status);
+    MPI_Send(sendBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD);
+    MPI_Recv(readBuffer, count, MPI_DOUBLE, destination, 0, MPI_COMM_WORLD, &status);
 }
 
 /*
@@ -284,9 +284,10 @@ void exchange(face_t face,
         /* check existance of a neighbor */
         if (my_pos[2] != Proc[2] - 1) {
             /* Number of elements in a buffer */
-            count = n[0] * n[1];
+            count = n[0] * n[1] * q;
             /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1], my_pos[2] + 1, Proc);
+            printXZvelocities(field, 2, n);
 
             node[2] = length[2];
             extract_z(field, sendBuffer, top_lattices, node, n);
@@ -300,7 +301,7 @@ void exchange(face_t face,
         /* check existance of a neighbor */
         if (my_pos[2] != 0) {
             /* Number of elements in a buffer */
-            count = n[0] * n[1];
+            count = n[0] * n[1] * q;
             /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1], my_pos[2] - 1, Proc);
             
@@ -316,7 +317,7 @@ void exchange(face_t face,
         /* check existance of a neighbor */
         if (my_pos[1] != 0) {
             /* Number of elements in a buffer */
-            count = n[0] * n[2];
+            count = n[0] * n[2] * q;
             /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1] - 1, my_pos[2], Proc);
  
@@ -332,7 +333,7 @@ void exchange(face_t face,
         /* check existance of a neighbor */
         if (my_pos[1] != Proc[1] - 1) {
             /* Number of elements in a buffer */
-            count = n[0] * n[2];
+            count = n[0] * n[2] * q;
             /* rank of neighbor process */
             destination = get_rank(my_pos[0], my_pos[1] + 1, my_pos[2], Proc);
  

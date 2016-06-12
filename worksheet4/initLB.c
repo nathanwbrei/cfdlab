@@ -176,16 +176,16 @@ void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
     sendBuffer[1] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
 
     /* TOP: XY */
-    readBuffer[2] = (double *)malloc(sizeof(double) * n[0] * n[1] * q);
-    sendBuffer[2] = (double *)malloc(sizeof(double) * n[0] * n[1] * q);
+    readBuffer[2] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
+    sendBuffer[2] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
     /* BOTTOM: XY */
-    readBuffer[3] = (double *)malloc(sizeof(double) * n[0] * n[1] * q);
-    sendBuffer[3] = (double *)malloc(sizeof(double) * n[0] * n[1] * q);
+    readBuffer[3] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
+    sendBuffer[3] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
 
     /* FRONT: XZ */
-    readBuffer[4] = (double *)malloc(sizeof(double) * n[0] * n[2] * q);
-    sendBuffer[4] = (double *)malloc(sizeof(double) * n[0] * n[2] * q);
+    readBuffer[4] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
+    sendBuffer[4] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
     /* BACK: XZ */
-    readBuffer[5] = (double *)malloc(sizeof(double) * n[0] * n[2] * q);
-    sendBuffer[5] = (double *)malloc(sizeof(double) * n[0] * n[2] * q);
+    readBuffer[5] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
+    sendBuffer[5] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
 }
