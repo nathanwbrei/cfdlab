@@ -26,10 +26,6 @@ int main(int argc, char *argv[]){
     double * s;
 
     initializeMPI(&my_rank, &number_of_ranks, argc, argv);
-    /* initializeMPI */
-    //MPI_Init( &argc, &argv );
-    //MPI_Comm_size( MPI_COMM_WORLD, &number_of_ranks );
-    //MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
 
     readParameters(&xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv, Proc, my_rank);
 
@@ -43,8 +39,6 @@ int main(int argc, char *argv[]){
 
     initBuffers(readBuffer, sendBuffer, my_lengths);
 
-    MPI_Barrier(MPI_COMM_WORLD); /* Barrier to get order in the output, just for thebug */
-    //   printf("Debug: Process %2d: Position x, y, z %d %d %d ; lenghts %d %d %d \n", my_rank, my_pos[0], my_pos[1], my_pos[2], my_lengths[0], my_lengths[1], my_lengths[2]);
 
     double *collideField = (double *) malloc((size_t)(Q*(my_lengths[0]+2)*(my_lengths[1]+2)*(my_lengths[2]+2)) * sizeof(double));
     double *streamField = (double *) malloc((size_t)(Q*(my_lengths[0]+2)*(my_lengths[1]+2)*(my_lengths[2]+2)) * sizeof(double));
@@ -53,7 +47,6 @@ int main(int argc, char *argv[]){
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");
     }
-    int n[3] = { my_lengths[0] + 2, my_lengths[1] + 2, my_lengths[2] + 2 };
 
     initialiseFields(collideField, streamField, flagField, my_lengths, my_pos, Proc);
 
@@ -80,7 +73,7 @@ int main(int argc, char *argv[]){
         doCollision(collideField,flagField,&tau,my_lengths);
         treatBoundary(collideField, flagField, velocityWall, my_lengths);
 
-        total_time += clock() - start_time; // Add elapsed ticks to total_time
+        total_time += clock() - start_time; /* Add elapsed ticks to total_time */
 
         if (t % timestepsPerPlotting == 0) {
             printf("Process %i finished step %i\n", my_rank, t);
@@ -88,11 +81,13 @@ int main(int argc, char *argv[]){
         }
     }
 
-    // Compute average mega-lattice-updates-per-second in order to judge performance
-    float elapsed_time = total_time/((float)CLOCKS_PER_SEC);
-    float mlups = ((xlength+2) * (xlength+2) * (xlength+2) * timesteps) / (elapsed_time * 1000000);
-    printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
-
+    /* Compute average mega-lattice-updates-per-second in order to judge performance */
+    if (my_rank==0)
+    {
+        float elapsed_time = total_time/((float)CLOCKS_PER_SEC);
+        float mlups = ((xlength+2) * (xlength+2) * (xlength+2) * timesteps) / (elapsed_time * 1000000);
+        printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
+    }
 
     free(collideField);
     free(streamField);

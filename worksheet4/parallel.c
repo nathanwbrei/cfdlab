@@ -84,7 +84,7 @@ void Programm_Stop(char *txt)
    fflush(stderr);
    MPI_Barrier(MPI_COMM_WORLD);
    MPI_Finalize();
-   exit(1);
+   exit(0);
 }
 
 /* Initializes the MPI Porcess, also obtains the total number of ranks and the process assigned */
