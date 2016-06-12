@@ -63,10 +63,11 @@ int main(int argc, char *argv[]){
 
         exchange(LEFT, collideField, sendBuffer[0], readBuffer[0], my_lengths, my_pos, Proc, my_rank);
         exchange(RIGHT, collideField, sendBuffer[1], readBuffer[1], my_lengths, my_pos, Proc, my_rank);
-        //exchange(BACK, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
-        //exchange(FRONT, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
-        //exchange(BOTTOM, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
-        //exchange(TOP, collideField, sendBuffer, readBuffer, my_lengths, my_pos, Proc);
+        exchange(TOP, collideField, sendBuffer[2], readBuffer[2], my_lengths, my_pos, Proc, my_rank);
+        exchange(BOTTOM, collideField, sendBuffer[3], readBuffer[3], my_lengths, my_pos, Proc, my_rank);
+        exchange(BACK, collideField, sendBuffer[4], readBuffer[4], my_lengths, my_pos, Proc, my_rank);
+        exchange(FRONT, collideField, sendBuffer[5], readBuffer[5], my_lengths, my_pos, Proc, my_rank);
+ 
         // TODO: Is this ordering correct? Remember that we send the RIGHT face to the right
 
         doStreaming(collideField, streamField, flagField, my_lengths);

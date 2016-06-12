@@ -11,5 +11,5 @@ timesteps                   1000
 vtkoutput                   10
 
 iProc						2
-jProc						1
-kProc						1
+jProc						2
+kProc						2
