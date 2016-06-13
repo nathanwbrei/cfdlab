@@ -12,12 +12,10 @@
 #include "boundary.h"
 #include "LBDefinitions.h"
 
-// TODO: Move these to their own file
-
 
 int main(int argc, char *argv[]){
     int xlength, timesteps, timestepsPerPlotting;
-    int my_rank, number_of_ranks, Proc[3], my_pos[3], my_lengths[3];
+    int my_rank, number_of_ranks, Proc[3], my_pos[3], my_lengths[3], my_origin[3];
     double tau, velocityWall[3];    
     int t;
     clock_t start_time, total_time = 0;
@@ -35,7 +33,7 @@ int main(int argc, char *argv[]){
     }
 
     get_rank_pos(my_pos, my_rank, Proc);
-    get_my_lengths(my_pos, xlength, my_lengths, Proc);
+    get_my_lengths(my_pos, xlength, Proc, my_lengths, my_origin);
 
     initBuffers(readBuffer, sendBuffer, my_lengths);
 
@@ -77,7 +75,7 @@ int main(int argc, char *argv[]){
 
         if (t % timestepsPerPlotting == 0) {
             printf("Process %i finished step %i\n", my_rank, t);
-            writeVtkOutput(collideField, flagField, argv[1], t, my_lengths, my_pos, my_rank);
+            writeVtkOutput(collideField, flagField, argv[1], t, my_lengths, my_origin, my_pos, my_rank);
         }
     }
 

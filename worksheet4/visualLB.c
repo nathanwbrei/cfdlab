@@ -2,7 +2,7 @@
 #include "computeCellValues.h"
 #include "helper.h"
 
-void write_vtkFile(const char *szProblem, int t, int * length, double * collideField, int * my_pos, int my_rank) {
+void write_vtkFile(const char *szProblem, int t, int * length, double * collideField, int * my_pos, int my_rank, int * my_origin) {
     char szFileName[80];
     FILE *fp=NULL;
  
@@ -24,7 +24,7 @@ void write_vtkFile(const char *szProblem, int t, int * length, double * collideF
     }
 
     write_vtkHeader(fp, length);
-    write_vtkPointCoordinates(fp, length, my_pos);
+    write_vtkPointCoordinates(fp, length, my_pos, my_origin);
 
     fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
   
@@ -92,10 +92,7 @@ void write_vtkHeader( FILE *fp, int * length) {
 }
 
 
-void write_vtkPointCoordinates(FILE *fp, int * length, int * my_pos) {
-    int originX = my_pos[0] * length[0];
-    int originY = my_pos[1] * length[1];
-    int originZ = my_pos[2] * length[2];
+void write_vtkPointCoordinates(FILE *fp, int * length, int * my_pos, int * my_origin) {
 
     int x, y, z;
 
@@ -103,7 +100,7 @@ void write_vtkPointCoordinates(FILE *fp, int * length, int * my_pos) {
         for(y = 1; y  <= length[1]; y++) {
             for(x = 1; x  <= length[0]; x++) {
                 /* dx = dy = dz = 1 */
-                fprintf(fp, "%d %d %d\n", originX + x, originY + y, originZ + z);
+                fprintf(fp, "%d %d %d\n", my_origin[0] + x, my_origin[1] + y, my_origin[2] + z);
             }
         }
     }
@@ -114,8 +111,9 @@ void writeVtkOutput(double * collideField,
                     const char * filename,
                     unsigned int t,
                     int * length,
+                    int * origin,
                     int * my_pos,
                     int my_rank) {
-    write_vtkFile(filename, t, length, collideField, my_pos, my_rank);
+    write_vtkFile(filename, t, length, collideField, my_pos, my_rank, origin);
 }
 

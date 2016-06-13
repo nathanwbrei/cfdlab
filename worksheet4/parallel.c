@@ -110,13 +110,23 @@ int get_rank(int px, int py, int pz,  int * Proc) {
     return pz * Proc[1] * Proc[0] + py * Proc[0] + px;
 }
 
-/* Compute number of elements in each direction within subdomain */
-void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
+/* Compute number of elements, and location of subdomain origin, in each direction */
+void get_my_lengths(int* my_pos, int xlength, int * Proc, int * my_lengths, int * my_origin){
     int i;
-    for (i = 0; i < D; ++i){
-        my_lengths[i] = (int) (1.0*xlength / Proc[i]);  /*Divides the length of the cavity betwen the number of sections in that dimention (takes the floor)*/
-        if ((xlength % Proc[i]) > my_pos[i])    /*If the number of sections is not a divisor of the number of cells then an extra cell is assigned to the first processes*/
+    for (i = 0; i < D; ++i) { 
+        my_lengths[i] = (int) (1.0*xlength / Proc[i]);  
+        my_origin[i] = my_lengths[i] * my_pos[i];
+        /* Divide the length of the cavity between the number of sections in that dimension, taking the floor */
+        if ((xlength % Proc[i]) > my_pos[i]) {
+
+            /* If the number of sections is not a divisor of the number of cells
+             * then an extra cell is assigned to the leftmost cells */
             my_lengths[i] ++;
+            my_origin[i] += my_pos[i];
+        }
+        else {
+            my_origin[i] += (xlength % Proc[i]);
+        } 
     }
 }
 

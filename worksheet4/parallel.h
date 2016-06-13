@@ -37,7 +37,7 @@ void exchange(face_t face,
 void get_rank_pos(int * my_pos, int rank, int *Proc);
 
 /* Obtain the size of the prtion assigned to the procces my_lengths, using the length of the cavity xlength, the position on each dimetion y the total number of processes per dimention*/
-void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc);
+void get_my_lengths(int* my_pos, int xlength, int * Proc, int * my_lengths, int * my_origin);
 
 int get_rank(int px, int py, int pz,  int * Proc);
 
