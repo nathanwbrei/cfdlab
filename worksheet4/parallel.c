@@ -94,6 +94,32 @@ void initializeMPI(int * my_rank,int * number_of_ranks,int argc, char * argv[]){
     MPI_Comm_rank( MPI_COMM_WORLD, my_rank );
 }
 
+/* Get 3D rank */
+void get_rank_pos(int * my_pos, int rank, int *Proc){
+    int i;
+    int aux_rank = rank;
+
+    for (i = 0; i < D; ++i){
+        my_pos[i] = aux_rank % Proc[i];
+        aux_rank = (aux_rank - my_pos[i]) / Proc[i];
+    }
+}
+
+/* By 3D rank get normal rank */
+int get_rank(int px, int py, int pz,  int * Proc) {
+    return pz * Proc[1] * Proc[0] + py * Proc[0] + px;
+}
+
+/* Compute number of elements in each direction within subdomain */
+void get_my_lengths(int* my_pos, int xlength, int* my_lengths, int * Proc){
+    int i;
+    for (i = 0; i < D; ++i){
+        my_lengths[i] = (int) (1.0*xlength / Proc[i]);  /*Divides the length of the cavity betwen the number of sections in that dimention (takes the floor)*/
+        if ((xlength % Proc[i]) > my_pos[i])    /*If the number of sections is not a divisor of the number of cells then an extra cell is assigned to the first processes*/
+            my_lengths[i] ++;
+    }
+}
+
 /*
   Extraction for TOP & BOTTOM
   node[2] = 0 || length[2] + 1
