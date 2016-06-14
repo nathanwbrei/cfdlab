@@ -1,0 +1,15 @@
+xlength                     150
+
+tau                         0.596
+
+characteristicvelocity_x    0.05
+characteristicvelocity_y    0
+characteristicvelocity_z    0
+
+timesteps                   50
+
+vtkoutput                   500
+
+iProc						4
+jProc						2
+kProc						2
