@@ -91,6 +91,11 @@ int main(int argc, char *argv[]){
     free(streamField);
     free(flagField);
 
+    for (int i = 0; i < 6; i++) {
+        free(sendBuffer[i]);
+        free(readBuffer[i]);
+    }
+
     /* TODO free buffers */
 
     Programm_Stop("End");
