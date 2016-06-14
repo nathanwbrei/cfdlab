@@ -57,16 +57,16 @@ int readParameters(
     return 0;
 }
 
-void initialiseCell(double *collideField, double *streamField, int *flagField, int *length, int x, int y, int z, int flag) {	
+void initialiseCell(double *collideField, double *streamField, int *flagField, int *length, int * node, int flag) {	
     int i;
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-    *getFlag(flagField, x, y, z, n) = flag;    /*asigns the flag to the specified cell */
+    *getFlag(flagField, node, n) = flag;    /*asigns the flag to the specified cell */
 
     for (i = 0; i < Q; ++i){
-        *getEl(streamField, x, y, z, i, n) = LATTICEWEIGHTS[i];    /*Insert on each cell the initial value */
-        *getEl(collideField, x, y, z, i, n) = LATTICEWEIGHTS[i];
+        *getEl(streamField, node, i, n) = LATTICEWEIGHTS[i];    /*Insert on each cell the initial value */
+        *getEl(collideField, node, i, n) = LATTICEWEIGHTS[i];
     }
 }
 
@@ -93,7 +93,7 @@ void checkForbiddenPatterns(int ** image, int * length) {
 }
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * boundaries, char *argv[]){
-    int x, y, z;
+    int x, y, z, node[3];
     int ** image;
     char filename[20] ;
 
@@ -113,41 +113,57 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     *   Definition of the fields 
     *   The structure of the looping makes possible to define the boudaries
     */
-    z = 0;
+    /* z = 0; */
+    node[2] = 0;
     for (y = 0; y <= length[1]+1; ++y){
+        node[1] = y;
         for (x = 0; x <= length[2]+1; ++x){			
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[4]);   /* Loop for the down wall of the cavity*/
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[4]);   /* Loop for the down wall of the cavity*/
         }
     }
     
     for (z = 1; z <= length[0]; ++z){
-        y = 0;
+        node[2] = z;
+        /* y = 0; */
+        node[1] = 0;
         for (x = 0; x <= length[2]+1; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[2]);   /* Loop for the front wall of the cavity*/
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[2]);   /* Loop for the front wall of the cavity*/
         }
 
         for (y = 1; y <= length[1]; ++y){
-            x = 0;
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[0]);   /* Loop for the left wall of the cavity*/
+            node[1] = y;
+            /* x = 0; */
+            node[0] = 0;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[0]);   /* Loop for the left wall of the cavity*/
             for (x = 1; x <= length[2]; ++x){				
-                initialiseCell(collideField, streamField, flagField, length, x, y, z, image[x][z]);           /* Loop for the interior points*/
+                node[0] = x;
+                initialiseCell(collideField, streamField, flagField, length, node, image[x][z]);           /* Loop for the interior points*/
             }
-            x = length[2]+1;
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[1]);   /* Loop for the right wall of the cavity*/
+            /* x = length[2]+1; */
+            node[0] = length[2] + 1;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[1]);   /* Loop for the right wall of the cavity*/
         }
 
-        y = length[1]+1;
+        /* y = length[1]+1; */
+        node[1] = length[1] + 1;
         for (x = 0; x <= length[2]+1; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[3]);   /* Loop for the back wall of the cavity*/
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[3]);   /* Loop for the back wall of the cavity*/
         }
     }
 
-    z = length[0]+1;
+    /* z = length[0] + 1; */
+    node[2] = length[0] + 1;
     for (y = 0; y <= length[1]+1; ++y){
+        node[1] = y;
         for (x = 0; x < length[2]+2; ++x){
-            initialiseCell(collideField, streamField, flagField, length, x, y, z, boundaries[5]);   /* Loop for the up wall of the cavity*/
+            node[0] = x;
+            initialiseCell(collideField, streamField, flagField, length, node, boundaries[5]);   /* Loop for the up wall of the cavity*/
         }
     }
-    free_imatrix( image, 0, length[0]+2,0,length[2]+2);
+
+    free_imatrix(image, 0, length[0] + 2, 0, length[2] + 2);
 }
 

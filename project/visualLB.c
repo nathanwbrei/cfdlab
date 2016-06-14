@@ -9,7 +9,7 @@ void write_vtkFile(const char *szProblem,
                    double *collideField,
                    int * flagField) {
   
-    int x, y, z;
+    int x, y, z, node[3];
     char szFileName[80];
     FILE *fp=NULL;
     int n[3] = {length[0] + 2,length[1] + 2,length[2] + 2};
@@ -34,10 +34,13 @@ void write_vtkFile(const char *szProblem,
     fprintf(fp,"\n");
     fprintf(fp, "VECTORS velocity float\n");
     for(z = 1; z  <= length[0]; z++) {
+        node[2] = z;
         for(y = 1; y  <= length[1]; y++) {
+            node[1] = y;
             for(x = 1; x  <= length[2]; x++) {
-                if (*getFlag(flagField, x, y, z, n) != OBSTACLE) {
-                    el = getEl(collideField, x, y, z, 0, n);
+                node[0] = x;
+                if (*getFlag(flagField, node, n) != OBSTACLE) {
+                    el = getEl(collideField, node, 0, n);
                     computeDensity(el, &density);
                     computeVelocity(el, &density, velocity);
                     fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
@@ -53,11 +56,14 @@ void write_vtkFile(const char *szProblem,
     fprintf(fp, "SCALARS density float 1 \n"); 
     fprintf(fp, "LOOKUP_TABLE default \n");
 
-    for(z = 1; z  <= length[0]; z++) {
+    for(z = 1; z <= length[0]; z++) {
+        node[2] = z;
         for(y = 1; y  <= length[1]; y++) {
+            node[1] = y;
             for(x = 1; x  <= length[2]; x++) {
-                if (*getFlag(flagField, x, y, z, n) != OBSTACLE) {
-                    computeDensity(getEl(collideField, x, y, z, 0, n), &density);
+                node[0] = x;
+                if (*getFlag(flagField, node, n) != OBSTACLE) {
+                    computeDensity(getEl(collideField, node, 0, n), &density);
                     fprintf(fp, "%f\n", density);
                 } else {
                     fprintf(fp, "%f\n", 1.0);
@@ -105,9 +111,9 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
     int y = 0;
     int z = 0;
 
-    for(z = 1; z  <= length[0]; z++) {
-        for(y = 1; y  <= length[1]; y++) {
-            for(x = 1; x  <= length[2]; x++) {
+    for(z = 1; z <= length[0]; z++) {
+        for(y = 1; y <= length[1]; y++) {
+            for(x = 1; x <= length[2]; x++) {
                 /* dx = dy = dz = 1 */
                 fprintf(fp, "%d %d %d\n", originX + x, originY + y, originZ + z);
             }

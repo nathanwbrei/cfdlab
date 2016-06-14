@@ -21,18 +21,17 @@
  * Return pointer to i-th lattice in (x, y, z) cell
  */
 /** TODO pass coordinates as a array [x, y, z] */
-static inline double * getEl(double * array, int x, int y, int z, int i, int *n) {
-    return array + Q * (z * n[2] * n[1] + y * n[2] + x) + i;
+static inline double * getEl(double * array, int * point, int i, int *n) {
+    return array + Q * (point[2] * n[2] * n[1] + point[1] * n[2] + point[0]) + i;
 }
 
 /**
  * Return pointer to (x,y,z) element
  */
 /** TODO pass coordinates as a array [x, y, z] */
-static inline int * getFlag(int * array, int x, int y, int z, int *n) {
-    return array + z * n[2] * n[1] + y * n[2] + x;
+static inline int * getFlag(int * array, int * point, int *n) {
+    return array + point[2] * n[2] * n[1] + point[1] * n[2] + point[0];
 }
-
 
 /**
  * Maximum length of input lines
