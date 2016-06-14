@@ -34,21 +34,21 @@ int main(int argc, char *argv[]){
     
     initialiseFields(collideField, streamField, flagField, length, boundaries, argv);
 
-    /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
-    int a=0;
-    for (int z = 0; z <= length[0]+1; ++z)
-    {
-        for (int y = 0; y <= length[1]+1; ++y)
-        {
-            for (int x = 0; x <= length[2]+1; ++x)
-            {
-                printf("%d ", flagField[a]);
-                a++;
-            }
-            printf("\n");
-        }
-        printf("\n");
-    }
+    // /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
+        // int a=0;
+    // for (int z = 0; z <= length[0]+1; ++z)
+    // {
+    //     for (int y = 0; y <= length[1]+1; ++y)
+    //     {
+    //         for (int x = 0; x <= length[2]+1; ++x)
+    //         {
+    //             printf("%d ", flagField[a]);
+    //             a++;
+    //         }
+    //         printf("\n");
+    //     }
+    //     printf("\n");
+    // }
 
     treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 

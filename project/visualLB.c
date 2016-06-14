@@ -12,7 +12,7 @@ void write_vtkFile(const char *szProblem,
     int x, y, z, node[3];
     char szFileName[80];
     FILE *fp=NULL;
-    int n[3] = {length[0] + 2,length[1] + 2,length[2] + 2};
+    int n[3] = { length[0] + 2,length[1] + 2,length[2] + 2 };
     double velocity[3];
     double density;
     double * el = NULL;
@@ -30,14 +30,14 @@ void write_vtkFile(const char *szProblem,
     write_vtkHeader(fp, length);
     write_vtkPointCoordinates(fp, length);
 
-    fprintf(fp,"POINT_DATA %i \n", length[0]*length[1]*length[2]);
+    fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
     fprintf(fp,"\n");
     fprintf(fp, "VECTORS velocity float\n");
-    for(z = 1; z  <= length[0]; z++) {
+    for(z = 1; z <= length[2]; z++) {
         node[2] = z;
-        for(y = 1; y  <= length[1]; y++) {
+        for(y = 1; y <= length[1]; y++) {
             node[1] = y;
-            for(x = 1; x  <= length[2]; x++) {
+            for(x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 if (*getFlag(flagField, node, n) != OBSTACLE) {
                     el = getEl(collideField, node, 0, n);
@@ -56,11 +56,11 @@ void write_vtkFile(const char *szProblem,
     fprintf(fp, "SCALARS density float 1 \n"); 
     fprintf(fp, "LOOKUP_TABLE default \n");
 
-    for(z = 1; z <= length[0]; z++) {
+    for(z = 1; z <= length[2]; z++) {
         node[2] = z;
-        for(y = 1; y  <= length[1]; y++) {
+        for(y = 1; y <= length[1]; y++) {
             node[1] = y;
-            for(x = 1; x  <= length[2]; x++) {
+            for(x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 if (*getFlag(flagField, node, n) != OBSTACLE) {
                     computeDensity(getEl(collideField, node, 0, n), &density);
@@ -96,8 +96,8 @@ void write_vtkHeader( FILE *fp, int * length) {
     fprintf(fp,"ASCII\n");
     fprintf(fp,"\n");	
     fprintf(fp,"DATASET STRUCTURED_GRID\n");
-    fprintf(fp,"DIMENSIONS  %i %i %i \n", length[2], length[1], length[0]);
-    fprintf(fp,"POINTS %i float\n", length[0]*length[1]*length[2]);
+    fprintf(fp,"DIMENSIONS  %i %i %i \n", length[0], length[1], length[2]);
+    fprintf(fp,"POINTS %i float\n", length[0] * length[1] * length[2]);
     fprintf(fp,"\n");
 }
 
@@ -111,9 +111,9 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
     int y = 0;
     int z = 0;
 
-    for(z = 1; z <= length[0]; z++) {
+    for(z = 1; z <= length[2]; z++) {
         for(y = 1; y <= length[1]; y++) {
-            for(x = 1; x <= length[2]; x++) {
+            for(x = 1; x <= length[0]; x++) {
                 /* dx = dy = dz = 1 */
                 fprintf(fp, "%d %d %d\n", originX + x, originY + y, originZ + z);
             }

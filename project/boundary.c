@@ -18,9 +18,8 @@ void setNoSlip(double * collideField, int * flagField, int * node, int * n) {
         coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
 
         /* does the pointed cell lay in our domain? */
-        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+        if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
-            // TODO printf("%d %d %d \n",coord_dest[0],coord_dest[1],coord_dest[2] );
             /* if pointed cell is FLUID */
             if (*getFlag(flagField, coord_dest, n) == FLUID) {
                 /* get pointer to the i-th lattice of boundary cell */
@@ -51,10 +50,9 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
         coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
 
         /* does the pointed cell lay in our domain? */
-        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+        if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0 ) {
        
-            /** TODO do we need to consider FLUID-OBSTACLE boundaries? */
             /* if pointed cell is FLUID */
             if (*getFlag(flagField, coord_dest, n) == FLUID) {
                 /* get pointer to the i-th lattice of boundary cell */
@@ -97,13 +95,12 @@ void setOutflow(double * collideField,
     /* for each lattice */
     for (i = 0; i < Q; i++) {
         /* compute a cell where lattice is pointing*/
-        /** TODO Am I sure that we need to use those coordinates? */
         coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
         coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
         coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
 
         /* does the pointed cell lay in our domain? */
-        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+        if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0 ) {
        
             if (*getFlag(flagField, coord_dest, n) == FLUID) {
@@ -157,14 +154,13 @@ void setInflow(double * collideField,
     /* for each lattice */
     for (i = 0; i < Q; i++) {
         /* compute a cell where lattice is pointing*/
-        /** TODO */
         coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
         coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
         coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
 
         /* does the pointed cell lay in our domain? */
-        if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
-            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0 ) {
+        if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
+            coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
        
             if (*getFlag(flagField, coord_dest, n) == FLUID) {
             
@@ -194,15 +190,15 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
             coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
             coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
             /* If the pointed cell does not fall out of bounds */
-            if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
-                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >=0) {            
+            if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
+                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
                 /* if pointed cell is FLUID */
                 if (*getFlag(flagField, coord_dest, n) == FLUID) {    
                     for (j = 0; j < Q; j++) {
                         /* looking for a direction with one of the components inverse to the direction of the face */
                         if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1 ||
                            LATTICEVELOCITIES[i][1]*LATTICEVELOCITIES[j][1] == -1 ||
-                           LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1){
+                           LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1) {
                             
                             /* If the selected direction of the fluid cell falls on another fluid cell, they will interact in the streaming step */
                             non_fluid_cell[0] = coord_dest[0] + LATTICEVELOCITIES[j][0];
@@ -242,7 +238,7 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
             coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
             coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
     
-            if (coord_dest[0] < n[2] && coord_dest[1] < n[1] && coord_dest[2] < n[0] &&
+            if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
                 coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
                 /* if pointed cell is FLUID */
                 if (*getFlag(flagField, coord_dest, n) == FLUID) {
@@ -267,7 +263,6 @@ void boundaryCell(double * collideField,
                   const double * const velocity,
                   int * node,
                   int * n) {
-    /** TODO maybe it is more convenient to use length[0] for x and length[2] for z, and not vice versa */
 
     /* Type of boundary cell */
     int flag = *getFlag(flagField, node, n);
@@ -298,11 +293,11 @@ void treatBoundary(double *collideField,
     int x, y, z, flag, node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-    for (z = 0; z < n[0]; z++) {
+    for (z = 0; z < n[2]; z++) {
         node[2] = z;
         for (y = 0; y < n[1]; y++) {
             node[1] = y;
-            for (x = 0; x < n[2]; x++) {
+            for (x = 0; x < n[0]; x++) {
                 node[0] = x;
                 flag = *getFlag(flagField, node, n);
                 if (flag != FLUID && flag != OBSTACLE) {

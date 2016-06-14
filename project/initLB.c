@@ -28,9 +28,9 @@ int readParameters(
     strcpy(filename,argv[1]);
     const char *szFileName = strcat( filename,".dat"); /* Concatenate .dat so the imput is independent of extesion*/
 
-    read_int(szFileName, "zlength", &length[0]);
+    read_int(szFileName, "zlength", &length[2]);
     read_int(szFileName, "ylength", &length[1]);
-    read_int(szFileName, "xlength", &length[2]);
+    read_int(szFileName, "xlength", &length[0]);
     read_double(szFileName,"tau", tau);
 
     read_double(szFileName, "velocity_x", &velocity[0]);
@@ -77,8 +77,8 @@ void checkForbiddenPatterns(int ** image, int * length) {
     int x, z;
     int c1, c2, c3, c4, result;
 
-    for (x = 0; x <= length[2]; x++) {
-        for (z = 0; z <= length[0]; z++) {
+    for (x = 0; x <= length[0]; x++) {
+        for (z = 0; z <= length[2]; z++) {
             c1 = image[x][z] == FLUID;
             c2 = image[x + 1][z] == FLUID;
             c3 = image[x][z + 1] == FLUID;
@@ -102,32 +102,25 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     image = read_pgm(filename);/* Concatenate .pgm so the imput is independent of extension*/
     checkForbiddenPatterns(image, length);
 
-    for (z = 0; z <= length[0]; z++) {
-        for (x = 0; x <= length[2]; x++) {
-            printf("%d ", image[x][z]);
-        }
-        printf("\n");
-    }
-
     /* 
     *   Definition of the fields 
     *   The structure of the looping makes possible to define the boudaries
     */
     /* z = 0; */
     node[2] = 0;
-    for (y = 0; y <= length[1]+1; ++y){
+    for (y = 0; y <= length[1] + 1; ++y){
         node[1] = y;
-        for (x = 0; x <= length[2]+1; ++x){			
+        for (x = 0; x <= length[0] + 1; ++x){			
             node[0] = x;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[4]);   /* Loop for the down wall of the cavity*/
         }
     }
     
-    for (z = 1; z <= length[0]; ++z){
+    for (z = 1; z <= length[2]; ++z){
         node[2] = z;
         /* y = 0; */
         node[1] = 0;
-        for (x = 0; x <= length[2]+1; ++x){
+        for (x = 0; x <= length[0] + 1; ++x){
             node[0] = x;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[2]);   /* Loop for the front wall of the cavity*/
         }
@@ -137,33 +130,33 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             /* x = 0; */
             node[0] = 0;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[0]);   /* Loop for the left wall of the cavity*/
-            for (x = 1; x <= length[2]; ++x){				
+            for (x = 1; x <= length[0]; ++x){				
                 node[0] = x;
                 initialiseCell(collideField, streamField, flagField, length, node, image[x][z]);           /* Loop for the interior points*/
             }
-            /* x = length[2]+1; */
-            node[0] = length[2] + 1;
+            /* x = length[0]+1; */
+            node[0] = length[0] + 1;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[1]);   /* Loop for the right wall of the cavity*/
         }
 
         /* y = length[1]+1; */
         node[1] = length[1] + 1;
-        for (x = 0; x <= length[2]+1; ++x){
+        for (x = 0; x <= length[0] + 1; ++x){
             node[0] = x;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[3]);   /* Loop for the back wall of the cavity*/
         }
     }
 
-    /* z = length[0] + 1; */
-    node[2] = length[0] + 1;
-    for (y = 0; y <= length[1]+1; ++y){
+    /* z = length[2] + 1; */
+    node[2] = length[2] + 1;
+    for (y = 0; y <= length[1] + 1; ++y){
         node[1] = y;
-        for (x = 0; x < length[2]+2; ++x){
+        for (x = 0; x < length[0] + 2; ++x){
             node[0] = x;
             initialiseCell(collideField, streamField, flagField, length, node, boundaries[5]);   /* Loop for the up wall of the cavity*/
         }
     }
 
-    free_imatrix(image, 0, length[0] + 2, 0, length[2] + 2);
+    free_imatrix(image, 0, length[2] + 2, 0, length[0] + 2);
 }
 

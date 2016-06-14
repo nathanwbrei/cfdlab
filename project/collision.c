@@ -29,11 +29,11 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     // Loop over inner cells: compare to streaming.c
-    for (z = 1; z <= length[0]; z++) {
+    for (z = 1; z <= length[2]; z++) {
         node[2] = z;
         for (y = 1; y <= length[1]; y++) {
             node[1] = y;
-            for (x = 1; x <= length[2]; x++) {
+            for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 if (*getFlag(flagField, node, n) == FLUID) {
                     currentCell = getEl(collideField, node, 0, n);

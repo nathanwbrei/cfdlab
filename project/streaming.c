@@ -8,11 +8,11 @@ void doStreaming(double * collideField, double * streamField, int * flagField, i
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     /* Loop for inner cells */
-    for (z = 1; z <= length[0]; z++) {
+    for (z = 1; z <= length[2]; z++) {
         node[2] = z;
         for (y = 1; y <= length[1]; y++) {
             node[1] = y;
-            for (x = 1; x <= length[2]; x++) {
+            for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 for (i = 0; i < Q; i++) {
                     source_node[0] = x - LATTICEVELOCITIES[i][0];
