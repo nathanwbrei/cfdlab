@@ -39,3 +39,6 @@ worksheet1/sim
 
 # Worksheet 2 & 3 & 4 generated files
 worksheet[234]/lbsim
+
+# Project generated files
+project/lbsim
