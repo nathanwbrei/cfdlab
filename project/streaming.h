@@ -4,7 +4,7 @@
 /** carries out the streaming step and writes the respective distribution functions from
  *  collideField to streamField.
  */
-void doStreaming(double *collideField, double *streamField,int *flagField,int * length);
+void doStreaming(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length);
 
 #endif
 

@@ -21,9 +21,12 @@ int main(int argc, char *argv[]){
     /* Read the file of parameters */
     readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
     /* Allocate memory */
-    double  *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
-    double  *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
-    int  *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
+    double *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
+    double *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
+    int *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
+    double * massField = (double *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(double));
+    /* fluid fraction field */
+    double * fractionField = (double *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(double));
 
     double viscosity = C_S * C_S * (tau - 0.5);
     double Re = 1 / viscosity;
@@ -56,11 +59,11 @@ int main(int argc, char *argv[]){
 
         start_time = clock();  // Start the timer for the lattice updates
 
-        doStreaming(collideField, streamField, flagField, length);
+        doStreaming(collideField, streamField, flagField, massField, fractionField, length);
         swap = collideField;
         collideField = streamField;
         streamField = swap;
-        doCollision(collideField,flagField,&tau,length,extForces);
+        doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces);
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
@@ -79,6 +82,8 @@ int main(int argc, char *argv[]){
     free(collideField);
     free(streamField);
     free(flagField);
+    free(massField);
+    free(fractionField);
     
     return 0;
 }

@@ -20,19 +20,31 @@
 /**
  * Return pointer to i-th lattice in (x, y, z) cell
  */
-/** TODO pass coordinates as a array [x, y, z] */
 static inline double * getEl(double * array, int * node, int i, int *n) {
     return array + Q * (node[2] * n[0] * n[1] + node[1] * n[0] + node[0]) + i;
 }
 
 /**
- * Return nodeer to (x,y,z) element
+ * Return pointer to a flag of (x,y,z) element
  */
-/** TODO pass coordinates as a array [x, y, z] */
 static inline int * getFlag(int * array, int * node, int *n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 
+/**
+ * Return pointer to a mass of (x,y,z) element
+ */
+static inline double * getMass(double * array, int * node, int *n) {
+    return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
+}
+
+/**
+ * Return pointer to a mass of (x,y,z) element
+ */
+/* TODO think about common function name for getMass and getFraction */
+static inline double * getFraction(double * array, int * node, int *n) {
+    return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
+}
 /**
  * Maximum length of input lines
  */
