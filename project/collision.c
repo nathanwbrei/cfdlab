@@ -1,7 +1,16 @@
 #include "helper.h"
 #include "collision.h"
 
-void computePostCollisionDistributions(double *currentCell, const double * const tau, const double *const feq){
+double computeExternal (int i, double density, double * extForces){
+    /* Computes the influence of external forces, like gravity */
+    int j = 0;
+    double dprod = 0;
+    for (j = 0; j < D; ++j)
+        dprod += LATTICEVELOCITIES[i][j] * extForces[j];
+    return dprod * density * LATTICEWEIGHTS[i];
+}
+
+void computePostCollisionDistributions(double *currentCell, const double * const tau, const double *const feq, double density, double * extForces){
     /* Compute the post-collision distribution f*[i] according to BGK update rule. See Eq 14.  */
 
     int i;
@@ -9,11 +18,11 @@ void computePostCollisionDistributions(double *currentCell, const double * const
 
     for (i=0; i<Q; i++) {
         fi = currentCell[i];
-        currentCell[i] = fi - (fi - feq[i]) / *tau;
+        currentCell[i] = fi - (fi - feq[i]) / *tau + computeExternal(i, density, extForces);
     }
 }
 
-void doCollision(double *collideField, int *flagField, const double * const tau, int * length){
+void doCollision(double *collideField, int *flagField, const double * const tau, int * length, double * extForces){
     /* 
      * For each inner grid cell in collideField, compute the post-collide
      * distribution
@@ -40,7 +49,7 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
                     computeDensity(currentCell, &density);
                     computeVelocity(currentCell, &density, velocity);
                     computeFeq(&density, velocity, feq);
-                    computePostCollisionDistributions(currentCell, tau, feq);
+                    computePostCollisionDistributions(currentCell, tau, feq, density, extForces);
                 }
             }
         }

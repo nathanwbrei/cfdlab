@@ -1,0 +1,28 @@
+xlength       	8
+ylength       	8
+zlength       	20
+
+tau           	1.8
+
+velocity_x    	0
+velocity_y    	0
+velocity_z    	0
+
+forces_x    	0
+forces_y    	0
+forces_z    	-0.005
+
+timesteps     	100
+
+vtkoutput     	2
+
+problem   parabolic
+ro_ref		1
+ro_in		1.005
+
+wall_x0   	1
+wall_xmax	  1
+wall_y0  	  1
+wall_ymax	  1
+wall_z0 	  1
+wall_zmax	  1

@@ -13,13 +13,13 @@
 int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6];
     /* TODO do we need inVelocity? */
-    double tau, velocity[3], ro_in, ro_ref;
+    double tau, velocity[3], ro_in, ro_ref, extForces[3];
     int t;
     double *swap=NULL;
     clock_t start_time, total_time = 0;
     char problem [10];
     /* Read the file of parameters */
-    readParameters(length, &tau, velocity, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
+    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
     /* Allocate memory */
     double  *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
     double  *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( double ));
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
         swap = collideField;
         collideField = streamField;
         streamField = swap;
-        doCollision(collideField,flagField,&tau,length);
+        doCollision(collideField,flagField,&tau,length,extForces);
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time

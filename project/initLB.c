@@ -11,6 +11,7 @@ int readParameters(
     int *length,                        /* reads domain size. Parameter name: "xlength" */
     double *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
     double *velocity,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
+    double *extForces,                  /* External force, like gravity or electromagnetic */
     int *timesteps,                     /* number of timesteps. Parameter name: "timesteps" */
     int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
     int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
@@ -36,6 +37,10 @@ int readParameters(
     read_double(szFileName, "velocity_x", &velocity[0]);
     read_double(szFileName, "velocity_y", &velocity[1]);
     read_double(szFileName, "velocity_z", &velocity[2]);
+    
+    read_double(szFileName, "forces_x", &extForces[0]);
+    read_double(szFileName, "forces_y", &extForces[1]);
+    read_double(szFileName, "forces_z", &extForces[2]);
     
     read_int(szFileName, "timesteps", timesteps);
     read_int(szFileName, "vtkoutput", timestepsPerPlotting);
