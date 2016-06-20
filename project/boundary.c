@@ -86,7 +86,7 @@ void setOutflow(double * collideField,
                 const double * const ro_ref,
                 int * node,
                 int * n) {
-    int i, coord_dest[3];
+    int i, coord_dest[3], flag;
     double * cell_ptr;
     double feq[Q];
     double velocity[D];
@@ -102,8 +102,9 @@ void setOutflow(double * collideField,
         /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0 ) {
+            flag = *getFlag(flagField, coord_dest, n);
        
-            if (*getFlag(flagField, coord_dest, n) == FLUID) {
+            if (flag == FLUID || flag == INTERFACE) {
                 /* get pointer to the fluid cell */
                 fluidCell = getEl(collideField, coord_dest, 0, n);
 
@@ -262,12 +263,13 @@ void boundaryCell(double * collideField,
                   const double * const ro_in,
                   const double * const velocity,
                   int * node,
+                  int flag,
                   int * n) {
 
-    /* Type of boundary cell */
-    int flag = *getFlag(flagField, node, n);
-
-    if (flag == NOSLIP) {
+    if (flag == GAS) {
+        /* Reconstruction of gas distributions is the same as outflow condition */
+        setOutflow(collideField, flagField, ro_ref, node, n);
+    } else if (flag == NOSLIP) {
         setNoSlip(collideField, flagField, node, n);
     } else if (flag == MOVING_WALL) {
         setMovingWall(collideField, flagField, velocity, node, n);
@@ -300,8 +302,8 @@ void treatBoundary(double *collideField,
             for (x = 0; x < n[0]; x++) {
                 node[0] = x;
                 flag = *getFlag(flagField, node, n);
-                if (flag != FLUID && flag != OBSTACLE) {
-                    boundaryCell(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, node, n);
+                if (flag != FLUID && flag != OBSTACLE && flag != INTERFACE) {
+                    boundaryCell(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, node, flag, n);
                 }
             }
         }
