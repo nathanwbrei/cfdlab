@@ -9,6 +9,7 @@
 #include "visualLB.h"
 #include "boundary.h"
 #include "flag.h"
+#include "checks.h"
 
 int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6];
@@ -69,6 +70,7 @@ int main(int argc, char *argv[]){
         total_time += clock() - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
+            run_checks(collideField, massField, flagField, length, t );
             writeVtkOutput(collideField, flagField, argv[1], t, length);
             printf("Time step %i finished, vtk file was created\n", t);
         }
