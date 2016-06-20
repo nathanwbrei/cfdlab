@@ -8,7 +8,7 @@
 #include "initLB.h"
 #include "visualLB.h"
 #include "boundary.h"
-#include "LBDefinitions.h"
+#include "flag.h"
 
 int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6];
