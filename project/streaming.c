@@ -14,10 +14,9 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
         source_node[1] = node[1] - LATTICEVELOCITIES[i][1];
         source_node[2] = node[2] - LATTICEVELOCITIES[i][2];
 
-        /* no interaction between GAS cells */
-        if (*getFlag(flagField, source_node, n) == GAS) {
-            continue;
-        }
+        /* Amount of particles that goes to this cell */
+        fi_nb = *getEl(collideField, source_node, i, n);
+        *getEl(streamField, node, i, n) = fi_nb;
 
         if (isFluid) {
             /* If it is fluid then mass is equal to density */
@@ -25,10 +24,6 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
             computeDensity(streamField, &density);
             *getMass(massField, node, n) = density;
         } else {
-        /* Amount of particles that goes to this cell */
-        fi_nb = *getEl(collideField, source_node, i, n);
-        *getEl(streamField, node, i, n) = fi_nb;
-
         /*
           Update mass field according formula (4.3) (PhD thesis):
           dm_i(x, t + dt) = se * (E(x + dt*e_i, t) + E(x, t)) / 2
