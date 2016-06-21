@@ -65,6 +65,7 @@ int main(int argc, char *argv[]){
         collideField = streamField;
         streamField = swap;
         doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces);
+        updateFlagField(collideField, flagField, fractionField, length);
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
         total_time += clock() - start_time; // Add elapsed ticks to total_time
