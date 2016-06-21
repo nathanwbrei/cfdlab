@@ -1,14 +1,15 @@
 #include "LBDefinitions.h"
 #include "helper.h"
+#include "flag.h"
 
 void updateFlagField(double * collideField, int * flagField, double * fractionField, int * length) {
-    int x, y, z, flag, nFilled = 0, nEmptied = 0, k, i;
+    int x, y, z, flag, nFilled = 0, nEmptied = 0, k;
     int node[3];
-    double fraction, * cell;
+    double fraction;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
-    double * filledCells[n[0] * n[1] * n[2]];
-    double * emptiedCells[n[0] * n[1] * n[2]];
+    int filledCells[n[0] * n[1] * n[2]][3];
+    int emptiedCells[n[0] * n[1] * n[2]][3];
 
     /*
       Updating flags for INTERFACE cells:
@@ -27,14 +28,21 @@ void updateFlagField(double * collideField, int * flagField, double * fractionFi
 
                 /* We are interested only in INTERFACE cells now */
                 if (flag == INTERFACE) {
-                    cell = getEl(collideField, node, 0, n);
                     fraction = *getFraction(fractionField, node, n);
 
                     if (fraction > 1) {
-                        filledCells[nFilled++] = cell;
+                        filledCells[nFilled][0] = node[0];
+                        filledCells[nFilled][1] = node[1];
+                        filledCells[nFilled][2] = node[2];
+                        nFilled++;
+
                         *getFlag(flagField, node, n) = FLUID;
                     } else if (fraction < 0) {
-                        emptiedCells[nEmptied++] = cell;
+                        emptiedCells[nEmptied][0] = node[0];
+                        emptiedCells[nEmptied][1] = node[1];
+                        emptiedCells[nEmptied][2] = node[2];
+                        nEmptied++;
+
                         *getFlag(flagField, node, n) = GAS;
                     }
                 }
@@ -61,7 +69,30 @@ void updateFlagField(double * collideField, int * flagField, double * fractionFi
     /*
       Second - neighbors of the emptied cells.
      */
+    updateEmptiedNeighbors(collideField, flagField, emptiedCells, nEmptied, n);
+}
+
+void updateEmptiedNeighbors(double * collideField, int * flagField, int emptiedCells[][3], int nEmptied, int * n) {
+    int i, k, neighbor_node[3], * flag;
+
     for (k = 0; k < nEmptied; k++) {
-        /* TODO */
+        for (i = 0; i < Q; i++) {
+            neighbor_node[0] = emptiedCells[k][0] + LATTICEVELOCITIES[i][0];
+            neighbor_node[1] = emptiedCells[k][1] + LATTICEVELOCITIES[i][1];
+            neighbor_node[2] = emptiedCells[k][2] + LATTICEVELOCITIES[i][2];
+            //         printf("%i %i %i\n", neighbor_node[0], neighbor_node[1], neighbor_node[2]);
+            if (neighbor_node[0] == 0 || neighbor_node[0] == n[0] ||
+                neighbor_node[1] == 0 || neighbor_node[1] == n[1] ||
+                neighbor_node[2] == 0 || neighbor_node[2] == n[2]) {
+                continue;
+            }
+
+            flag = getFlag(flagField, neighbor_node, n);
+
+            if (*flag == FLUID) {
+                *flag = INTERFACE;
+            }
+        }
     }
+
 }
