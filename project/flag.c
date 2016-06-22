@@ -1,9 +1,192 @@
 #include "LBDefinitions.h"
 #include "helper.h"
 #include "flag.h"
+#include "computeCellValues.h"
+
+
+void makeAvgDistFn(double * collideField, int * n, int * cell) {
+    /*
+    A GAS cell that is promoted to INTERFACE needs an initial distribution function, which 
+    is calculated via f_eq(rho_avg, v_avg), 
+    where v_avg, rho_avg are averaged from the neighboring FLUID and INTERFACE cells.
+
+    collideField  An array of DFs for each cell in the domain, excluding boundary cells
+    n             The dimensions of the domain, including boundary cells
+    cell          The coordinates of the cell in need of a DF
+    */    
+
+    // TODO: How does this conserve mass?
+    // TODO: Do we have to set the mass field?
+    // TODO: Can we make this faster?
+
+    int i, neighbor[3], nNeighbors;
+    double density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF;
+    
+
+    cellDF = getEl(collideField, cell, 0, n);
+
+    nNeighbors = 0;
+    density_avg = 0;
+    velocity_avg[0] = 0;
+    velocity_avg[1] = 0;
+    velocity_avg[2] = 0;
+
+    // for each i <- lattice direction
+    for (i = 0; i < Q; i++) {
+
+        // Retrieve coordinates of neighbor in direction i
+        neighbor[0] = cell[0] + LATTICEVELOCITIES[i][0];
+        neighbor[1] = cell[1] + LATTICEVELOCITIES[i][1];
+        neighbor[2] = cell[2] + LATTICEVELOCITIES[i][2];
+
+        // Do not overstep boundaries
+        if (neighbor[0] < 1 || neighbor[0] > n[0]-2 || neighbor[1] == 0 || 
+            neighbor[1] == n[1] || neighbor[2] == 0 || neighbor[2] == n[2]) {
+            continue;
+        }
+
+        // Retrieve distribution function of that neighbor
+        neighborDF = getEl(collideField, neighbor, 0, n);
+
+        // Extract density, velocity from that neighbor
+        computeDensity(neighborDF, &density);
+        computeVelocity(neighborDF, &density, velocity);
+
+        nNeighbors++;
+        density_avg += density;
+        velocity_avg[0] += velocity[0];
+        velocity_avg[1] += velocity[1];
+        velocity_avg[2] += velocity[2];
+    }
+
+    density_avg /= nNeighbors;
+    velocity_avg[0] /= nNeighbors;
+    velocity_avg[1] /= nNeighbors;
+    velocity_avg[2] /= nNeighbors;
+    computeFeq(&density_avg, velocity_avg, cellDF);
+}
+
+
+// TODO Implement this
+// TODO Use a real data structure
+void removeFromEmptyList(int * neighbor) {
+
+}
+
+
+void performFill(double * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
+    /*
+    For collections of interface cells that get emptied or filled, examine the neighboring cells 
+    and update their flags to maintain the integrity of the interface layer. For example, if a cell 
+    is updated to FLUID, any neighboring GAS cells become INTERFACE.
+
+    collideField  An array of DFs for each cell in the domain
+    flagField     An array of flags <- {FLUID, INTERFACE, GAS, ...} for each cell in domain
+    n             The dimensions of flagField
+    updatedCells  An ?x3 array containing coordinates of cells which have just been updated
+    nUpdated      The length of updatedCells
+    */
+
+    int i, k, neighbor[3], *flag;
+
+    // for each k <- cell that has been updated
+    for (k = 0; k < nUpdated; k++) {         
+
+        // Update the cell's own flag
+        *getFlag(flagField, updatedCells[k], n) = FLUID;
+
+        // Update each neighbor to ensure mesh integrity
+        for (i = 0; i < Q; i++) {            // for each i <- lattice direction
+
+            // Retrieve coordinates of neighbor in direction i
+            neighbor[0] = updatedCells[k][0] + LATTICEVELOCITIES[i][0];
+            neighbor[1] = updatedCells[k][1] + LATTICEVELOCITIES[i][1];
+            neighbor[2] = updatedCells[k][2] + LATTICEVELOCITIES[i][2];
+
+
+            // Check if neighbor is on the domain boundary, in which case we ignore it
+            // TODO: See if this actually makes things faster, if not, delete it. 
+            //       Unless someone sets the FLUID flag as a domain boundary condition, 
+            //       which would probably cause lots of problems, this won't do anything.
+            if (neighbor[0] == 0 || neighbor[0] == n[0] || neighbor[1] == 0 || 
+                neighbor[1] == n[1] || neighbor[2] == 0 || neighbor[2] == n[2]) {
+                continue;
+            }
+
+            // Retrieve the flag corresponding to neighbor
+            flag = getFlag(flagField, neighbor, n);
+
+            // If neighbor needs to be updated
+            if (*flag == GAS) {
+
+                *flag = INTERFACE;
+
+                // update distribution function from average of neighbors
+                makeAvgDistFn(collideField, n, neighbor);
+
+                // Remove this neighbor from 'empty' list
+                removeFromEmptyList(neighbor); // TODO
+
+            }
+        }
+    }
+}
+
+
+
+void performEmpty(double * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
+    /*
+    For collections of interface cells that get emptied or filled, examine the neighboring cells 
+    and update their flags to maintain the integrity of the interface layer. For example, if a cell 
+    is updated to FLUID, any neighboring GAS cells become INTERFACE.
+
+    collideField  An array of DFs for each cell in the domain
+    flagField     An array of flags <- {FLUID, INTERFACE, GAS, ...} for each cell in domain
+    n             The dimensions of flagField
+    updatedCells  An ?x3 array containing coordinates of cells which have just been updated
+    nUpdated      The length of updatedCells
+    */
+
+    int i, k, neighbor[3], * flag;
+
+    // for each k <- cell that has been updated
+    for (k = 0; k < nUpdated; k++) {         
+
+        // Update the cell's own flag 
+        * getFlag(flagField, updatedCells[k], n) = GAS;
+
+        // Heal interface by updating neighbors
+        for (i = 0; i < Q; i++) {            // for each i <- lattice direction
+
+            // Retrieve coordinates of neighbor in direction i
+            neighbor[0] = updatedCells[k][0] + LATTICEVELOCITIES[i][0];
+            neighbor[1] = updatedCells[k][1] + LATTICEVELOCITIES[i][1];
+            neighbor[2] = updatedCells[k][2] + LATTICEVELOCITIES[i][2];
+
+            // Check if neighbor is on the domain boundary, in which case we ignore it
+            // TODO: See if this actually makes things faster, if not, delete it. 
+            //       Unless someone sets the FLUID flag as a domain boundary condition, 
+            //       which would probably cause lots of problems, this won't do anything.
+            if (neighbor[0] == 0 || neighbor[0] == n[0] || neighbor[1] == 0 || 
+                neighbor[1] == n[1] || neighbor[2] == 0 || neighbor[2] == n[2]) {
+                continue;
+            }
+
+            // Retrieve the flag corresponding to neighbor
+            flag = getFlag(flagField, neighbor, n);
+
+            // Swap out flag
+            if (*flag == FLUID) {
+                *flag = INTERFACE;
+            }
+        }
+    }
+}
+
+
 
 void updateFlagField(double * collideField, int * flagField, double * fractionField, int * length) {
-    int x, y, z, flag, nFilled = 0, nEmptied = 0, k;
+    int x, y, z, flag, nFilled = 0, nEmptied = 0;
     int node[3];
     double fraction;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
@@ -36,63 +219,27 @@ void updateFlagField(double * collideField, int * flagField, double * fractionFi
                         filledCells[nFilled][2] = node[2];
                         nFilled++;
 
-                        *getFlag(flagField, node, n) = FLUID;
                     } else if (fraction < 0) {
                         emptiedCells[nEmptied][0] = node[0];
                         emptiedCells[nEmptied][1] = node[1];
                         emptiedCells[nEmptied][2] = node[2];
                         nEmptied++;
-
-                        *getFlag(flagField, node, n) = GAS;
                     }
                 }
             }
         }
     }
 
-    /*
-      On this step we need to update neighbors of filled and emptied cells
-      in order to have closed interface layer
-     */
 
-    /*
-      First - neighbors of the filled cells.
-      We need to convert all empty neighbors of filled cells to INTERFACE.
-      Distribution of these cells will be initialized with f_eq(rho_avg, v_avg),
-      where v_avg and rho_avg is average characteristics of surrounding FLUID and INTERFACE cells.
-      All such neighbors must be deleted from emptiedCells array.
-     */
-    for (k = 0; k < nFilled; k++) {
-        /* TODO */
-    }
-
-    /*
-      Second - neighbors of the emptied cells.
-     */
-    updateEmptiedNeighbors(collideField, flagField, emptiedCells, nEmptied, n);
+    // Update neighbors of filled and emptied cells in order to have closed interface layer
+    performFill(collideField, flagField, n, filledCells, nFilled);
+    performEmpty(collideField, flagField, n, emptiedCells, nEmptied);
+    
+    // TODO: Redistribute mass
 }
 
-void updateEmptiedNeighbors(double * collideField, int * flagField, int emptiedCells[][3], int nEmptied, int * n) {
-    int i, k, neighbor_node[3], * flag;
 
-    for (k = 0; k < nEmptied; k++) {
-        for (i = 0; i < Q; i++) {
-            neighbor_node[0] = emptiedCells[k][0] + LATTICEVELOCITIES[i][0];
-            neighbor_node[1] = emptiedCells[k][1] + LATTICEVELOCITIES[i][1];
-            neighbor_node[2] = emptiedCells[k][2] + LATTICEVELOCITIES[i][2];
-            //         printf("%i %i %i\n", neighbor_node[0], neighbor_node[1], neighbor_node[2]);
-            if (neighbor_node[0] == 0 || neighbor_node[0] == n[0] ||
-                neighbor_node[1] == 0 || neighbor_node[1] == n[1] ||
-                neighbor_node[2] == 0 || neighbor_node[2] == n[2]) {
-                continue;
-            }
 
-            flag = getFlag(flagField, neighbor_node, n);
 
-            if (*flag == FLUID) {
-                *flag = INTERFACE;
-            }
-        }
-    }
 
-}
+
