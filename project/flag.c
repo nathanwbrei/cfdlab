@@ -4,7 +4,7 @@
 #include "computeCellValues.h"
 
 
-void makeAvgDistFn(double * collideField, int * n, int * cell) {
+void makeAvgDistFn(double * collideField, int * flagField, int * n, int * cell) {
     /*
     A GAS cell that is promoted to INTERFACE needs an initial distribution function, which 
     is calculated via f_eq(rho_avg, v_avg), 
@@ -19,7 +19,7 @@ void makeAvgDistFn(double * collideField, int * n, int * cell) {
     // TODO: Do we have to set the mass field?
     // TODO: Can we make this faster?
 
-    int i, neighbor[3], nNeighbors;
+    int i, neighbor[3], nNeighbors, flag;
     double density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF;
     
 
@@ -42,6 +42,12 @@ void makeAvgDistFn(double * collideField, int * n, int * cell) {
         // Do not overstep boundaries
         if (neighbor[0] < 1 || neighbor[0] > n[0]-2 || neighbor[1] == 0 || 
             neighbor[1] == n[1] || neighbor[2] == 0 || neighbor[2] == n[2]) {
+            continue;
+        }
+
+        flag = *getFlag(flagField, neighbor, n);
+
+        if (flag != FLUID && flag != INTERFACE) {
             continue;
         }
 
@@ -122,7 +128,7 @@ void performFill(double * collideField, int * flagField, int * n, int updatedCel
                 *flag = INTERFACE;
 
                 // update distribution function from average of neighbors
-                makeAvgDistFn(collideField, n, neighbor);
+                makeAvgDistFn(collideField, flagField, n, neighbor);
 
                 // Remove this neighbor from 'empty' list
                 removeFromEmptyList(neighbor); // TODO
