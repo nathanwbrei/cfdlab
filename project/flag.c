@@ -73,14 +73,44 @@ void makeAvgDistFn(double * collideField, int * flagField, int * n, int * cell) 
 }
 
 
-// TODO Implement this
 // TODO Use a real data structure
-void removeFromEmptyList(int * neighbor) {
+void removeFromEmptyList(int emptiedCells[][3], int * nEmptied, int * targetCell) {
 
+    // printf("REMOVING: %d,%d,%d\n", targetCell[0], targetCell[1], targetCell[2]);
+    // printf("BEFORE: List contains: ");
+    // for (int k=0; k < *nEmptied; k++) {
+    //     printf("(%d,%d,%d), ", emptiedCells[k][0],emptiedCells[k][1],emptiedCells[k][2]);
+
+    // }
+    // printf("\n");
+    int j = 0; 
+    while (j < *nEmptied && !(
+        emptiedCells[j][0] == targetCell[0] && 
+        emptiedCells[j][1] == targetCell[1] &&
+        emptiedCells[j][2] == targetCell[2])) {
+        j++;
+    }
+    // j is either nEmptied or index of match
+    for (int k=j; k < (*nEmptied)-1; k++) {
+        emptiedCells[k][0] = emptiedCells[k+1][0];
+        emptiedCells[k][1] = emptiedCells[k+1][1];
+        emptiedCells[k][2] = emptiedCells[k+1][2];
+    }
+    // Decrement list length
+    if (j != *nEmptied) {
+        // printf("*************** REMOVED SOMETHING ******************\n");
+        (*nEmptied)--;
+    }
+
+    // printf("After list contains: ");
+    // for (int k=0; k < *nEmptied; k++) {
+    //     printf("(%d,%d,%d), ", emptiedCells[k][0],emptiedCells[k][1],emptiedCells[k][2]);
+    // }
+    // printf("\n");
 }
 
 
-void performFill(double * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
+void performFill(double * collideField, int * flagField, int * n, int filledCells[][3], int nFilled, int emptiedCells[][3], int * nEmptied) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -89,25 +119,27 @@ void performFill(double * collideField, int * flagField, int * n, int updatedCel
     collideField  An array of DFs for each cell in the domain
     flagField     An array of flags <- {FLUID, INTERFACE, GAS, ...} for each cell in domain
     n             The dimensions of flagField
-    updatedCells  An ?x3 array containing coordinates of cells which have just been updated
-    nUpdated      The length of updatedCells
+    filledCells   An ?x3 array containing coordinates of cells which have just been filled
+    nFilled       The length of emptiedCells
+    emptiedCells  An ?x3 array containing coordinates of cells which have just been emptied
+    nEmptied      The length of emptiedCells
     */
 
     int i, k, neighbor[3], *flag;
 
     // for each k <- cell that has been updated
-    for (k = 0; k < nUpdated; k++) {         
+    for (k = 0; k < nFilled; k++) {         
 
         // Update the cell's own flag
-        *getFlag(flagField, updatedCells[k], n) = FLUID;
+        *getFlag(flagField, filledCells[k], n) = FLUID;
 
         // Update each neighbor to ensure mesh integrity
         for (i = 0; i < Q; i++) {            // for each i <- lattice direction
 
             // Retrieve coordinates of neighbor in direction i
-            neighbor[0] = updatedCells[k][0] + LATTICEVELOCITIES[i][0];
-            neighbor[1] = updatedCells[k][1] + LATTICEVELOCITIES[i][1];
-            neighbor[2] = updatedCells[k][2] + LATTICEVELOCITIES[i][2];
+            neighbor[0] = filledCells[k][0] + LATTICEVELOCITIES[i][0];
+            neighbor[1] = filledCells[k][1] + LATTICEVELOCITIES[i][1];
+            neighbor[2] = filledCells[k][2] + LATTICEVELOCITIES[i][2];
 
 
             // Check if neighbor is on the domain boundary, in which case we ignore it
@@ -131,8 +163,7 @@ void performFill(double * collideField, int * flagField, int * n, int updatedCel
                 makeAvgDistFn(collideField, flagField, n, neighbor);
 
                 // Remove this neighbor from 'empty' list
-                removeFromEmptyList(neighbor); // TODO
-
+                removeFromEmptyList(emptiedCells, nEmptied, neighbor);
             }
         }
     }
@@ -238,9 +269,9 @@ void updateFlagField(double * collideField, int * flagField, double * fractionFi
 
 
     // Update neighbors of filled and emptied cells in order to have closed interface layer
-    performFill(collideField, flagField, n, filledCells, nFilled);
+    performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied);
     performEmpty(collideField, flagField, n, emptiedCells, nEmptied);
-    
+
     // TODO: Redistribute mass
 }
 
