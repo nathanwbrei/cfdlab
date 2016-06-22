@@ -81,3 +81,4 @@ void run_checks(double *collideField, double *massField, int *flagField, int * l
 	check_flags(flagField, length, FLUID, GAS, 	 t);
 	check_mass( massField, flagField, length, t);
 }
+

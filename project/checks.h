@@ -23,3 +23,4 @@ void check_mass(double *massField, int* flagField, int* length, int t);
 void run_checks(double *collideField, double *massField, int *flagField, int * length, int t );
 
 #endif
+
