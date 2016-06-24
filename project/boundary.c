@@ -7,7 +7,7 @@
  * Set NOSLIP condition
  */
 void setNoSlip(double * collideField, int * flagField, int * node, int * n) {
-    int i, coord_dest[3];
+    int i, coord_dest[3], flag;
     double * cell_ptr;
 
     /* for each lattice */
@@ -20,8 +20,9 @@ void setNoSlip(double * collideField, int * flagField, int * node, int * n) {
         /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
-            /* if pointed cell is FLUID */
-            if (*getFlag(flagField, coord_dest, n) == FLUID) {
+            flag = *getFlag(flagField, coord_dest, n);
+            /* if pointed cell is FLUID or INTERFACE */
+            if (flag == FLUID || flag == INTERFACE) {
                 /* get pointer to the i-th lattice of boundary cell */
                 cell_ptr = getEl(collideField, node, i, n);
     
@@ -136,7 +137,7 @@ void setInflow(double * collideField,
                const double * const inVelocity,
                int * node,
                int * n) {
-    int i, coord_dest[3];
+    int i, coord_dest[3], flag;
     double * cell_ptr;
     double feq[Q];
     double velocity[3];
@@ -162,8 +163,9 @@ void setInflow(double * collideField,
         /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
+            flag = *getFlag(flagField, coord_dest, n); 
        
-            if (*getFlag(flagField, coord_dest, n) == FLUID) {
+            if (flag == FLUID || flag == INTERFACE) {
             
                 computeFeq(ro_ref, velocity, feq);
 
@@ -176,7 +178,7 @@ void setInflow(double * collideField,
 }
 
 void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
-    int i, j, k, coord_dest[3], non_fluid_cell[3], sum;
+    int i, j, k, coord_dest[3], non_fluid_cell[3], sum, flag;
     double * cell_ptr;
 
     for (i = 0; i < Q; i++) {
@@ -193,8 +195,9 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
             /* If the pointed cell does not fall out of bounds */
             if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
                 coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
+                flag = *getFlag(flagField, coord_dest, n);
                 /* if pointed cell is FLUID */
-                if (*getFlag(flagField, coord_dest, n) == FLUID) {    
+                if (flag == FLUID || flag == INTERFACE) {    
                     for (j = 0; j < Q; j++) {
                         /* looking for a direction with one of the components inverse to the direction of the face */
                         if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1 ||
@@ -206,7 +209,8 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
                             non_fluid_cell[1] = coord_dest[1] + LATTICEVELOCITIES[j][1];
                             non_fluid_cell[2] = coord_dest[2] + LATTICEVELOCITIES[j][0];
 
-                            if (*getFlag(flagField, non_fluid_cell, n) != FLUID) {
+                            flag = *getFlag(flagField, non_fluid_cell, n);
+                            if (flag != FLUID && flag != INTERFACE) {
                                 for (k = 0; k < Q; k++) {
                                     /* Search for a (unique) direcrion in the boundary cell which is the reflection of the fluid cell */
                                     if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1 || 
@@ -241,8 +245,9 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
     
             if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
                 coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
+                flag = *getFlag(flagField, coord_dest, n); 
                 /* if pointed cell is FLUID */
-                if (*getFlag(flagField, coord_dest, n) == FLUID) {
+                if (flag == FLUID || flag == INTERFACE) {
                     /* get pointer to the i-th lattice of boundary cell */
                     cell_ptr = getEl(collideField, node, i, n);
         

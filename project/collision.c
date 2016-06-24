@@ -45,7 +45,7 @@ void doCollision(double *collideField, int *flagField, double * massField, doubl
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 flag = *getFlag(flagField, node, n);
-                if (flag == FLUID || flag == INTERFACE || flag == GAS) {
+                if (flag == FLUID || flag == INTERFACE) {
                     currentCell = getEl(collideField, node, 0, n);
                     computeDensity(currentCell, &density);
                     computeVelocity(currentCell, &density, velocity);

@@ -25,7 +25,7 @@ void check_in_rank(double *collideField, int *flagField, int * length, int t){
 					if(density>1.1 || density<0.9)
 						printf("Warning: In timestep %d position %d %d %d is an anormal density of %f \n", t, node[0],node[1],node[2],density);
 
-					if(norm_v>(C_S*C_S))
+					if(norm_v>(3 * C_S * C_S))
 						printf("Warning: In timestep %d position %d %d %d is an anormal velocity of %f \n", t, node[0],node[1],node[2],norm_v);
 				}
 			}
@@ -77,8 +77,8 @@ void check_mass(double *massField, int* flagField, int* length, int t){
 }
 
 void run_checks(double *collideField, double *massField, int *flagField, int * length, int t ){
-	check_in_rank(collideField, flagField, length, t);
-	check_flags(flagField, length, FLUID, GAS, 	 t);
+//	check_in_rank(collideField, flagField, length, t);
+//	check_flags(flagField, length, FLUID, GAS, 	 t);
 	check_mass( massField, flagField, length, t);
 }
 

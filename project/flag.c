@@ -76,7 +76,7 @@ void makeAvgDistFn(double * collideField, int * flagField, int * n, int * cell) 
 // TODO Use a real data structure
 void removeFromEmptyList(int emptiedCells[][3], int * nEmptied, int * targetCell) {
 
-    // printf("REMOVING: %d,%d,%d\n", targetCell[0], targetCell[1], targetCell[2]);
+    //printf("REMOVING: %d,%d,%d\n", targetCell[0], targetCell[1], targetCell[2]);
     // printf("BEFORE: List contains: ");
     // for (int k=0; k < *nEmptied; k++) {
     //     printf("(%d,%d,%d), ", emptiedCells[k][0],emptiedCells[k][1],emptiedCells[k][2]);
@@ -225,7 +225,7 @@ void performEmpty(double * collideField, int * flagField, int * n, int updatedCe
 void updateFlagField(double * collideField, int * flagField, double * fractionField, int * length) {
     int x, y, z, flag, nFilled = 0, nEmptied = 0;
     int node[3];
-    double fraction;
+    double fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
     int filledCells[n[0] * n[1] * n[2]][3];
@@ -250,13 +250,13 @@ void updateFlagField(double * collideField, int * flagField, double * fractionFi
                 if (flag == INTERFACE) {
                     fraction = *getFraction(fractionField, node, n);
 
-                    if (fraction > 1) {
+                    if (fraction > 1 + eps) {
                         filledCells[nFilled][0] = node[0];
                         filledCells[nFilled][1] = node[1];
                         filledCells[nFilled][2] = node[2];
                         nFilled++;
 
-                    } else if (fraction < 0) {
+                    } else if (fraction < -eps) {
                         emptiedCells[nEmptied][0] = node[0];
                         emptiedCells[nEmptied][1] = node[1];
                         emptiedCells[nEmptied][2] = node[2];
