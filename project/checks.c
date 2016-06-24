@@ -58,7 +58,7 @@ void check_flags(int * flagField, int* length, int flag1, int flag2, int t){
 
 void check_mass(double *massField, int* flagField, int* length, int t){
 	double tot_mass = 0;
-	int node[D], x, y, z;
+	int node[D], x, y, z, flag;
 	int n[D] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
 	for (z = 1; z < length[2]; ++z){
@@ -67,9 +67,10 @@ void check_mass(double *massField, int* flagField, int* length, int t){
 			node[1] = y;
 			for (x = 1; x < length[0]; ++x){
 				node[0] = x;
-				if (*getFlag(flagField, node, n) == FLUID){
+        flag = *getFlag(flagField, node, n);
+				if (flag == FLUID || flag == INTERFACE) {
 					tot_mass += *getMass(massField, node, n);
-				}
+  			}
 			}
 		}
 	}

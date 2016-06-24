@@ -3,7 +3,7 @@
 #include "LBDefinitions.h"
 #include "computeCellValues.h"
 
-void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, int * n, int isFluid) {
+void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, int * n, int isInterface) {
     int i, flag;
     int source_node[3];
     double fi_nb, se;
@@ -18,13 +18,7 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
         fi_nb = *getEl(collideField, source_node, i, n);
         *getEl(streamField, node, i, n) = fi_nb;
 
-        if (isFluid) {
-            // TODO update it during the collide step
-            /* If it is fluid then mass is equal to density */
-            double density;
-            computeDensity(streamField, &density);
-            *getMass(massField, node, n) = density;
-        } else {
+        if (isInterface) {
         /*
           Update mass field according formula (4.3) (PhD thesis):
           dm_i(x, t + dt) = se * (E(x + dt*e_i, t) + E(x, t)) / 2
@@ -62,7 +56,7 @@ void doStreaming(double * collideField, double * streamField, int * flagField, d
                 isInterface = flag == INTERFACE;
 
                 if (isFluid || isInterface) {
-                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, n, isFluid);
+                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, n, isInterface);
                 }
             }
         }

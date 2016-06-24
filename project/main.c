@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
         ERROR("Unable to allocate matrices.");
     } 
     
-    initialiseFields(collideField, streamField, flagField, length, boundaries, argv);
+    initialiseFields(collideField, streamField, flagField, massField, fractionField, length, boundaries, argv);
 
     // /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
         // int a=0;
