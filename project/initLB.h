@@ -21,9 +21,9 @@ int readParameters(
 
 
 /* initialises the particle distribution functions and the flagfield */
-void initialiseFields(double *collideField, double *streamField,int *flagField, int *length, int * boundaries, char *argv[]);
+void initialiseFields(double *collideField, double *streamField,int *flagField, double * massField, double * fractionField, int *length, int * boundaries, char *argv[]);
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
-void initialiseCell(double *collideField, double *streamField, int *flagField, int *length, int * node, int flag);
+void initialiseCell(double *collideField, double *streamField, int *flagField, int *n, int * node, int flag);
 #endif
 

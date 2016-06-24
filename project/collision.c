@@ -76,7 +76,7 @@ void doCollision(double *collideField, int *flagField, double * massField, doubl
 
     double * currentCell;
 
-    int x, y, z, node[3], flag;
+    int x, y, z, node[3], flag, isFluid;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     // Loop over inner cells: compare to streaming.c
@@ -87,7 +87,8 @@ void doCollision(double *collideField, int *flagField, double * massField, doubl
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
                 flag = *getFlag(flagField, node, n);
-                if (flag == FLUID || flag == INTERFACE) {
+                isFluid = flag == FLUID;
+                if (isFluid || flag == INTERFACE) {
                     currentCell = getEl(collideField, node, 0, n);
                     computeDensity(currentCell, &density);
                     computeVelocity(currentCell, &density, velocity);
@@ -97,6 +98,9 @@ void doCollision(double *collideField, int *flagField, double * massField, doubl
 
                     /* Update fluid fraction */
                     *getFraction(fractionField, node, n) = *getMass(massField, node, n) / density;
+                    if (isFluid) {
+                        *getMass(massField, node, n) = density;
+                    }
                 }
             }
         }

@@ -62,10 +62,8 @@ int readParameters(
     return 0;
 }
 
-void initialiseCell(double *collideField, double *streamField, int *flagField, int *length, int * node, int flag) {	
+void initialiseCell(double *collideField, double *streamField, int *flagField, int *n, int * node, int flag) {	
     int i;
-
-    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     *getFlag(flagField, node, n) = flag;    /*asigns the flag to the specified cell */
 
@@ -73,6 +71,31 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
         *getEl(streamField, node, i, n) = LATTICEWEIGHTS[i];    /*Insert on each cell the initial value */
         *getEl(collideField, node, i, n) = LATTICEWEIGHTS[i];
     }
+}
+
+void initializeMass(double * collideField, int * flagField, double *massField, double * fractionField, int * node, int * n) {
+    int neighbor_node[3], i;
+    double * mass;
+
+    mass = getMass(massField, node, n);
+    *mass = 0.0;
+
+    for (i = 0; i < Q; i++) {
+        neighbor_node[0] = node[0] + LATTICEVELOCITIES[i][0];
+        neighbor_node[1] = node[1] + LATTICEVELOCITIES[i][1];
+        neighbor_node[2] = node[2] + LATTICEVELOCITIES[i][2];
+
+        if (neighbor_node[0] < n[0] && neighbor_node[1] < n[1] && neighbor_node[2] < n[2] &&
+            neighbor_node[0] >= 0 && neighbor_node[1] >= 0 && neighbor_node[2] >= 0) {            
+           
+            if (*getFlag(flagField, neighbor_node, n) == FLUID) {
+                *mass += *getEl(collideField, neighbor_node, Q - 1- i, n);
+            }
+        }
+    }
+    printf("%f\n", *mass);
+
+    *getFraction(fractionField, node, n) = *mass;
 }
 
 /**
@@ -97,14 +120,15 @@ void checkForbiddenPatterns(int ** image, int * length) {
     }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int * length, int * boundaries, char *argv[]){
+void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, char *argv[]){
     int x, y, z, node[3];
     int ** image;
     char filename[20] ;
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     strcpy(filename,argv[1]);                   /*Copy the value from argv to filename to not modify the original one*/ 
-    strcat( filename,".pgm");
-    image = read_pgm(filename);/* Concatenate .pgm so the imput is independent of extension*/
+    strcat( filename,".pgm"); /* Concatenate .pgm so the imput is independent of extension*/
+    image = read_pgm(filename);
     checkForbiddenPatterns(image, length);
 
     /* 
@@ -117,7 +141,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         node[1] = y;
         for (x = 0; x <= length[0] + 1; ++x){			
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[4]);   /* Loop for the down wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[4]);   /* Loop for the down wall of the cavity*/
         }
     }
     
@@ -127,28 +151,28 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         node[1] = 0;
         for (x = 0; x <= length[0] + 1; ++x){
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[2]);   /* Loop for the front wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[2]);   /* Loop for the front wall of the cavity*/
         }
 
         for (y = 1; y <= length[1]; ++y){
             node[1] = y;
             /* x = 0; */
             node[0] = 0;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[0]);   /* Loop for the left wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[0]);   /* Loop for the left wall of the cavity*/
             for (x = 1; x <= length[0]; ++x){				
                 node[0] = x;
-                initialiseCell(collideField, streamField, flagField, length, node, image[x][z]);           /* Loop for the interior points*/
+                initialiseCell(collideField, streamField, flagField, n, node, image[x][z]);           /* Loop for the interior points*/
             }
             /* x = length[0]+1; */
             node[0] = length[0] + 1;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[1]);   /* Loop for the right wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[1]);   /* Loop for the right wall of the cavity*/
         }
 
         /* y = length[1]+1; */
         node[1] = length[1] + 1;
         for (x = 0; x <= length[0] + 1; ++x){
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[3]);   /* Loop for the back wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[3]);   /* Loop for the back wall of the cavity*/
         }
     }
 
@@ -158,10 +182,24 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
         node[1] = y;
         for (x = 0; x < length[0] + 2; ++x){
             node[0] = x;
-            initialiseCell(collideField, streamField, flagField, length, node, boundaries[5]);   /* Loop for the up wall of the cavity*/
+            initialiseCell(collideField, streamField, flagField, n, node, boundaries[5]);   /* Loop for the up wall of the cavity*/
         }
     }
+    
+    for (z = 1; z <= length[2]; z++) {
+        node[2] = z;
+        for (y = 1; y <= length[1]; y++) {
+            node[1] = y;
+            for (x = 1; x <= length[0]; x++) {
+                node[0] = x;
 
+                if (*getFlag(flagField, node, n) == INTERFACE) {
+                    initializeMass(collideField, flagField, massField, fractionField, node, n);
+                }
+            }
+        }
+        
+    }
     free_imatrix(image, 0, length[2] + 2, 0, length[0] + 2);
 }
 
