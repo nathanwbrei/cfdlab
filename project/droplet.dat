@@ -10,11 +10,11 @@ velocity_z    	0.05
 
 forces_x    	0
 forces_y    	0
-forces_z    	-0.03
+forces_z    	-0.001
 
-timesteps     	1000
+timesteps     	2000
 
-vtkoutput     	1
+vtkoutput     	15
 
 problem		constant
 ro_ref		1
