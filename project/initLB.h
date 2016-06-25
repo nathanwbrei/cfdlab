@@ -16,12 +16,13 @@ int readParameters(
     char *problem,                      /* specifies the considered problem scenario (parabolic or constant inflow )*/
     double *ro_ref,                     /* reference density nomally set to 1 */
     double *ro_in,                       /* density of inflow/outflow */
-    int *boundaries                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int * r                             /* radius of the drop */
 );
 
 
 /* initialises the particle distribution functions and the flagfield */
-void initialiseFields(double *collideField, double *streamField,int *flagField, double * massField, double * fractionField, int *length, int * boundaries, char *argv[]);
+void initialiseFields(double *collideField, double *streamField,int *flagField, double * massField, double * fractionField, int *length, int * boundaries, int r, char *argv[]);
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
 void initialiseCell(double *collideField, double *streamField, int *flagField, int *n, int * node, int flag);

@@ -1,8 +1,9 @@
 xlength       	30
 ylength       	30
 zlength       	30
+radius          5
 
-tau           	2
+tau           	0.6
 
 velocity_x    	0
 velocity_y    	0
@@ -12,7 +13,7 @@ forces_x    	0
 forces_y    	0
 forces_z    	-0.002
 
-timesteps     	1000
+timesteps     	2000
 
 vtkoutput     	15
 
@@ -20,9 +21,9 @@ problem		constant
 ro_ref		1
 ro_in		  1.01
 
-wall_x0	    1
-wall_xmax   1
+wall_x0	    7
+wall_xmax   7
 wall_y0	    7
 wall_ymax	7
-wall_z0	    1
-wall_zmax   1
+wall_z0	    7
+wall_zmax   7

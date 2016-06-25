@@ -12,7 +12,7 @@
 #include "checks.h"
 
 int main(int argc, char *argv[]){
-    int length[3], timesteps, timestepsPerPlotting, boundaries[6];
+    int length[3], timesteps, timestepsPerPlotting, boundaries[6], r;
     /* TODO do we need inVelocity? */
     double tau, velocity[3], ro_in, ro_ref, extForces[3];
     int t;
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]){
     clock_t start_time, total_time = 0;
     char problem [10];
     /* Read the file of parameters */
-    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries);
+    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r);
     /* Allocate memory */
     double *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
     double *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
         ERROR("Unable to allocate matrices.");
     } 
     
-    initialiseFields(collideField, streamField, flagField, massField, fractionField, length, boundaries, argv);
+    initialiseFields(collideField, streamField, flagField, massField, fractionField, length, boundaries, r, argv);
 
     // /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
         // int a=0;

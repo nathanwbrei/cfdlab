@@ -19,7 +19,8 @@ int readParameters(
     char *problem,                      /* specifies the considered problem scenario (parabolic or constant inflow )*/
     double *ro_ref,                     /* reference density nomally set to 1 */
     double *ro_in,                      /* density of inflow/outflow */
-    int *boundaries                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int * r
     ){
 
     if (argc != 2) {
@@ -32,6 +33,7 @@ int readParameters(
     read_int(szFileName, "zlength", &length[2]);
     read_int(szFileName, "ylength", &length[1]);
     read_int(szFileName, "xlength", &length[0]);
+    read_int(szFileName, "radius", r);
     read_double(szFileName,"tau", tau);
 
     read_double(szFileName, "velocity_x", &velocity[0]);
@@ -73,6 +75,10 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
     }
 }
 
+/*
+  For INTERFACE cells sets initial mass to sum of the distributions from the neighboring FLUID cells.
+  Set fraction to be equal to the mass, since our initial density is equal to 1.
+ */
 void initializeMass(double * collideField, int * flagField, double *massField, double * fractionField, int * node, int * n) {
     int neighbor_node[3], i;
     double * mass;
@@ -93,7 +99,6 @@ void initializeMass(double * collideField, int * flagField, double *massField, d
             }
         }
     }
-    printf("%f\n", *mass);
 
     *getFraction(fractionField, node, n) = *mass;
 }
@@ -120,10 +125,46 @@ void checkForbiddenPatterns(int ** image, int * length) {
     }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, char *argv[]){
+void initDropletFlags(int * flagField, int * n, int r) {
+    int x0 = n[0] / 2; 
+    int y0 = n[1] / 2; 
+    int z0 = n[2] - r - 2;
+
+    int node[3], neighbor_node[3];
+
+    int x, y, z, i;
+
+    for (z = z0 - r; z <= z0 + r; z++) {
+        node[2] = z;
+        for (y = y0 - r; y <= y0 + r; y++) {
+            node[1] = y;
+            for (x = x0 - r; x <= x0 + r; x++) {
+                node[0] = x;
+                /* Initialize sphere of FLUID with radius r */
+                if ((x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) < r*r) {
+                    *getFlag(flagField, node, n) = FLUID;
+                    /* Check whether its neighbors are in the sphere. If not mark them as INTERFACE */
+                    for (i = 0; i < Q; i++) {
+                        neighbor_node[0] = node[0] + LATTICEVELOCITIES[i][0];
+                        neighbor_node[1] = node[1] + LATTICEVELOCITIES[i][1];
+                        neighbor_node[2] = node[2] + LATTICEVELOCITIES[i][2];
+
+                        if ((neighbor_node[0]-x0)*(neighbor_node[0]-x0) +
+                            (neighbor_node[1]-y0)*(neighbor_node[1]-y0) +
+                            (neighbor_node[2]-z0)*(neighbor_node[2]-z0) >= r*r) {
+                            *getFlag(flagField, node, n) = INTERFACE;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[]){
     int x, y, z, node[3];
     int ** image;
-    char filename[20] ;
+    char filename[20];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     strcpy(filename,argv[1]);                   /*Copy the value from argv to filename to not modify the original one*/ 
@@ -135,6 +176,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     *   Definition of the fields 
     *   The structure of the looping makes possible to define the boudaries
     */
+
     /* z = 0; */
     node[2] = 0;
     for (y = 0; y <= length[1] + 1; ++y){
@@ -185,7 +227,11 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
             initialiseCell(collideField, streamField, flagField, n, node, boundaries[5]);   /* Loop for the up wall of the cavity*/
         }
     }
-    
+ 
+    if (strcmp(argv[1], "droplet") == 0) {
+        initDropletFlags(flagField, n, r);
+    }
+   
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;
         for (y = 1; y <= length[1]; y++) {
