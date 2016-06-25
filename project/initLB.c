@@ -28,9 +28,10 @@ int readParameters(
     if (argc != 2) {
         ERROR("number of arguments is incorrect");
     }
-    char filename[20] ;
-    strcpy(filename,argv[1]);
-    const char *szFileName = strcat( filename,".dat"); /* Concatenate .dat so the imput is independent of extesion*/
+    char path[80] = "examples/";
+    
+    strcat(path,argv[1]);
+    const char *szFileName = strcat(path,".dat"); /* Concatenate .dat so the imput is independent of extesion*/
 
     read_int(szFileName, "zlength", &length[2], my_rank);
     read_int(szFileName, "ylength", &length[1], my_rank);
@@ -260,18 +261,18 @@ void initialiseFlagsAndDF(double * collideField, double * streamField, int * fla
 void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[], int * my_pos, int* Proc){
     int x, y, z, node[3], walls[6];
     int ** image;
-    char filename[20];
+    char path[80] = "examples/";
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
     determineBoundaries(walls, my_pos, Proc, boundaries);
     
     /*Copy the value from argv to filename to not modify the original one*/ 
-    strcpy(filename, argv[1]);
+    strcat(path, argv[1]);
     
     /* Concatenate .pgm so the imput is independent of extension*/
-    strcat( filename,".pgm");
+    strcat(path,".pgm");
 
-    image = read_pgm(filename);
+    image = read_pgm(path);
     checkForbiddenPatterns(image, length);
 
     initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, walls);

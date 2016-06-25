@@ -3,6 +3,11 @@
 #include "helper.h"
 #include "LBDefinitions.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+
 void write_vtkFile(const char *szProblem,
                    int t,
                    int * length,
@@ -11,16 +16,23 @@ void write_vtkFile(const char *szProblem,
                    int my_rank,
                    int * my_origin) {
   
+    struct stat s;
     int x, y, z, node[3];
     char szFileName[80];
+    char path[80] = "vtk-output";
+    // char path[80] = "vtk-output/";
     FILE *fp=NULL;
     int n[3] = { length[0] + 2,length[1] + 2,length[2] + 2 };
     double velocity[3];
     double density;
     double * el = NULL;
 
-    sprintf( szFileName, "%s.%i.vtk", szProblem, t );
-    fp = fopen( szFileName, "w");
+    if (stat(path, &s) == -1) {
+        mkdir(path, 0700);
+    }
+
+    sprintf(szFileName, "%s/%s.%i.vtk", path, szProblem, t );
+    fp = fopen(szFileName, "w");
     if( fp == NULL )
     {
         char szBuff[80];
