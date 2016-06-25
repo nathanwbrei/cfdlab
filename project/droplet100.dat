@@ -1,8 +1,8 @@
-xlength       	30
-ylength       	30
-zlength       	30
+xlength       	100
+ylength       	31
+zlength       	100
 
-tau           	2
+tau           	1
 
 velocity_x    	0
 velocity_y    	0
@@ -10,11 +10,11 @@ velocity_z    	0.05
 
 forces_x    	0
 forces_y    	0
-forces_z    	-0.002
+forces_z    	-0.001
 
-timesteps     	1000
+timesteps     	7000
 
-vtkoutput     	15
+vtkoutput     	20
 
 problem		constant
 ro_ref		1
