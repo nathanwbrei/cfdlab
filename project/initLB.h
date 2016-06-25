@@ -17,14 +17,19 @@ int readParameters(
     double *ro_ref,                     /* reference density nomally set to 1 */
     double *ro_in,                       /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int *Proc,                          /* Array whit the number of processors per dimention */
+    int my_rank,                         /* Indicates the process number to allow print, if is not pararlel here goes a 0*/
     int * r                             /* radius of the drop */
 );
 
 
 /* initialises the particle distribution functions and the flagfield */
-void initialiseFields(double *collideField, double *streamField,int *flagField, double * massField, double * fractionField, int *length, int * boundaries, int r, char *argv[]);
+void initialiseFields(double *collideField, double *streamField,int *flagField, double * massField, double * fractionField, int *length, int * boundaries, int r, char *argv[], int * my_pos, int* Proc);
 
 /* Initializes oen cell in the fields, this is called by initialiseFields*/
 void initialiseCell(double *collideField, double *streamField, int *flagField, int *n, int * node, int flag);
+
+/* Allocate memory for sendBuffer and readBuffer */
+void initBuffers(double ** readBuffer, double ** sendBuffer, int * length);
 #endif
 

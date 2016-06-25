@@ -1,9 +1,9 @@
 # Include files
-SOURCES=initLB.c visualLB.c boundary.c collision.c streaming.c computeCellValues.c flag.c main.c helper.c checks.c
+SOURCES=initLB.c visualLB.c boundary.c collision.c streaming.c computeCellValues.c flag.c main.c helper.c checks.c parallel.c
 
 # Compiler
 # --------
-CC=gcc
+CC=mpicc
 
 CFLAGS=-Wpedantic -Wall -std=c99 -O3 -g
 

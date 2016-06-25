@@ -27,3 +27,7 @@ wall_y0	    7
 wall_ymax	7
 wall_z0	    7
 wall_zmax   7
+
+iProc						1
+jProc						1
+kProc						1

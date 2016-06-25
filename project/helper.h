@@ -38,6 +38,11 @@ static inline double * getMass(double * array, int * node, int *n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 
+/* Get lattice from read or send buffer */
+static inline double * getBufferEl(double * buffer, int k, int l, int i, int n_k) {
+    return buffer + q * (l * n_k + k) + i;
+}
+
 /**
  * Return pointer to a mass of (x,y,z) element
  */
@@ -129,10 +134,9 @@ void  errhandler( int nLine, const char *szFile, const char *szString );
  */
 #define READ_STRING( szFileName, VarName) read_string( szFileName, #VarName,  (VarName) )
 
-void read_string( const char* szFilename, const char* szName, char*  sValue);
-void read_int   ( const char* szFilename, const char* szName, int*    nValue);
-void read_double( const char* szFilename, const char* szName, double*  Value);
-
+void read_string( const char* szFilename, const char* szName, char*  sValue, int my_rank);
+void read_int   ( const char* szFilename, const char* szName, int*    nValue, int my_rank);
+void read_double( const char* szFilename, const char* szName, double*  Value, int my_rank);
 
 /**
  * Writing matrices to a file.
