@@ -20,6 +20,7 @@ static const double LATTICEWEIGHTS[Q] = {
 
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const double C_S = 1.0 / 1.732050807568877;
+static const double C_S2 = 1.0 / 3.0; 
 
 static const int FLUID = 0;
 static const int NOSLIP = 1;

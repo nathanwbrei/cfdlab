@@ -3,7 +3,7 @@
 #include "LBDefinitions.h"
 #include "computeCellValues.h"
 
-void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, int * n, int isInterface) {
+void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, double * el, int * n, int isInterface) {
     int i, flag;
     int source_node[3];
     double fi_nb, se;
@@ -16,7 +16,7 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
 
         /* Amount of particles that goes to this cell */
         fi_nb = *getEl(collideField, source_node, i, n);
-        *getEl(streamField, node, i, n) = fi_nb;
+        *(el + i) = fi_nb;
 
         if (isInterface) {
         /*
@@ -39,27 +39,46 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
 }
 
 void doStreaming(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * length){
-    int x, y, z, flag, isFluid, isInterface;
-    int node[3];
+    int x, y, z, *flag, isFluid, isInterface;
+    int node[3] = { 0, 0, 0 };
+    double * el;
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+    int n0Q = n[0] * Q;
 
+    flag = getFlag(flagField, node, n);
+    el = getEl(streamField, node, 0, n);
+    el += n[0] * n[1] *Q;
+    flag += n[0] * n[1];
+        
     /* Loop for inner cells */
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;
+        el += n0Q;
+        flag += n[0];
+         
         for (y = 1; y <= length[1]; y++) {
             node[1] = y;
+            el += Q;
+            flag++;
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
-                flag = *getFlag(flagField, node, n);
-                isFluid = flag == FLUID;
-                isInterface = flag == INTERFACE;
+                isFluid = *flag == FLUID;
+                isInterface = *flag == INTERFACE;
 
                 if (isFluid || isInterface) {
-                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, n, isInterface);
+                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface);
                 }
+
+                el+=Q;
+                flag++;
+
             }
+            el += Q;
+            flag++;
         }
+        el += n0Q;
+        flag += n[0];
     }
 }
 

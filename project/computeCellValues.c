@@ -39,28 +39,22 @@ void computeFeq(const double * const density, const double * const velocity, dou
      */
 
     int i;
-    double ci_dot_u, u_dot_u;
+    double ci_dot_u_cs2, u_dot_u_cs2;
     double ci0, ci1, ci2, u0, u1, u2;
-    double cs2 = C_S * C_S;
 
+    u0 = velocity[0];
+    u1 = velocity[1];
+    u2 = velocity[2];
+    u_dot_u_cs2 = (u0*u0 + u1*u1 + u2*u2) / (2 * C_S2);
+ 
     for (i=0; i<Q; i++) {
-        
         ci0 = LATTICEVELOCITIES[i][0];
         ci1 = LATTICEVELOCITIES[i][1];
         ci2 = LATTICEVELOCITIES[i][2];
+       
+        ci_dot_u_cs2 = (ci0*u0 + ci1*u1 + ci2*u2) / C_S2;
 
-        u0 = velocity[0];
-        u1 = velocity[1];
-        u2 = velocity[2];
-        
-        ci_dot_u = ci0*u0 + ci1*u1 + ci2*u2;
-        u_dot_u = u0*u0 + u1*u1 + u2*u2;
-
-        feq[i] = 1;
-        feq[i] += ci_dot_u/cs2;
-        feq[i] += (ci_dot_u * ci_dot_u) / (2 * cs2 * cs2);
-        feq[i] -= u_dot_u / (2 * cs2);
-        feq[i] *= *density;
-        feq[i] *= LATTICEWEIGHTS[i];
+        feq[i] = (1 + ci_dot_u_cs2 + (ci_dot_u_cs2 * ci_dot_u_cs2) / 2 - u_dot_u_cs2) * (*density) * LATTICEWEIGHTS[i];
     }
 }
+
