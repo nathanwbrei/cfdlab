@@ -48,12 +48,11 @@ void computeFeq(const double * const density, const double * const velocity, dou
     u_dot_u_cs2 = (u0*u0 + u1*u1 + u2*u2) / (2 * C_S2);
  
     for (i=0; i<Q; i++) {
-        
         ci0 = LATTICEVELOCITIES[i][0];
         ci1 = LATTICEVELOCITIES[i][1];
         ci2 = LATTICEVELOCITIES[i][2];
        
-        ci_dot_u_cs2 = ci0*u0 + ci1*u1 + ci2*u2 / C_S2;
+        ci_dot_u_cs2 = (ci0*u0 + ci1*u1 + ci2*u2) / C_S2;
 
         feq[i] = (1 + ci_dot_u_cs2 + (ci_dot_u_cs2 * ci_dot_u_cs2) / 2 - u_dot_u_cs2) * (*density) * LATTICEWEIGHTS[i];
     }
