@@ -38,7 +38,7 @@ void setNoSlip(float * collideField, int * flagField, int * node, int * n) {
  * Set MOVING_WALL condition
  */
 void setMovingWall(float * collideField, int * flagField,  const float * const wallVelocity, int * node, int * n) {
-    int i, coord_dest[3];
+    int i, coord_dest[3], flag;
     float * cell_ptr;
     float dotProd;
     float density;
@@ -53,9 +53,10 @@ void setMovingWall(float * collideField, int * flagField,  const float * const w
         /* does the pointed cell lay in our domain? */
         if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
             coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0 ) {
-       
+
+            flag = *getFlag(flagField, coord_dest, n);
             /* if pointed cell is FLUID */
-            if (*getFlag(flagField, coord_dest, n) == FLUID) {
+            if (flag == FLUID || flag == INTERFACE) {
                 /* get pointer to the i-th lattice of boundary cell */
                 cell_ptr = getEl(collideField, node, i, n);
 

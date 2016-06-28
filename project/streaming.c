@@ -32,7 +32,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
             flag = *getFlag(flagField, source_node, n); 
             if (flag == FLUID || flag == INTERFACE) {
                 se = fi_nb - *getEl(collideField, source_node, Q - 1 - i, n);
-                *getMass(massField, node, n) += se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) / 2;
+                *getMass(massField, node, n) += 3*se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) / 2;
             }
         }
     }

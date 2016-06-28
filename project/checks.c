@@ -18,7 +18,8 @@ void check_in_rank(float *collideField, int *flagField, int * length, int t){
 					currentCell = getEl(collideField, node, 0, n);
 					computeDensity(currentCell, &density);
 					computeVelocity(currentCell, &density, velocity);
-					
+          norm_v = 0;
+
 					for (i = 0; i < D; ++i)
 						norm_v += velocity[i]*velocity[i];
 

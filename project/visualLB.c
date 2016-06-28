@@ -86,7 +86,7 @@ void write_vtkFile(const char *szProblem,
 
     fprintf(fp,"\n");
 
-    fprintf(fp, "SCALARS gas float 1 \n"); 
+    fprintf(fp, "SCALARS a_taype int 1 \n"); 
     fprintf(fp, "LOOKUP_TABLE default \n");
 
     for(z = 1; z <= length[2]; z++) {
@@ -95,11 +95,7 @@ void write_vtkFile(const char *szProblem,
             node[1] = y;
             for(x = 1; x <= length[0]; x++) {
                 node[0] = x;
-                if (*getFlag(flagField, node, n) == GAS) {
-                    fprintf(fp, "%f\n", -1.0);
-                } else {
-                    fprintf(fp, "%f\n", 1.0);
-                }
+                fprintf(fp, "%d\n", *getFlag(flagField, node, n));
             }
         }
     }
