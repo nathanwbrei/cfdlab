@@ -28,9 +28,7 @@ void write_vtkFile(const char *szProblem,
                    int    t,
                    int * length,
                    double * collideField,
-                   int * flagField,
-                   int my_rank,
-                   int * my_origin);
+                   int * flagField);
 
 /**
  * Method for writing header information in vtk format. 
@@ -56,7 +54,7 @@ void write_vtkHeader(FILE *fp, int * length);
  * 
  * @author Tobias Neckel
  */
-void write_vtkPointCoordinates(FILE *fp, int * length, int * my_origin); 
+void write_vtkPointCoordinates(FILE *fp, int * length); 
 
 /** writes the density and velocity field (derived from the distributions in collideField)
  *  to a file determined by 'filename' and timestep 't'. You can re-use parts of the code
@@ -66,9 +64,8 @@ void writeVtkOutput(double * collideField,
                     int * flagField,
                     const char * filename,
                     unsigned int t,
-                    int * length,
-                    int * origin,
-                    int my_rank);
+                    int * length);
+                    
 
 #endif
 

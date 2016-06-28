@@ -20,8 +20,6 @@ int readParameters(
     double *ro_ref,                     /* reference density nomally set to 1 */
     double *ro_in,                      /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
-    int *Proc,                          /* Array whit the number of processors per dimention */
-    int my_rank,                         /* Indicates the process number to allow print, if is not pararlel here goes a 0*/
     int * r
     ){
 
@@ -33,37 +31,32 @@ int readParameters(
     strcat(path,argv[1]);
     const char *szFileName = strcat(path,".dat"); /* Concatenate .dat so the imput is independent of extesion*/
 
-    read_int(szFileName, "zlength", &length[2], my_rank);
-    read_int(szFileName, "ylength", &length[1], my_rank);
-    read_int(szFileName, "xlength", &length[0], my_rank);
-    read_int(szFileName, "radius", r, my_rank);
-    read_double(szFileName,"tau", tau, my_rank);
+    read_int(szFileName, "zlength", &length[2]);
+    read_int(szFileName, "ylength", &length[1]);
+    read_int(szFileName, "xlength", &length[0]);
+    read_int(szFileName, "radius", r);
+    read_double(szFileName,"tau", tau);
     
-    read_int(szFileName, "iProc", &Proc[0], my_rank);
-    read_int(szFileName, "jProc", &Proc[1], my_rank);
-    read_int(szFileName, "kProc", &Proc[2], my_rank);
-
-
-    read_double(szFileName, "velocity_x", &velocity[0], my_rank);
-    read_double(szFileName, "velocity_y", &velocity[1], my_rank);
-    read_double(szFileName, "velocity_z", &velocity[2], my_rank);
+    read_double(szFileName, "velocity_x", &velocity[0]);
+    read_double(szFileName, "velocity_y", &velocity[1]);
+    read_double(szFileName, "velocity_z", &velocity[2]);
     
-    read_double(szFileName, "forces_x", &extForces[0], my_rank);
-    read_double(szFileName, "forces_y", &extForces[1], my_rank);
-    read_double(szFileName, "forces_z", &extForces[2], my_rank);
+    read_double(szFileName, "forces_x", &extForces[0]);
+    read_double(szFileName, "forces_y", &extForces[1]);
+    read_double(szFileName, "forces_z", &extForces[2]);
     
-    read_int(szFileName, "timesteps", timesteps, my_rank);
-    read_int(szFileName, "vtkoutput", timestepsPerPlotting, my_rank);
-    read_string(szFileName, "problem", problem, my_rank);
-    read_double(szFileName,"ro_ref", ro_ref, my_rank);
-    read_double(szFileName,"ro_in", ro_in, my_rank);
+    read_int(szFileName, "timesteps", timesteps);
+    read_int(szFileName, "vtkoutput", timestepsPerPlotting);
+    read_string(szFileName, "problem", problem);
+    read_double(szFileName,"ro_ref", ro_ref);
+    read_double(szFileName,"ro_in", ro_in);
 
-    read_int(szFileName, "wall_x0", &boundaries[0], my_rank);
-    read_int(szFileName, "wall_xmax", &boundaries[1], my_rank);
-    read_int(szFileName, "wall_y0", &boundaries[2], my_rank);
-    read_int(szFileName, "wall_ymax", &boundaries[3], my_rank);
-    read_int(szFileName, "wall_z0", &boundaries[4], my_rank);
-    read_int(szFileName, "wall_zmax", &boundaries[5], my_rank);
+    read_int(szFileName, "wall_x0", &boundaries[0]);
+    read_int(szFileName, "wall_xmax", &boundaries[1]);
+    read_int(szFileName, "wall_y0", &boundaries[2]);
+    read_int(szFileName, "wall_ymax", &boundaries[3]);
+    read_int(szFileName, "wall_z0", &boundaries[4]);
+    read_int(szFileName, "wall_zmax", &boundaries[5]);
 
     if (strcmp(problem, PARABOLIC_SCENARIO) != 0 && strcmp(problem, CONSTANT_SCENARIO) != 0) {
         ERROR("Unrecognized scenario");
@@ -180,24 +173,6 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
-void determineBoundaries(int * walls, int * my_pos, int * Proc, int * boundaries) {
-    int i;
-
-    /* Determine which type each boundary has */
-    for (i = 0; i < D; ++i) {
-        if (my_pos[i] == 0)
-            walls[2 * i] = boundaries[2 * i];
-        else {
-            walls[2 * i] = PARALLEL;
-        }
-        if (my_pos[i] == (Proc[i] - 1))
-            walls[2 * i + 1] = boundaries[2 * i + 1];
-        else {
-            walls[2 * i + 1] = PARALLEL;
-        }
-    }
-}
-
 void initialiseFlagsAndDF(double * collideField, double * streamField, int * flagField, int ** image, int * length, int * n, int * walls) {
     int x, y, z, node[3];
 
@@ -258,24 +233,22 @@ void initialiseFlagsAndDF(double * collideField, double * streamField, int * fla
     }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[], int * my_pos, int* Proc){
-    int x, y, z, node[3], walls[6];
+void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[]){
+    int x, y, z, node[3];
     int ** image;
     char path[80] = "examples/";
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
-    
-    determineBoundaries(walls, my_pos, Proc, boundaries);
-    
+
     /*Copy the value from argv to filename to not modify the original one*/ 
     strcat(path, argv[1]);
-    
+
     /* Concatenate .pgm so the imput is independent of extension*/
     strcat(path,".pgm");
 
     image = read_pgm(path);
     checkForbiddenPatterns(image, length);
 
-    initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, walls);
+    initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries);
  
     if (strcmp(argv[1], "droplet") == 0) {
         initDropletFlags(flagField, n, r);
@@ -296,31 +269,4 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
     }
 
     free_imatrix(image, 0, length[2] + 2, 0, length[0] + 2);
-}
-
-/* Allocate memory for sendBuffer and readBuffer */
-void initBuffers(double ** readBuffer, double ** sendBuffer, int * length) {
-    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
-
-    /* TODO think about sizes carefully */
-    /* LEFT: YZ */
-    readBuffer[0] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
-    sendBuffer[0] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
-    /* RIGHT: YZ */
-    readBuffer[1] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
-    sendBuffer[1] = (double *)calloc(n[1] * n[2] * q, sizeof(double));
-
-    /* TOP: XY */
-    readBuffer[2] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
-    sendBuffer[2] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
-    /* BOTTOM: XY */
-    readBuffer[3] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
-    sendBuffer[3] = (double *)calloc(n[0] * n[1] * q, sizeof(double));
-
-    /* FRONT: XZ */
-    readBuffer[4] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
-    sendBuffer[4] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
-    /* BACK: XZ */
-    readBuffer[5] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
-    sendBuffer[5] = (double *)calloc(n[0] * n[2] * q, sizeof(double));
 }

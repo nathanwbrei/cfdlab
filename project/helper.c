@@ -153,7 +153,7 @@ char* find_string( const char* szFileName, const char *szVarName )
     return NULL;                /* dummy to satisfy the compiler  */
 }
 
-void read_string( const char* szFileName, const char* szVarName, char*   pVariable, int my_rank)
+void read_string( const char* szFileName, const char* szVarName, char*   pVariable)
 {
     char* szValue = NULL;       /* string containg the read variable value */
 
@@ -169,14 +169,13 @@ void read_string( const char* szFileName, const char* szVarName, char*   pVariab
     if( sscanf( szValue, "%s", pVariable) == 0)
         READ_ERROR("wrong format", szVarName, szFileName,0);
 
-    if (my_rank ==0)  /*Just the first thread is able to print out */
     printf( "File: %s\t\t%s%s= %s\n", szFileName,
                                       szVarName,
                                       &("               "[min_int( (int)strlen(szVarName), 15)]),
                                       pVariable );
 }
 
-void read_int( const char* szFileName, const char* szVarName, int* pVariable, int my_rank)
+void read_int( const char* szFileName, const char* szVarName, int* pVariable)
 {
     char* szValue = NULL;       /* string containing the read variable value */
 
@@ -192,14 +191,13 @@ void read_int( const char* szFileName, const char* szVarName, int* pVariable, in
     if( sscanf( szValue, "%d", pVariable) == 0)
         READ_ERROR("wrong format", szVarName, szFileName, 0);
 
-    if (my_rank ==0)  /*Just the first thread is able to print out */
     printf( "File: %s\t\t%s%s = %d\n", szFileName,
                                       szVarName,
                                       &("               "[min_int( (int)strlen(szVarName), 15)]),
                                       *pVariable );
 }
 
-void read_double( const char* szFileName, const char* szVarName, double* pVariable, int my_rank)
+void read_double( const char* szFileName, const char* szVarName, double* pVariable)
 {
     char* szValue = NULL;       /* String mit dem eingelesenen Variablenwert */
 
@@ -215,7 +213,6 @@ void read_double( const char* szFileName, const char* szVarName, double* pVariab
     if( sscanf( szValue, "%lf", pVariable) == 0)
         READ_ERROR("wrong format", szVarName, szFileName, 0);
 
-    if (my_rank ==0)  /*Just the first thread is able to print out */
     printf( "File: %s\t\t%s%s = %f\n", szFileName,
                                       szVarName,
                                       &("               "[min_int( (int)strlen(szVarName), 15)]),

@@ -271,11 +271,6 @@ void boundaryCell(double * collideField,
                   int flag,
                   int * n) {
 
-    /* if boundary is parallel do not do anything */
-    if (flag == PARALLEL) {
-        return;
-    }
-
     if (flag == GAS) {
         /* Reconstruction of gas distributions is the same as outflow condition */
         setOutflow(collideField, flagField, ro_ref, node, n);
