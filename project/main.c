@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
 
     /* TODO do we need inVelocity? */
     double tau, velocity[3], ro_in, ro_ref, extForces[3];
-    double *swap=NULL;
+    float *swap=NULL;
 
     clock_t start_time, total_time = 0;
 
@@ -26,8 +26,8 @@ int main(int argc, char *argv[]){
     readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r);
     
     /* Allocate memory */
-    double *collideField = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
-    double *streamField  = (double *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( double ));
+    float *collideField = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
+    float *streamField  = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
     int *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
     double * massField = (double *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(double));
     /* fluid fraction field */

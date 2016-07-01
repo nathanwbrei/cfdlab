@@ -2,7 +2,7 @@
 #include "computeCellValues.h"
 #include <stdio.h>
 
-void computeDensity(const double *const currentCell, double *density){
+void computeDensity(const float *const currentCell, float *density){
     /*
      * Computes the macroscopic density within currentCell
      * rho(x,t) = sum(f_i, i=0:Q-1)
@@ -16,7 +16,7 @@ void computeDensity(const double *const currentCell, double *density){
     }
 }
 
-void computeVelocity(const double * const currentCell, const double * const density, double *velocity){
+void computeVelocity(const float * const currentCell, const float * const density, float *velocity){
     /*
      * Computes the velocity within currentCell 
      * u(x,t) = sum(f[i] * c[i] for i in [0:Q-1]) / rho
@@ -33,7 +33,7 @@ void computeVelocity(const double * const currentCell, const double * const dens
     }
 }
 
-void computeFeq(const double * const density, const double * const velocity, double *feq){
+void computeFeq(const float * const density, const float * const velocity, float *feq){
     /*
      * feq[i] = w[i] * rho * (1 + c_i*u / (c_s^2) + ... 
      */

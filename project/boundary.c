@@ -6,9 +6,9 @@
 /**
  * Set NOSLIP condition
  */
-void setNoSlip(double * collideField, int * flagField, int * node, int * n) {
+void setNoSlip(float * collideField, int * flagField, int * node, int * n) {
     int i, coord_dest[3], flag;
-    double * cell_ptr;
+    float * cell_ptr;
 
     /* for each lattice */
     for (i = 0; i < Q; i++) {
@@ -37,11 +37,11 @@ void setNoSlip(double * collideField, int * flagField, int * node, int * n) {
 /**
  * Set MOVING_WALL condition
  */
-void setMovingWall(double * collideField, int * flagField,  const double * const wallVelocity, int * node, int * n) {
+void setMovingWall(float * collideField, int * flagField,  const double * const wallVelocity, int * node, int * n) {
     int i, coord_dest[3];
-    double * cell_ptr;
+    float * cell_ptr;
     double dotProd;
-    double density;
+    float density;
     
 /* for each lattice */
     for (i = 0; i < Q; i++) {
@@ -82,16 +82,16 @@ void setMovingWall(double * collideField, int * flagField,  const double * const
 /**
  * Set OUTFLOW condition
  */
-void setOutflow(double * collideField,
+void setOutflow(float * collideField,
                 int * flagField,
                 const double * const ro_ref,
                 int * node,
                 int * n) {
     int i, coord_dest[3], flag;
-    double * cell_ptr;
-    double feq[Q];
-    double velocity[D];
-    double * fluidCell;
+    float * cell_ptr;
+    float feq[Q];
+    float velocity[D];
+    float * fluidCell;
 
     /* for each lattice */
     for (i = 0; i < Q; i++) {
@@ -128,7 +128,7 @@ void setOutflow(double * collideField,
 /**
  * Set INFLOW condition
  */
-void setInflow(double * collideField,
+void setInflow(float * collideField,
                int * flagField,
                const char * const scenario,
                const double * const Re,
@@ -138,9 +138,9 @@ void setInflow(double * collideField,
                int * node,
                int * n) {
     int i, coord_dest[3], flag;
-    double * cell_ptr;
-    double feq[Q];
-    double velocity[3];
+    float * cell_ptr;
+    float feq[Q];
+    float velocity[3];
 
     /* If scenario is parabolic */
     if (strcmp(scenario, PARABOLIC_SCENARIO) == 0) {
@@ -177,9 +177,9 @@ void setInflow(double * collideField,
     }
 }
 
-void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
+void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
     int i, j, k, coord_dest[3], non_fluid_cell[3], sum, flag;
-    double * cell_ptr;
+    float * cell_ptr;
 
     for (i = 0; i < Q; i++) {
         /* Initialize the cell with a flag, that will later make possible to know if some lattice was modifided*/
@@ -260,7 +260,7 @@ void setFreeSlip(double * collideField, int * flagField, int * node, int * n) {
     }
 }
 
-void boundaryCell(double * collideField,
+void boundaryCell(float * collideField,
                   int * flagField,
                   const char * const scenario,
                   const double * const Re,
@@ -289,7 +289,7 @@ void boundaryCell(double * collideField,
     }
 }
 
-void treatBoundary(double *collideField,
+void treatBoundary(float *collideField,
                    int *flagField,
                    const char * const scenario,
                    const double * const Re,

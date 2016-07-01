@@ -28,22 +28,22 @@ void computeNormal(int* node, int* length, double * fractionField, double* norma
     //printf("\n");
 }
 
-double computeExternal (int i, double density, double * extForces){
+double computeExternal (int i, float density, double * extForces){
     /* Computes the influence of external forces, like gravity */
 
     return dotProd(LATTICEVELOCITIES[i], extForces, D) * density * LATTICEWEIGHTS[i];
 }
 
-void computePostCollisionDistributions(int *node, double * currentCell, int* flagField, double* fractionField, const double * const tau, const double *const feq, const double *const feqAtm, double density, double * extForces, int * length){
+void computePostCollisionDistributions(int *node, float * currentCell, int* flagField, double* fractionField, const double * const tau, const float *const feq, const float *const feqAtm, float density, double * extForces, int * length){
     /* Compute the post-collision distribution f*[i] according to BGK update rule. See Eq 14.  */
 
     int i;
-    double fi;
+    float fi;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     if (*getFlag(flagField, node, n) == INTERFACE){        
         // int source_node[D];
-        double normal_dir[3];
+        float normal_dir[3];
         // double epsilon = 0.00000000001;
 
         for (i=0; i<Q; i++) {
@@ -71,17 +71,17 @@ void computePostCollisionDistributions(int *node, double * currentCell, int* fla
     }
 }
 
-void doCollision(double *collideField, int *flagField, double * massField, double * fractionField, const double * const tau, int * length, double * extForces){
+void doCollision(float *collideField, int *flagField, double * massField, double * fractionField, const double * const tau, int * length, double * extForces){
     /* 
      * For each inner grid cell in collideField, compute the post-collide
      * distribution
      */
  
-    double density, densityAtm =1;
-    double velocity[D];
-    double feq[Q], feqAtm[Q];
+    float density, densityAtm =1;
+    float velocity[D];
+    float feq[Q], feqAtm[Q];
 
-    double * currentCell;
+    float * currentCell;
 
     int x, y, z, node[3], flag, isFluid;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };

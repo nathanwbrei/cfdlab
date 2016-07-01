@@ -6,7 +6,7 @@
 	*** If the norm of velocity is not greater than the speed of sound 
 	*lenght is a vector with the size of the field and t is the current timestep
 */	
-void check_in_rank(double *collideField, int* flagField, int * length, int t);
+void check_in_rank(float *collideField, int* flagField, int * length, int t);
 
 /* 	Checks if for each cell in flagField with flag flag1 is adjacent 
 	*(in one of the 19 lattices) with a cel of flag flag2
@@ -20,7 +20,7 @@ void check_flags(int * flagField, int* length, int flag1, int flag2, int t);
 void check_mass(double *massField, int* flagField, int* length, int t);
 
 /*	Carrys al the checks (check_in_rank, check_flags, check_mass) */
-void run_checks(double *collideField, double *massField, int *flagField, int * length, int t );
+void run_checks(float *collideField, double *massField, int *flagField, int * length, int t );
 
 #endif
 

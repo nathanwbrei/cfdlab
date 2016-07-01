@@ -27,7 +27,7 @@
 void write_vtkFile(const char *szProblem,
                    int    t,
                    int * length,
-                   double * collideField,
+                   float * collideField,
                    int * flagField);
 
 /**
@@ -60,7 +60,7 @@ void write_vtkPointCoordinates(FILE *fp, int * length);
  *  to a file determined by 'filename' and timestep 't'. You can re-use parts of the code
  *  from visual.c (VTK output for Navier-Stokes solver) and modify it for 3D datasets.
  */
-void writeVtkOutput(double * collideField,
+void writeVtkOutput(float * collideField,
                     int * flagField,
                     const char * filename,
                     unsigned int t,

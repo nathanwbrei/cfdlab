@@ -4,7 +4,7 @@
 #include "computeCellValues.h"
 
 
-void makeAvgDistFn(double * collideField, int * flagField, int * n, int * cell) {
+void makeAvgDistFn(float * collideField, int * flagField, int * n, int * cell) {
     /*
     A GAS cell that is promoted to INTERFACE needs an initial distribution function, which 
     is calculated via f_eq(rho_avg, v_avg), 
@@ -20,7 +20,7 @@ void makeAvgDistFn(double * collideField, int * flagField, int * n, int * cell) 
     // TODO: Can we make this faster?
 
     int i, neighbor[3], nNeighbors, flag;
-    double density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF;
+    float density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF;
     
 
     cellDF = getEl(collideField, cell, 0, n);
@@ -110,7 +110,7 @@ void removeFromEmptyList(int emptiedCells[][3], int * nEmptied, int * targetCell
 }
 
 
-void performFill(double * collideField, int * flagField, int * n, int filledCells[][3], int nFilled, int emptiedCells[][3], int * nEmptied) {
+void performFill(float * collideField, int * flagField, int * n, int filledCells[][3], int nFilled, int emptiedCells[][3], int * nEmptied) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -171,7 +171,7 @@ void performFill(double * collideField, int * flagField, int * n, int filledCell
 
 
 
-void performEmpty(double * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
+void performEmpty(float * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -222,7 +222,7 @@ void performEmpty(double * collideField, int * flagField, int * n, int updatedCe
 
 
 
-void updateFlagField(double * collideField, int * flagField, double * fractionField, int * length) {
+void updateFlagField(float * collideField, int * flagField, double * fractionField, int * length) {
     int x, y, z, flag, nFilled = 0, nEmptied = 0;
     int node[3];
     double fraction, eps = 1e-3;

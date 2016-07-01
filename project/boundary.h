@@ -2,7 +2,7 @@
 #define _BOUNDARY_H_
 
 /** handles the boundaries in our simulation setup */
-void treatBoundary(double * collideField,
+void treatBoundary(float * collideField,
                    int * flagField,
                    const char * const problem,
                    const double * const Re,

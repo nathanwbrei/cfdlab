@@ -65,7 +65,7 @@ int readParameters(
     return 0;
 }
 
-void initialiseCell(double *collideField, double *streamField, int *flagField, int *n, int * node, int flag) {	
+void initialiseCell(float *collideField, float *streamField, int *flagField, int *n, int * node, int flag) {	
     int i;
 
     *getFlag(flagField, node, n) = flag;    /*asigns the flag to the specified cell */
@@ -81,7 +81,7 @@ void initialiseCell(double *collideField, double *streamField, int *flagField, i
   For INTERFACE cells sets initial mass to sum of the distributions from the neighboring FLUID cells.
   Set fraction to be equal to the mass, since our initial density is equal to 1.
  */
-void initializeCellMass(double * collideField, int * flagField, double *massField, double * fractionField, int * node, int * n) {
+void initializeCellMass(float * collideField, int * flagField, double *massField, double * fractionField, int * node, int * n) {
     int neighbor_node[3], i, flag;
     double * mass;
 
@@ -173,7 +173,7 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
-void initialiseFlagsAndDF(double * collideField, double * streamField, int * flagField, int ** image, int * length, int * n, int * walls) {
+void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagField, int ** image, int * length, int * n, int * walls) {
     int x, y, z, node[3];
 
    /* 
@@ -233,7 +233,7 @@ void initialiseFlagsAndDF(double * collideField, double * streamField, int * fla
     }
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[]){
+void initialiseFields(float *collideField, float *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[]){
     int x, y, z, node[3];
     int ** image;
     char path[80] = "examples/";

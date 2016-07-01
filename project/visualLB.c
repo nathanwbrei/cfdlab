@@ -11,7 +11,7 @@
 void write_vtkFile(const char *szProblem,
                    int t,
                    int * length,
-                   double * collideField,
+                   float * collideField,
                    int * flagField) {
   
     struct stat s;
@@ -21,9 +21,9 @@ void write_vtkFile(const char *szProblem,
     // char path[80] = "vtk-output/";
     FILE *fp=NULL;
     int n[3] = { length[0] + 2,length[1] + 2,length[2] + 2 };
-    double velocity[3];
-    double density;
-    double * el = NULL;
+    float velocity[3];
+    float density;
+    float * el = NULL;
 
     if (stat(path, &s) == -1) {
         mkdir(path, 0700);
@@ -147,7 +147,7 @@ void write_vtkPointCoordinates(FILE *fp, int * length) {
     }
 }
 
-void writeVtkOutput(double * collideField,
+void writeVtkOutput(float * collideField,
                     int * flagField,
                     const char * filename,
                     unsigned int t,

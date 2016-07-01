@@ -20,7 +20,7 @@
 /**
  * Return pointer to i-th lattice in (x, y, z) cell
  */
-static inline double * getEl(double * array, int * node, int i, int *n) {
+static inline float * getEl(float * array, int * node, int i, int *n) {
     return array + Q * (node[2] * n[0] * n[1] + node[1] * n[0] + node[0]) + i;
 }
 

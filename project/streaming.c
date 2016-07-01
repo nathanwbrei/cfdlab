@@ -4,10 +4,10 @@
 #include "computeCellValues.h"
 #include <omp.h>
 
-void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, double * el, int * n, int isInterface) {
+void doStremingCell(float * collideField, float * streamField, int * flagField, double * massField, double * fractionField, int * node, float * el, int * n, int isInterface) {
     int i, flag;
     int source_node[3];
-    double fi_nb, se;
+    float fi_nb, se;
 
     for (i = 0; i < Q; i++) {
         /* neighboring cell from which particles are obtained */
@@ -39,10 +39,10 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
 
 }
 
-void doStreaming(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * length){
+void doStreaming(float * collideField, float * streamField, int * flagField, double * massField, double * fractionField, int * length){
     int x, y, z, *flag, isFluid, isInterface;
     int node[3];
-    double * el;
+    float * el;
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
@@ -54,9 +54,9 @@ void doStreaming(double * collideField, double * streamField, int * flagField, d
         for (y = 1; y <= length[1]; y++) {
             node[1] = y;
             for (x = 1; x <= length[0]; x++) {
+                node[0] = x;
                 el = getEl(streamField, node, 0, n);
                 flag = getFlag(flagField, node, n);
-                node[0] = x;
                 isFluid = *flag == FLUID;
                 isInterface = *flag == INTERFACE;
 
