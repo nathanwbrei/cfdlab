@@ -7,10 +7,11 @@
 \usepackage{graphicx}
 \usepackage[breakable, theorems, skins]{tcolorbox}
 \usepackage{multimedia}
-\author{ Nathan Brei \\ Irivng Cabrera \\ Natasha Saiapova}
+\author{ Nathan Brei, Irving Cabrera, Natalia Saiapova}
 \institute[TUM]{TU München}
 \date{\today}
 \title{Free surfaces with Lattice-Boltzmann method}
+\titlegraphic{\includegraphics[height=4cm]{water-drop}}
 \DeclareRobustCommand{\mybox}[2][gray!20]{%
 \begin{tcolorbox}[   %% Adjust the following parameters at will.
         breakable,
@@ -33,10 +34,7 @@
 	\maketitle
 \end{frame}
 \begin{frame}
-	\tableofcontents
-\end{frame}
-\begin{frame}
-	\frametitle{Output from worksheets}
+	\frametitle{Output from previous worksheets}
 	\begin{itemize}
 	\item LBM D3Q19;
 	\item Different boundary conditions
@@ -48,34 +46,10 @@
 	\item 2D complex geometries reader.
 	\end{itemize}
 \end{frame}
-\begin{frame}
-	What we implemented
-	\begin{itemize}
-	\item Influence of gravity
-	\item Coexistence of fluid, gas and interface 
-	\item Movement of the interface
-	\end{itemize}
-\end{frame}
-\begin{frame}
-	What we want to implement
-	\begin{itemize}
-	\item Instabilities in the method
-	\item Conservation of mass
-	\item Parallelism?
-	\item 3D scenarios
-	\end{itemize}
-\end{frame}
-\begin{frame}
-	Some link to a nice video
-    \movie [width=6cm,height=6cm,duration=5s,poster]{}{wall100-freeslip.mp4} 
-\end{frame}
-\begin{frame}
-Thank you
-\end{frame}
 
 \begin{frame}
   \begin{itemize}
-    \frametitle{New fields}
+    \frametitle{New values}
   \item New cell types: \textbf{GAS} and \textbf{INTERFACE};
   \item New values for cell: \textbf{mass} (double) and \textbf{fluid fraction} (double).\\
     Fluid fraction is
@@ -91,7 +65,6 @@ Thank you
   \item Add gravity to our model;
   \item Reconstruct distributions from GAS cells to INTERFACE.\\
     Use INFLOW boundary conditions.
-    
   \end{itemize}
 \end{frame}
 
@@ -106,7 +79,7 @@ Thank you
     \begin{equation}
       \bigtriangleup m_i = \Big(f_{\bar{i}}\big(x+\bigtriangleup te_i,t\big)-f_i\big(x,t\big)\Big)\frac{\epsilon\big(x+\bigtriangleup te_i,t\big)+\epsilon\big(x,t\big)}{2}
     \end{equation}
-    For fluid cell mass is equal its density.
+    For fluid cell mass is equal to its density.
 \end{frame}
 
 \begin{frame}
@@ -128,6 +101,12 @@ Thank you
   \item Make our code faster.
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+\frametitle{Thank you for your attention!}
+\movie [width=7cm,height=5cm,duration=5s,poster]{}{wall100-freeslip.mp4} 
+\end{frame}
+
 
 \begin{frame}
   References
