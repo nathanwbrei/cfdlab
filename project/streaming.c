@@ -2,6 +2,7 @@
 #include "helper.h"
 #include "LBDefinitions.h"
 #include "computeCellValues.h"
+#include <omp.h>
 
 void doStremingCell(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * node, double * el, int * n, int isInterface) {
     int i, flag;
@@ -40,28 +41,21 @@ void doStremingCell(double * collideField, double * streamField, int * flagField
 
 void doStreaming(double * collideField, double * streamField, int * flagField, double * massField, double * fractionField, int * length){
     int x, y, z, *flag, isFluid, isInterface;
-    int node[3] = { 0, 0, 0 };
+    int node[3];
     double * el;
 
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
-    int n0Q = n[0] * Q;
 
-    flag = getFlag(flagField, node, n);
-    el = getEl(streamField, node, 0, n);
-    el += n[0] * n[1] *Q;
-    flag += n[0] * n[1];
-        
     /* Loop for inner cells */
+//#pragma omp parallel for schedule(dynamic) private(y, x, node, isFluid, flag, isInterface, el) num_threads(6)
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;
-        el += n0Q;
-        flag += n[0];
          
         for (y = 1; y <= length[1]; y++) {
             node[1] = y;
-            el += Q;
-            flag++;
             for (x = 1; x <= length[0]; x++) {
+                el = getEl(streamField, node, 0, n);
+                flag = getFlag(flagField, node, n);
                 node[0] = x;
                 isFluid = *flag == FLUID;
                 isInterface = *flag == INTERFACE;
@@ -70,15 +64,9 @@ void doStreaming(double * collideField, double * streamField, int * flagField, d
                     doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface);
                 }
 
-                el+=Q;
-                flag++;
 
             }
-            el += Q;
-            flag++;
         }
-        el += n0Q;
-        flag += n[0];
     }
 }
 

@@ -1,5 +1,6 @@
 #include "helper.h"
 #include "collision.h"
+#include <omp.h>
 
 double dotProd (const int * array1, double * array2, int length){
     int i;
@@ -85,6 +86,7 @@ void doCollision(double *collideField, int *flagField, double * massField, doubl
     int x, y, z, node[3], flag, isFluid;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
+#pragma omp parallel for schedule(dynamic) private(y, x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(6)
     // Loop over inner cells: compare to streaming.c
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;

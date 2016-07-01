@@ -80,6 +80,6 @@ void check_mass(double *massField, int* flagField, int* length, int t){
 void run_checks(double *collideField, double *massField, int *flagField, int * length, int t ){
 //	check_in_rank(collideField, flagField, length, t);
 //	check_flags(flagField, length, FLUID, GAS, 	 t);
-	check_mass( massField, flagField, length, t);
+//	check_mass( massField, flagField, length, t);
 }
 
