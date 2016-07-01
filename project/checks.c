@@ -56,8 +56,8 @@ void check_flags(int * flagField, int* length, int flag1, int flag2, int t){
 	}
 }
 
-void check_mass(double *massField, int* flagField, int* length, int t){
-	double tot_mass = 0;
+void check_mass(float *massField, int* flagField, int* length, int t){
+	float tot_mass = 0;
 	int node[D], x, y, z, flag;
 	int n[D] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
@@ -77,7 +77,7 @@ void check_mass(double *massField, int* flagField, int* length, int t){
 	printf("On timestep %d : Total mass: %f \n",t,tot_mass);
 }
 
-void run_checks(float *collideField, double *massField, int *flagField, int * length, int t ){
+void run_checks(float *collideField, float *massField, int *flagField, int * length, int t ){
 //	check_in_rank(collideField, flagField, length, t);
 //	check_flags(flagField, length, FLUID, GAS, 	 t);
 //	check_mass( massField, flagField, length, t);

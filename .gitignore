@@ -43,3 +43,12 @@ worksheet[234]/lbsim
 # Project generated files
 project/lbsim
 project/vtk-output
+
+perf*
+project/LaTex/*pdf
+project/LaTex/*log
+project/LaTex/*aux
+project/LaTex/*nav
+project/LaTex/*snm
+project/LaTex/*toc
+project/LaTex/auto

@@ -15,7 +15,8 @@ int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6], r, t;
 
     /* TODO do we need inVelocity? */
-    double tau, velocity[3], ro_in, ro_ref, extForces[3];
+    float tau, extForces[3];
+    float velocity[3], ro_in, ro_ref;
     float *swap=NULL;
 
     clock_t start_time, total_time = 0;
@@ -29,12 +30,12 @@ int main(int argc, char *argv[]){
     float *collideField = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
     float *streamField  = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
     int *flagField = (int *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof( int ));
-    double * massField = (double *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(double));
+    float * massField = (float *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(float));
     /* fluid fraction field */
-    double * fractionField = (double *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(double));
+    float * fractionField = (float *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(float));
 
-    double viscosity = C_S * C_S * (tau - 0.5);
-    double Re = 1 / viscosity;
+    float viscosity = C_S * C_S * (tau - 0.5);
+    float Re = 1 / viscosity;
 
     if (collideField == NULL || streamField == NULL || flagField == NULL) {
         ERROR("Unable to allocate matrices.");

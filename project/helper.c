@@ -197,6 +197,29 @@ void read_int( const char* szFileName, const char* szVarName, int* pVariable)
                                       *pVariable );
 }
 
+void read_float( const char* szFileName, const char* szVarName, float* pVariable)
+{
+    char* szValue = NULL;       /* String mit dem eingelesenen Variablenwert */
+
+    if( szVarName  == 0 )  ERROR("null pointer given as varable name" );
+    if( szFileName == 0 )  ERROR("null pointer given as filename" );
+    if( pVariable  == 0 )  ERROR("null pointer given as variable" );
+
+    if( szVarName[0] == '*' )
+        szValue = find_string( szFileName, szVarName +1 );
+    else
+        szValue = find_string( szFileName, szVarName );
+
+    if( sscanf( szValue, "%f", pVariable) == 0)
+        READ_ERROR("wrong format", szVarName, szFileName, 0);
+
+    printf( "File: %s\t\t%s%s = %f\n", szFileName,
+            szVarName,
+            &("               "[min_int( (int)strlen(szVarName), 15)]),
+            *pVariable );
+}
+
+
 void read_double( const char* szFileName, const char* szVarName, double* pVariable)
 {
     char* szValue = NULL;       /* String mit dem eingelesenen Variablenwert */

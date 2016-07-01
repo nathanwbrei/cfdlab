@@ -4,7 +4,7 @@
 #include "computeCellValues.h"
 #include <omp.h>
 
-void doStremingCell(float * collideField, float * streamField, int * flagField, double * massField, double * fractionField, int * node, float * el, int * n, int isInterface) {
+void doStremingCell(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * node, float * el, int * n, int isInterface) {
     int i, flag;
     int source_node[3];
     float fi_nb, se;
@@ -39,7 +39,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
 
 }
 
-void doStreaming(float * collideField, float * streamField, int * flagField, double * massField, double * fractionField, int * length){
+void doStreaming(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * length){
     int x, y, z, *flag, isFluid, isInterface;
     int node[3];
     float * el;
@@ -63,8 +63,6 @@ void doStreaming(float * collideField, float * streamField, int * flagField, dou
                 if (isFluid || isInterface) {
                     doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface);
                 }
-
-
             }
         }
     }

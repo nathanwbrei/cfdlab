@@ -17,10 +17,10 @@ void check_flags(int * flagField, int* length, int flag1, int flag2, int t);
 /* 	Prints out the total mass in the cavity using the data in massField
 	*lenght is a vector with the size of the field and t is the current timestep
 */
-void check_mass(double *massField, int* flagField, int* length, int t);
+void check_mass(float *massField, int* flagField, int* length, int t);
 
 /*	Carrys al the checks (check_in_rank, check_flags, check_mass) */
-void run_checks(float *collideField, double *massField, int *flagField, int * length, int t );
+void run_checks(float *collideField, float *massField, int *flagField, int * length, int t );
 
 #endif
 

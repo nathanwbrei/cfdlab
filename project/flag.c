@@ -220,12 +220,10 @@ void performEmpty(float * collideField, int * flagField, int * n, int updatedCel
     }
 }
 
-
-
-void updateFlagField(float * collideField, int * flagField, double * fractionField, int * length) {
+void updateFlagField(float * collideField, int * flagField, float * fractionField, int * length) {
     int x, y, z, flag, nFilled = 0, nEmptied = 0;
     int node[3];
-    double fraction, eps = 1e-3;
+    float fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
     int filledCells[n[0] * n[1] * n[2]][3];

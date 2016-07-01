@@ -39,8 +39,8 @@ void computeFeq(const float * const density, const float * const velocity, float
      */
 
     int i;
-    double ci_dot_u_cs2, u_dot_u_cs2;
-    double ci0, ci1, ci2, u0, u1, u2;
+    float ci_dot_u_cs2, u_dot_u_cs2;
+    float ci0, ci1, ci2, u0, u1, u2;
 
     u0 = velocity[0];
     u1 = velocity[1];

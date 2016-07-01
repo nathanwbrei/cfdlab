@@ -2,16 +2,16 @@
 #include "collision.h"
 #include <omp.h>
 
-double dotProd (const int * array1, double * array2, int length){
+float dotProd (const int * array1, float * array2, int length){
     int i;
-    double product =0;
+    float product =0;
     for (i = 0; i < length; ++i){
         product += array1[i] * array2[i];
     }
     return product;
 }
 
-void computeNormal(int* node, int* length, double * fractionField, double* normal_dir){
+void computeNormal(int* node, int* length, float * fractionField, float* normal_dir){
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     int node_back[3] = { node[0], node[1], node[2] };
     int node_front[3] = { node[0], node[1], node[2] };
@@ -28,13 +28,13 @@ void computeNormal(int* node, int* length, double * fractionField, double* norma
     //printf("\n");
 }
 
-double computeExternal (int i, float density, double * extForces){
+float computeExternal (int i, float density, float * extForces){
     /* Computes the influence of external forces, like gravity */
 
     return dotProd(LATTICEVELOCITIES[i], extForces, D) * density * LATTICEWEIGHTS[i];
 }
 
-void computePostCollisionDistributions(int *node, float * currentCell, int* flagField, double* fractionField, const double * const tau, const float *const feq, const float *const feqAtm, float density, double * extForces, int * length){
+void computePostCollisionDistributions(int *node, float * currentCell, int* flagField, float* fractionField, const float * const tau, const float *const feq, const float *const feqAtm, float density, float * extForces, int * length){
     /* Compute the post-collision distribution f*[i] according to BGK update rule. See Eq 14.  */
 
     int i;
@@ -44,7 +44,7 @@ void computePostCollisionDistributions(int *node, float * currentCell, int* flag
     if (*getFlag(flagField, node, n) == INTERFACE){        
         // int source_node[D];
         float normal_dir[3];
-        // double epsilon = 0.00000000001;
+        // float epsilon = 0.00000000001;
 
         for (i=0; i<Q; i++) {
             /* Make this part with the normak work, folowing eq 4.5 in PHD */
@@ -71,7 +71,7 @@ void computePostCollisionDistributions(int *node, float * currentCell, int* flag
     }
 }
 
-void doCollision(float *collideField, int *flagField, double * massField, double * fractionField, const double * const tau, int * length, double * extForces){
+void doCollision(float *collideField, int *flagField, float * massField, float * fractionField, const float * const tau, int * length, float * extForces){
     /* 
      * For each inner grid cell in collideField, compute the post-collide
      * distribution
@@ -86,7 +86,7 @@ void doCollision(float *collideField, int *flagField, double * massField, double
     int x, y, z, node[3], flag, isFluid;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-#pragma omp parallel for schedule(dynamic) private(y, x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(6)
+#pragma omp parallel for schedule(dynamic) private(y, x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(5)
     // Loop over inner cells: compare to streaming.c
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;

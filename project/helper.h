@@ -34,7 +34,7 @@ static inline int * getFlag(int * array, int * node, int *n) {
 /**
  * Return pointer to a mass of (x,y,z) element
  */
-static inline double * getMass(double * array, int * node, int *n) {
+static inline float * getMass(float * array, int * node, int *n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 
@@ -42,7 +42,7 @@ static inline double * getMass(double * array, int * node, int *n) {
  * Return pointer to a mass of (x,y,z) element
  */
 /* TODO think about common function name for getMass and getFraction */
-static inline double * getFraction(double * array, int * node, int *n) {
+static inline float * getFraction(float * array, int * node, int *n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 /**
@@ -131,6 +131,7 @@ void  errhandler( int nLine, const char *szFile, const char *szString );
 
 void read_string( const char* szFilename, const char* szName, char*  sValue);
 void read_int   ( const char* szFilename, const char* szName, int*    nValue);
+void read_float( const char* szFilename, const char* szName, float*  Value);
 void read_double( const char* szFilename, const char* szName, double*  Value);
 
 /**

@@ -37,10 +37,10 @@ void setNoSlip(float * collideField, int * flagField, int * node, int * n) {
 /**
  * Set MOVING_WALL condition
  */
-void setMovingWall(float * collideField, int * flagField,  const double * const wallVelocity, int * node, int * n) {
+void setMovingWall(float * collideField, int * flagField,  const float * const wallVelocity, int * node, int * n) {
     int i, coord_dest[3];
     float * cell_ptr;
-    double dotProd;
+    float dotProd;
     float density;
     
 /* for each lattice */
@@ -84,7 +84,7 @@ void setMovingWall(float * collideField, int * flagField,  const double * const 
  */
 void setOutflow(float * collideField,
                 int * flagField,
-                const double * const ro_ref,
+                const float * const ro_ref,
                 int * node,
                 int * n) {
     int i, coord_dest[3], flag;
@@ -131,10 +131,10 @@ void setOutflow(float * collideField,
 void setInflow(float * collideField,
                int * flagField,
                const char * const scenario,
-               const double * const Re,
-               const double * const ro_ref,
-               const double * const ro_in,
-               const double * const inVelocity,
+               const float * const Re,
+               const float * const ro_ref,
+               const float * const ro_in,
+               const float * const inVelocity,
                int * node,
                int * n) {
     int i, coord_dest[3], flag;
@@ -263,10 +263,10 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
 void boundaryCell(float * collideField,
                   int * flagField,
                   const char * const scenario,
-                  const double * const Re,
-                  const double * const ro_ref,
-                  const double * const ro_in,
-                  const double * const velocity,
+                  const float * const Re,
+                  const float * const ro_ref,
+                  const float * const ro_in,
+                  const float * const velocity,
                   int * node,
                   int flag,
                   int * n) {
@@ -292,10 +292,10 @@ void boundaryCell(float * collideField,
 void treatBoundary(float *collideField,
                    int *flagField,
                    const char * const scenario,
-                   const double * const Re,
-                   const double * const ro_ref,
-                   const double * const ro_in,
-                   const double * const velocity,
+                   const float * const Re,
+                   const float * const ro_ref,
+                   const float * const ro_in,
+                   const float * const velocity,
                    int * length) {
     int x, y, z, flag, node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };

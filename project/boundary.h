@@ -5,10 +5,10 @@
 void treatBoundary(float * collideField,
                    int * flagField,
                    const char * const problem,
-                   const double * const Re,
-                   const double * const ro_ref,
-                   const double * const ro_in,
-                   const double * const velocity,
+                   const float * const Re,
+                   const float * const ro_ref,
+                   const float * const ro_in,
+                   const float * const velocity,
                    int * length);
 
 #endif

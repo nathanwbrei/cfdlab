@@ -9,16 +9,16 @@
  **/
 int readParameters(
     int *length,                        /* reads domain size. Parameter name: "xlength" */
-    double *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
-    double *velocity,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
-    double *extForces,                  /* External force, like gravity or electromagnetic */
+    float *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
+    float *velocity,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
+    float *extForces,                  /* External force, like gravity or electromagnetic */
     int *timesteps,                     /* number of timesteps. Parameter name: "timesteps" */
     int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
     int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
     char *argv[],                       /* argv[1] shall contain the path to the config file */
     char *problem,                      /* specifies the considered problem scenario (parabolic or constant inflow )*/
-    double *ro_ref,                     /* reference density nomally set to 1 */
-    double *ro_in,                      /* density of inflow/outflow */
+    float *ro_ref,                     /* reference density nomally set to 1 */
+    float *ro_in,                      /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
     int * r
     ){
@@ -35,21 +35,21 @@ int readParameters(
     read_int(szFileName, "ylength", &length[1]);
     read_int(szFileName, "xlength", &length[0]);
     read_int(szFileName, "radius", r);
-    read_double(szFileName,"tau", tau);
+    read_float(szFileName,"tau", tau);
     
-    read_double(szFileName, "velocity_x", &velocity[0]);
-    read_double(szFileName, "velocity_y", &velocity[1]);
-    read_double(szFileName, "velocity_z", &velocity[2]);
+    read_float(szFileName, "velocity_x", &velocity[0]);
+    read_float(szFileName, "velocity_y", &velocity[1]);
+    read_float(szFileName, "velocity_z", &velocity[2]);
     
-    read_double(szFileName, "forces_x", &extForces[0]);
-    read_double(szFileName, "forces_y", &extForces[1]);
-    read_double(szFileName, "forces_z", &extForces[2]);
+    read_float(szFileName, "forces_x", &extForces[0]);
+    read_float(szFileName, "forces_y", &extForces[1]);
+    read_float(szFileName, "forces_z", &extForces[2]);
     
     read_int(szFileName, "timesteps", timesteps);
     read_int(szFileName, "vtkoutput", timestepsPerPlotting);
     read_string(szFileName, "problem", problem);
-    read_double(szFileName,"ro_ref", ro_ref);
-    read_double(szFileName,"ro_in", ro_in);
+    read_float(szFileName,"ro_ref", ro_ref);
+    read_float(szFileName,"ro_in", ro_in);
 
     read_int(szFileName, "wall_x0", &boundaries[0]);
     read_int(szFileName, "wall_xmax", &boundaries[1]);
@@ -81,9 +81,9 @@ void initialiseCell(float *collideField, float *streamField, int *flagField, int
   For INTERFACE cells sets initial mass to sum of the distributions from the neighboring FLUID cells.
   Set fraction to be equal to the mass, since our initial density is equal to 1.
  */
-void initializeCellMass(float * collideField, int * flagField, double *massField, double * fractionField, int * node, int * n) {
+void initializeCellMass(float * collideField, int * flagField, float *massField, float * fractionField, int * node, int * n) {
     int neighbor_node[3], i, flag;
-    double * mass;
+    float * mass;
 
     flag = *getFlag(flagField, node, n);
     if (flag == FLUID) {
@@ -233,7 +233,7 @@ void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagF
     }
 }
 
-void initialiseFields(float *collideField, float *streamField, int *flagField, double * massField, double * fractionField, int * length, int * boundaries, int r, char *argv[]){
+void initialiseFields(float *collideField, float *streamField, int *flagField, float * massField, float * fractionField, int * length, int * boundaries, int r, char *argv[]){
     int x, y, z, node[3];
     int ** image;
     char path[80] = "examples/";
