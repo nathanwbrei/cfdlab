@@ -5,10 +5,29 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage[breakable, theorems, skins]{tcolorbox}
+\usepackage{multimedia}
 \author{ Nathan Brei \\ Irivng Cabrera \\ Natasha Saiapova}
 \institute[TUM]{TU München}
 \date{\today}
 \title{Free surfaces with Lattice-Boltzmann method}
+\DeclareRobustCommand{\mybox}[2][gray!20]{%
+\begin{tcolorbox}[   %% Adjust the following parameters at will.
+        breakable,
+        left=0pt,
+        right=0pt,
+        top=0pt,
+        bottom=0pt,
+        colback=#1,
+        colframe=#1,
+        width=\dimexpr\textwidth\relax, 
+        enlarge left by=0mm,
+        boxsep=5pt,
+        arc=0pt,outer arc=0pt,
+        ]
+        #2
+\end{tcolorbox}
+}
 \begin{document}
 \begin{frame}
 	\maketitle
@@ -17,18 +36,16 @@
 	\tableofcontents
 \end{frame}
 \begin{frame}
-	What we had
+	\frametitle{Output from worksheets}
 	\begin{itemize}
-	\item 3D Scenarios
+	\item LBM D3Q19;
 	\item Different boundary conditions
 		\begin{itemize}
-		\item Non-Slip  
-		\item Moving Wall 
-		\item Inflow
-		\item Outflow
-		\item Free-Slip
+		\item Non-Slip;  
+		\item Inflow;
+		\item Free-Slip.
 		\end{itemize}
-	\item 2D scenarios reader
+	\item 2D complex geometries reader.
 	\end{itemize}
 \end{frame}
 \begin{frame}
@@ -50,8 +67,76 @@
 \end{frame}
 \begin{frame}
 	Some link to a nice video
+    \movie [width=6cm,height=6cm,duration=5s,poster]{}{wall100-freeslip.mp4} 
 \end{frame}
 \begin{frame}
 Thank you
 \end{frame}
+
+\begin{frame}
+  \begin{itemize}
+    \frametitle{New fields}
+  \item New cell types: \textbf{GAS} and \textbf{INTERFACE};
+  \item New values for cell: \textbf{mass} (double) and \textbf{fluid fraction} (double).\\
+    Fluid fraction is
+    \(
+    \epsilon = \frac{m}{\rho},
+    \)
+    where $\rho$ is a density.
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Boundary conditions and gravity}
+  \begin{itemize}
+  \item Add gravity to our model;
+  \item Reconstruct distributions from GAS cells to INTERFACE.\\
+    Use INFLOW boundary conditions.
+    
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Mass exchange}
+  Calculate new mass for INTERFACE cells.
+    \begin{equation}
+      m\big(x, t+\bigtriangleup t\big) = m\big(x,t\big)+\sum_{i=1}\bigtriangleup m_i
+    \end{equation}
+    where $\bigtriangleup m_i$ is calculated only between INTERFACE-INTERFACE or
+    FLUID-INTERFACE cells in the following way:
+    \begin{equation}
+      \bigtriangleup m_i = \Big(f_{\bar{i}}\big(x+\bigtriangleup te_i,t\big)-f_i\big(x,t\big)\Big)\frac{\epsilon\big(x+\bigtriangleup te_i,t\big)+\epsilon\big(x,t\big)}{2}
+    \end{equation}
+    For fluid cell mass is equal its density.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Flag field update}
+  Update fraction field;
+  \mybox[green!20]{
+    \textbf{Important rule}\\
+    Between GAS and FLUID cells \textbf{always} has to be
+    an INTERFACE cell.
+  }
+  Update flag field afterwards. 
+\end{frame}
+\begin{frame}
+  \frametitle{What can be done}
+  \begin{itemize}
+  \item Make beautiful examples with higher resolution (falling drop, obstacles
+    etc.);
+    \item Improve physical correctness;
+  \item Make our code faster.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  References
+  \begin{itemize}
+  \item Physically based Animation of Free Surface Flows with the Lattice
+    Boltzmann Method, Nils Thürey, 2007.
+  \item GPU based simulation and visualization of fluids with free surfaces, Martin Schreiber, 2010.
+  \end{itemize}
+\end{frame}
+
+
 \end{document}
