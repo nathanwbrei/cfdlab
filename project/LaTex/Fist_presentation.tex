@@ -63,8 +63,11 @@
   \frametitle{Boundary conditions and gravity}
   \begin{itemize}
   \item Add gravity to our model;
+  $$ f^c_i (x, t) = (1 - \omega)f_i (x, t) + \omega f_i ^{eq} \mathbf{ + w_ i \rho e_i g }$$
   \item Reconstruct distributions from GAS cells to INTERFACE.\\
     Use INFLOW boundary conditions.
+    $$f_i (x,t) = f ^{eq} _{inv(i)} (\rho _{ref} ,\overrightarrow{v} ) + f ^{eq} _ i (\rho _{ref} ,\overrightarrow{v} ) - f _{inv(i)} (x + c_i \Delta t, t)$$
+    Where $\rho _{ref} = 1 $ is the  atmospheric pressure.
   \end{itemize}
 \end{frame}
 
