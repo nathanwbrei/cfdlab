@@ -74,7 +74,7 @@ void makeAvgDistFn(float * collideField, int * flagField, int * n, int * cell) {
 
 
 // TODO Use a real data structure
-void removeFromEmptyList(int emptiedCells[][3], int * nEmptied, int * targetCell) {
+void removeFromEmptyList(int ** emptiedCells, int * nEmptied, int * targetCell) {
 
     //printf("REMOVING: %d,%d,%d\n", targetCell[0], targetCell[1], targetCell[2]);
     // printf("BEFORE: List contains: ");
@@ -110,7 +110,7 @@ void removeFromEmptyList(int emptiedCells[][3], int * nEmptied, int * targetCell
 }
 
 
-void performFill(float * collideField, int * flagField, int * n, int filledCells[][3], int nFilled, int emptiedCells[][3], int * nEmptied) {
+void performFill(float * collideField, int * flagField, int * n, int ** filledCells, int nFilled, int ** emptiedCells, int * nEmptied) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -171,7 +171,7 @@ void performFill(float * collideField, int * flagField, int * n, int filledCells
 
 
 
-void performEmpty(float * collideField, int * flagField, int * n, int updatedCells[][3], int nUpdated) {
+void performEmpty(float * collideField, int * flagField, int * n, int ** updatedCells, int nUpdated) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -221,13 +221,19 @@ void performEmpty(float * collideField, int * flagField, int * n, int updatedCel
 }
 
 void updateFlagField(float * collideField, int * flagField, float * fractionField, int * length) {
-    int x, y, z, flag, nFilled = 0, nEmptied = 0;
+    int x, y, z, i, flag, nFilled = 0, nEmptied = 0;
     int node[3];
     float fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
-    int filledCells[n[0] * n[1] * n[2]][3];
-    int emptiedCells[n[0] * n[1] * n[2]][3];
+    // int filledCells[n[0] * n[1] * n[2]][3];
+    // int emptiedCells[n[0] * n[1] * n[2]][3];
+    int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+    int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+        filledCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+        emptiedCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+    }
 
     /*
       Updating flags for INTERFACE cells:
@@ -269,6 +275,14 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
     // Update neighbors of filled and emptied cells in order to have closed interface layer
     performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied);
     performEmpty(collideField, flagField, n, emptiedCells, nEmptied);
+
+    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+        free(filledCells[i]);
+        free(emptiedCells[i]);
+    }
+    free(filledCells);
+    free(emptiedCells);
+    
 
     // TODO: Redistribute mass
 }
