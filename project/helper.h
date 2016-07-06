@@ -20,14 +20,14 @@
 /**
  * Return pointer to i-th lattice in (x, y, z) cell
  */
-static inline float * getEl(float * array, int * node, int i, int *n) {
+__attribute__((always_inline))static inline float * getEl(float * array, int * node, int i, int *n) {
     return array + Q * (node[2] * n[0] * n[1] + node[1] * n[0] + node[0]) + i;
 }
 
 /**
  * Return pointer to a flag of (x,y,z) element
  */
-static inline int * getFlag(int * array, int * node, int *n) {
+__attribute__((always_inline))static inline int * getFlag(int * array, int * node, int *n) {
     return array + node[2] * n[0] * n[1] + node[1] * n[0] + node[0];
 }
 

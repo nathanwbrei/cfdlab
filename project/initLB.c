@@ -250,7 +250,7 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
 
     initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries);
  
-    if (strcmp(argv[1], "droplet") == 0) {
+    if (strcmp(argv[1], "droplet65") == 0) {
         initDropletFlags(flagField, n, r);
     }
 

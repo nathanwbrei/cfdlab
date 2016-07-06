@@ -1,7 +1,8 @@
 xlength       	100
-ylength       	31
+ylength       	30
 zlength       	100
 
+radius          10
 tau           	1
 
 velocity_x    	0
@@ -10,7 +11,7 @@ velocity_z    	0.05
 
 forces_x    	0
 forces_y    	0
-forces_z    	-0.001
+forces_z    	-0.0001
 
 timesteps     	7000
 

@@ -6,7 +6,7 @@
 #define Q 19
 #define D 3
 
-static const int LATTICEVELOCITIES[Q][D] = {
+static const float LATTICEVELOCITIES[Q][D] = {
     {0, -1, -1}, {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {0, 1, -1},
     {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {-1, 0, 0}, {0, 0, 0}, {1, 0, 0}, {-1, 1, 0}, {0, 1, 0}, {1, 1, 0},
     {0, -1, 1}, {-1, 0, 1}, {0, 0, 1}, {1, 0, 1}, {0, 1, 1}
@@ -20,7 +20,7 @@ static const float LATTICEWEIGHTS[Q] = {
 
 /* Math.sqrt(3.0) = 1.732050807568877 */
 static const float C_S = 1.0 / 1.732050807568877;
-static const float C_S2 = 1.0 / 3.0; 
+static const float C_S2_inv = 3.0; 
 
 static const int FLUID = 0;
 static const int MOVING_WALL = 2;

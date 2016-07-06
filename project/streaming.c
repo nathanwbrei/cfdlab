@@ -4,7 +4,7 @@
 #include "computeCellValues.h"
 #include <omp.h>
 
-void doStremingCell(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * node, float * el, int * n, int isInterface) {
+void doStremingCell(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * node, float * el, int * n, int isInterface, int isFluid) {
     int i, flag;
     int source_node[3];
     float fi_nb, se;
@@ -17,8 +17,9 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
 
         /* Amount of particles that goes to this cell */
         fi_nb = *getEl(collideField, source_node, i, n);
-        *(el + i) = fi_nb;
-
+        if (isFluid) {
+            *(el + i) = fi_nb;
+        }
         if (isInterface) {
         /*
           Update mass field according formula (4.3) (PhD thesis):
@@ -30,10 +31,28 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
         */
 
             flag = *getFlag(flagField, source_node, n); 
+            if (flag == GAS) {
+                float velocity[3], feq[Q], *fluidCell, rho_ref = 1;
+
+                /* get pointer to the fluid cell */
+                fluidCell = getEl(collideField, node, 0, n);
+
+                /* compute velocity of the fluid cell */
+                computeVelocity(fluidCell, &rho_ref, velocity);
+
+                /* compute f-equilibrium of the fluid cell */
+                computeFeq(&rho_ref, velocity, feq);
+
+                /* set boundary */
+                *(el + i) = feq[Q - i -1] + feq[i] - fluidCell[Q - 1 - i];
+ 
+            } else {
+                *(el + i) = fi_nb;
+            }
             if (flag == FLUID || flag == INTERFACE) {
                 se = fi_nb - *getEl(collideField, source_node, Q - 1 - i, n);
-                *getMass(massField, node, n) += 3*se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) / 2;
-            }
+                *getMass(massField, node, n) += 3.0 * se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) * 0.5;
+            } else {}
         }
     }
 
@@ -47,11 +66,11 @@ void doStreaming(float * collideField, float * streamField, int * flagField, flo
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     /* Loop for inner cells */
-//#pragma omp parallel for schedule(dynamic) private(y, x, node, isFluid, flag, isInterface, el) num_threads(6)
+#pragma omp parallel for schedule(dynamic) private(x, node, isFluid, flag, isInterface, el) num_threads(3) collapse(2)
     for (z = 1; z <= length[2]; z++) {
-        node[2] = z;
          
         for (y = 1; y <= length[1]; y++) {
+            node[2] = z;
             node[1] = y;
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
@@ -61,7 +80,7 @@ void doStreaming(float * collideField, float * streamField, int * flagField, flo
                 isInterface = *flag == INTERFACE;
 
                 if (isFluid || isInterface) {
-                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface);
+                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface, isFluid);
                 }
             }
         }

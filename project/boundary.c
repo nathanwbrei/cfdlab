@@ -179,17 +179,23 @@ void setInflow(float * collideField,
 }
 
 void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
-    int i, j, k, coord_dest[3], non_fluid_cell[3], sum, flag;
-    float * cell_ptr;
+    int i, j, k, coord_dest[3], non_fluid_cell[3], flag;
+    float * cell_ptr, sum, lv0, lv1, lv2;
 
     for (i = 0; i < Q; i++) {
         /* Initialize the cell with a flag, that will later make possible to know if some lattice was modifided*/
         *getEl(collideField, node, i, n) = 0;    
     }
+
     for (i = 0; i < Q; i++) {
-        sum = abs(LATTICEVELOCITIES[i][0])+abs(LATTICEVELOCITIES[i][1])+abs(LATTICEVELOCITIES[i][2]);
+        lv0 = LATTICEVELOCITIES[i][0];
+        lv1 = LATTICEVELOCITIES[i][1];
+        lv2 = LATTICEVELOCITIES[i][2];
+        
+        sum = lv0 * lv0 + lv1 * lv1 + lv2 * lv2;
+
         /* In this part we are interested only in the face of the cell, thus the lattice has just one component */
-        if (sum == 1){
+        if (sum == 1.0){
             coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
             coord_dest[1] = node[1] + LATTICEVELOCITIES[i][1];
             coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
@@ -201,9 +207,9 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
                 if (flag == FLUID || flag == INTERFACE) {    
                     for (j = 0; j < Q; j++) {
                         /* looking for a direction with one of the components inverse to the direction of the face */
-                        if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1 ||
-                           LATTICEVELOCITIES[i][1]*LATTICEVELOCITIES[j][1] == -1 ||
-                           LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1) {
+                        if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1.0 ||
+                           LATTICEVELOCITIES[i][1]*LATTICEVELOCITIES[j][1] == -1.0 ||
+                           LATTICEVELOCITIES[i][2]*LATTICEVELOCITIES[j][2] == -1.0) {
                             
                             /* If the selected direction of the fluid cell falls on another fluid cell, they will interact in the streaming step */
                             non_fluid_cell[0] = coord_dest[0] + LATTICEVELOCITIES[j][0];
@@ -214,12 +220,12 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
                             if (flag != FLUID && flag != INTERFACE) {
                                 for (k = 0; k < Q; k++) {
                                     /* Search for a (unique) direcrion in the boundary cell which is the reflection of the fluid cell */
-                                    if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1 || 
-                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[i][1] == 1 || 
-                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[i][2] == 1 ) &&
-                                       ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1 || 
-                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1 || 
-                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1 )) {
+                                    if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1.0 || 
+                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[i][1] == 1.0 || 
+                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[i][2] == 1.0 ) &&
+                                       ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1.0 || 
+                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1.0 || 
+                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1.0 )) {
                                         cell_ptr = getEl(collideField, node, k, n);
                                         *cell_ptr = *getEl(collideField, coord_dest, j, n);
                                         break;
@@ -273,8 +279,7 @@ void boundaryCell(float * collideField,
                   int * n) {
 
     if (flag == GAS) {
-        /* Reconstruction of gas distributions is the same as outflow condition */
-        setOutflow(collideField, flagField, ro_ref, node, n);
+        return;
     } else if (flag == NOSLIP) {
         setNoSlip(collideField, flagField, node, n);
     } else if (flag == MOVING_WALL) {
@@ -301,9 +306,10 @@ void treatBoundary(float *collideField,
     int x, y, z, flag, node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
+#pragma omp parallel for schedule(dynamic) collapse(2) private(node, x, flag) num_threads(3)
     for (z = 0; z < n[2]; z++) {
-        node[2] = z;
         for (y = 0; y < n[1]; y++) {
+            node[2] = z;
             node[1] = y;
             for (x = 0; x < n[0]; x++) {
                 node[0] = x;
