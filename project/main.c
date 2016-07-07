@@ -12,7 +12,7 @@
 #include "checks.h"
 
 int main(int argc, char *argv[]){
-    int length[3], timesteps, timestepsPerPlotting, boundaries[6], r, t;
+    int length[3], timesteps, timestepsPerPlotting, boundaries[6], r, t, n_threads;
 
     /* TODO do we need inVelocity? */
     float tau, extForces[3];
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
     char problem [10];
 
     /* Read the file of parameters */
-    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r);
+    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r, &n_threads);
     
     /* Allocate memory */
     float *collideField = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
@@ -68,19 +68,19 @@ int main(int argc, char *argv[]){
     //     printf("\n");
     // }
 
-    treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
+    treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
 
     for (t = 0; t < timesteps; t++) {
 
         start_time = time(NULL);  // Start the timer for the lattice updates
 
-        doStreaming(collideField, streamField, flagField, massField, fractionField, length);
+        doStreaming(collideField, streamField, flagField, massField, fractionField, length, n_threads);
         swap = collideField;
         collideField = streamField;
         streamField = swap;
-        doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces);
-        updateFlagField(collideField, flagField, fractionField, filledCells, emptiedCells, length);
-        treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
+        doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces, n_threads);
+        updateFlagField(collideField, flagField, fractionField, filledCells, emptiedCells, length, n_threads);
+        treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
 
         total_time += time(NULL) - start_time; // Add elapsed ticks to total_time
 

@@ -20,12 +20,15 @@ int readParameters(
     float *ro_ref,                     /* reference density nomally set to 1 */
     float *ro_in,                      /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
-    int * r
+    int * r, 
+    int * n_threads 
     ){
 
-    if (argc != 2) {
+    if (argc != 3) {
+        printf("Usage: %s filename #threads\n",argv[0] );
         ERROR("number of arguments is incorrect");
     }
+    *n_threads = atoi(argv[2]); 
     char path[80] = "examples/";
     
     strcat(path,argv[1]);

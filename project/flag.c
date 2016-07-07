@@ -115,7 +115,7 @@ void removeFromEmptyList(int ** emptiedCells, int * nEmptied, int * targetCell) 
 }
 
 
-void performFill(float * collideField, int * flagField, int * n, int ** filledCells, int nFilled, int ** emptiedCells, int * nEmptied) {
+void performFill(float * collideField, int * flagField, int * n, int ** filledCells, int nFilled, int ** emptiedCells, int * nEmptied, int n_threads) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -133,7 +133,7 @@ void performFill(float * collideField, int * flagField, int * n, int ** filledCe
     int i, k, neighbor[3], *flag;
 
     // for each k <- cell that has been updated
-#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag)
+#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag) num_threads(n_threads)
     for (k = 0; k < nFilled; k++) {         
 
         // Update the cell's own flag
@@ -175,7 +175,7 @@ void performFill(float * collideField, int * flagField, int * n, int ** filledCe
     }
 }
 
-void performEmpty(float * collideField, int * flagField, int * n, int ** updatedCells, int nUpdated) {
+void performEmpty(float * collideField, int * flagField, int * n, int ** updatedCells, int nUpdated, int n_threads) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
     and update their flags to maintain the integrity of the interface layer. For example, if a cell 
@@ -190,7 +190,7 @@ void performEmpty(float * collideField, int * flagField, int * n, int ** updated
 
     int i, k, neighbor[3], * flag;
 
-#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag)
+#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag) num_threads(n_threads)
     // for each k <- cell that has been updated
     for (k = 0; k < nUpdated; k++) {         
         if (updatedCells[k][0] == -1) continue;
@@ -225,8 +225,8 @@ void performEmpty(float * collideField, int * flagField, int * n, int ** updated
     }
 }
 
-void updateFlagField(float * collideField, int * flagField, float * fractionField, int ** filledCells, int ** emptiedCells, int * length) {
-    int x, y, z, i, flag, nFilled = 0, nEmptied = 0;
+void updateFlagField(float * collideField, int * flagField, float * fractionField, int ** filledCells, int ** emptiedCells, int * length, int n_threads) {
+    int x, y, z, flag, nFilled = 0, nEmptied = 0;
     int node[3];
     float fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
@@ -278,8 +278,8 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
 
 
     // Update neighbors of filled and emptied cells in order to have closed interface layer
-    performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied);
-    performEmpty(collideField, flagField, n, emptiedCells, nEmptied);
+    performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied, n_threads);
+    performEmpty(collideField, flagField, n, emptiedCells, nEmptied, n_threads);
 
    
 

@@ -58,7 +58,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
 
 }
 
-void doStreaming(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * length){
+void doStreaming(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * length, int n_threads){
     int x, y, z, *flag, isFluid, isInterface;
     int node[3];
     float * el;
@@ -66,7 +66,7 @@ void doStreaming(float * collideField, float * streamField, int * flagField, flo
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     /* Loop for inner cells */
-#pragma omp parallel for schedule(dynamic) private(x, node, isFluid, flag, isInterface, el) num_threads(3) collapse(2)
+#pragma omp parallel for schedule(dynamic) private(x, node, isFluid, flag, isInterface, el) num_threads(n_threads) collapse(2)
     for (z = 1; z <= length[2]; z++) {
          
         for (y = 1; y <= length[1]; y++) {
