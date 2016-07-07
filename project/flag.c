@@ -2,7 +2,7 @@
 #include "helper.h"
 #include "flag.h"
 #include "computeCellValues.h"
-
+#include <omp.h>
 
 void makeAvgDistFn(float * collideField, int * flagField, int * n, int * cell) {
     /*
@@ -90,17 +90,22 @@ void removeFromEmptyList(int ** emptiedCells, int * nEmptied, int * targetCell) 
         emptiedCells[j][2] == targetCell[2])) {
         j++;
     }
+    
+    emptiedCells[j][0] = -1;
+    emptiedCells[j][0] = -1;
+    emptiedCells[j][0] = -1;
+  
     // j is either nEmptied or index of match
-    for (int k=j; k < (*nEmptied)-1; k++) {
-        emptiedCells[k][0] = emptiedCells[k+1][0];
-        emptiedCells[k][1] = emptiedCells[k+1][1];
-        emptiedCells[k][2] = emptiedCells[k+1][2];
-    }
-    // Decrement list length
-    if (j != *nEmptied) {
-        // printf("*************** REMOVED SOMETHING ******************\n");
-        (*nEmptied)--;
-    }
+//    for (int k=j; k < (*nEmptied)-1; k++) {
+//        emptiedCells[k][0] = emptiedCells[k+1][0];
+//        emptiedCells[k][1] = emptiedCells[k+1][1];
+//        emptiedCells[k][2] = emptiedCells[k+1][2];
+//    }
+//    // Decrement list length
+//    if (j != *nEmptied) {
+//        // printf("*************** REMOVED SOMETHING ******************\n");
+//        (*nEmptied)--;
+//    }
 
     // printf("After list contains: ");
     // for (int k=0; k < *nEmptied; k++) {
@@ -128,6 +133,7 @@ void performFill(float * collideField, int * flagField, int * n, int ** filledCe
     int i, k, neighbor[3], *flag;
 
     // for each k <- cell that has been updated
+#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag)
     for (k = 0; k < nFilled; k++) {         
 
         // Update the cell's own flag
@@ -169,8 +175,6 @@ void performFill(float * collideField, int * flagField, int * n, int ** filledCe
     }
 }
 
-
-
 void performEmpty(float * collideField, int * flagField, int * n, int ** updatedCells, int nUpdated) {
     /*
     For collections of interface cells that get emptied or filled, examine the neighboring cells 
@@ -186,10 +190,11 @@ void performEmpty(float * collideField, int * flagField, int * n, int ** updated
 
     int i, k, neighbor[3], * flag;
 
+#pragma omp parallel for schedule(dynamic) private(i, neighbor, flag)
     // for each k <- cell that has been updated
     for (k = 0; k < nUpdated; k++) {         
-
-        // Update the cell's own flag 
+        if (updatedCells[k][0] == -1) continue;
+        
         * getFlag(flagField, updatedCells[k], n) = GAS;
 
         // Heal interface by updating neighbors
