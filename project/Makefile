@@ -5,7 +5,7 @@ SOURCES=initLB.c visualLB.c boundary.c collision.c streaming.c computeCellValues
 # --------
 CC=gcc
 
-CFLAGS=-Wpedantic -Wall -std=c99 -O3 -g -lpthread -fopenmp
+CFLAGS=-Wpedantic -Wall -std=c99 -O3 -g -lpthread -fopenmp -msse2 -ftree-vectorize -ftree-vectorizer-verbose=5 -fopt-info-vec-optimized
 
 # Linker flags
 # ------------

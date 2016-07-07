@@ -33,6 +33,15 @@ int main(int argc, char *argv[]){
     float * massField = (float *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(float));
     /* fluid fraction field */
     float * fractionField = (float *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(float));
+    int i;
+    int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+
+    int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+    int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+        filledCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+        emptiedCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+    }
 
     float viscosity = C_S * C_S * (tau - 0.5);
     float Re = 1 / viscosity;
@@ -70,7 +79,7 @@ int main(int argc, char *argv[]){
         collideField = streamField;
         streamField = swap;
         doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces);
-        updateFlagField(collideField, flagField, fractionField, length);
+        updateFlagField(collideField, flagField, fractionField, filledCells, emptiedCells, length);
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length);
 
         total_time += time(NULL) - start_time; // Add elapsed ticks to total_time
@@ -87,6 +96,13 @@ int main(int argc, char *argv[]){
         float mlups = ((length[0]+2) * (length[1]+2) * (length[2]+2) * timesteps) / (elapsed_time*1000000);
         printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
 
+        for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+            free(filledCells[i]);
+            free(emptiedCells[i]);
+        }
+        free(filledCells);
+        free(emptiedCells);
+ 
     free(collideField);
     free(streamField);
     free(flagField);

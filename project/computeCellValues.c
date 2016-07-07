@@ -75,6 +75,5 @@ void computeFeq(const float * const density, const float * const velocity, float
         feq[Q - i - 1] = feq[i] - 2 * ci_dot_u_cs2[i] * (*density) * LATTICEWEIGHTS[i];
     }
 
-        //  feq[i] = (1 + ci_dot_u_cs2[i] + (ci_dot_u_cs2[i] * ci_dot_u_cs2[i]) * 0.5 - u_dot_u_cs2) * (*density) * LATTICEWEIGHTS[i];
 }
 

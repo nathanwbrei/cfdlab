@@ -225,7 +225,7 @@ void performEmpty(float * collideField, int * flagField, int * n, int ** updated
     }
 }
 
-void updateFlagField(float * collideField, int * flagField, float * fractionField, int * length) {
+void updateFlagField(float * collideField, int * flagField, float * fractionField, int ** filledCells, int ** emptiedCells, int * length) {
     int x, y, z, i, flag, nFilled = 0, nEmptied = 0;
     int node[3];
     float fraction, eps = 1e-3;
@@ -233,12 +233,12 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
     
     // int filledCells[n[0] * n[1] * n[2]][3];
     // int emptiedCells[n[0] * n[1] * n[2]][3];
-    int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
-    int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
-    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
-        filledCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
-        emptiedCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
-    }
+//    int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+//    int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
+//    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+//        filledCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+//        emptiedCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
+//    }
 
     /*
       Updating flags for INTERFACE cells:
@@ -281,19 +281,8 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
     performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied);
     performEmpty(collideField, flagField, n, emptiedCells, nEmptied);
 
-    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
-        free(filledCells[i]);
-        free(emptiedCells[i]);
-    }
-    free(filledCells);
-    free(emptiedCells);
-    
+   
 
     // TODO: Redistribute mass
 }
-
-
-
-
-
 
