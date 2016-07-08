@@ -42,26 +42,26 @@ void write_vtkFile(const char *szProblem,
     write_vtkHeader(fp, length);
     write_vtkPointCoordinates(fp, length);
 
-    fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
-    fprintf(fp,"\n");
-    fprintf(fp, "VECTORS velocity float\n");
-    for(z = 1; z <= length[2]; z++) {
-        node[2] = z;
-        for(y = 1; y <= length[1]; y++) {
-            node[1] = y;
-            for(x = 1; x <= length[0]; x++) {
-                node[0] = x;
-                if (*getFlag(flagField, node, n) != OBSTACLE) {
-                    el = getEl(collideField, node, 0, n);
-                    computeDensity(el, &density);
-                    computeVelocity(el, &density, velocity);
-                    fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
-                } else {
-                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0); 
-                }
-            }
-        }
-    }
+//    fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
+//    fprintf(fp,"\n");
+//    fprintf(fp, "VECTORS velocity float\n");
+//    for(z = 1; z <= length[2]; z++) {
+//        node[2] = z;
+//        for(y = 1; y <= length[1]; y++) {
+//            node[1] = y;
+//            for(x = 1; x <= length[0]; x++) {
+//                node[0] = x;
+//                if (*getFlag(flagField, node, n) != OBSTACLE) {
+//                    el = getEl(collideField, node, 0, n);
+//                    computeDensity(el, &density);
+//                    computeVelocity(el, &density, velocity);
+//                    fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
+//                } else {
+//                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0); 
+//                }
+//            }
+//        }
+//    }
 
     fprintf(fp,"\n");
 

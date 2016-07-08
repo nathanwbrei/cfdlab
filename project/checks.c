@@ -2,12 +2,14 @@
 #include "computeCellValues.h"
 #include "LBDefinitions.h"
 #include "checks.h"
+#include <omp.h>
 
 void check_in_rank(float *collideField, int *flagField, int * length, int t){
 	int node[D], i, x, y, z;
 	int n[D] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 	float velocity[D], density, norm_v=0, *currentCell;
 
+#pragma omp parallel for private(node, y, x, density, norm_v, currentCell, velocity, i)
 	for (z = 1; z < length[2]; ++z){
 		node[2] = z;
 		for (y = 1; y < length[1]; ++y){
@@ -79,7 +81,7 @@ void check_mass(float *massField, int* flagField, int* length, int t){
 }
 
 void run_checks(float *collideField, float *massField, int *flagField, int * length, int t ){
-//	check_in_rank(collideField, flagField, length, t);
+	check_in_rank(collideField, flagField, length, t);
 //	check_flags(flagField, length, FLUID, GAS, 	 t);
 //	check_mass( massField, flagField, length, t);
 }
