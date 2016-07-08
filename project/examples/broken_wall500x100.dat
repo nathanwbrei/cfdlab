@@ -1,6 +1,6 @@
-xlength       	200
-ylength       	60
-zlength       	200
+xlength       	500
+ylength       	100
+zlength       	500
 radius          5
 tau           	1
 
@@ -10,7 +10,7 @@ velocity_z    	0.05
 
 forces_x    	0
 forces_y    	0
-forces_z    	-0.0001
+forces_z    	-0.00005
 
 timesteps     	10000
 
