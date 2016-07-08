@@ -42,8 +42,8 @@ void write_vtkFile(const char *szProblem,
     write_vtkHeader(fp, length);
     write_vtkPointCoordinates(fp, length);
 
-//    fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
-//    fprintf(fp,"\n");
+    fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
+    fprintf(fp,"\n");
 //    fprintf(fp, "VECTORS velocity float\n");
 //    for(z = 1; z <= length[2]; z++) {
 //        node[2] = z;
