@@ -176,7 +176,7 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
-void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagField, int ** image, int * length, int * n, int * walls) {
+void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagField, int ** image, int * length, int * n, int * walls, double * num_fluid_cells) {
     int x, y, z, node[3];
 
    /* 
@@ -211,6 +211,8 @@ void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagF
             for (x = 1; x <= length[0]; ++x){
                 node[0] = x;
                 initialiseCell(collideField, streamField, flagField, n, node, image[x][z]);           /* Loop for the interior points*/
+                if (image[x][z] != GAS)
+                    (*num_fluid_cells) ++;
             }
             /* x = length[0]+1; */
             node[0] = length[0] + 1;
@@ -236,7 +238,7 @@ void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagF
     }
 }
 
-void initialiseFields(float *collideField, float *streamField, int *flagField, float * massField, float * fractionField, int * length, int * boundaries, int r, char *argv[]){
+void initialiseFields(float *collideField, float *streamField, int *flagField, float * massField, float * fractionField, int * length, int * boundaries, int r, char *argv[], double * num_fluid_cells){
     int x, y, z, node[3];
     int ** image;
     char path[80] = "examples/";
@@ -251,7 +253,7 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
     image = read_pgm(path);
     checkForbiddenPatterns(image, length);
 
-    initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries);
+    initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries, num_fluid_cells);
  
     if (strcmp(argv[1], "droplet65") == 0) {
         initDropletFlags(flagField, n, r);

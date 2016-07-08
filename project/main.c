@@ -1,7 +1,7 @@
 #ifndef _MAIN_C_
 #define _MAIN_C_
 
-#include <time.h>
+#include <omp.h>
 
 #include "collision.h"
 #include "streaming.h"
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     float velocity[3], ro_in, ro_ref;
     float *swap=NULL;
 
-    clock_t start_time, total_time = 0;
+    double start_time, total_time = 0;
 
     char problem [10];
 
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]){
     float * fractionField = (float *) malloc((size_t)( (length[0]+2)*(length[1]+2)*(length[2]+2) ) * sizeof(float));
     int i;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+    double num_fluid_cells = 2 * (n[0]+n[1]+n[2]);
 
     int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
     int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]){
         ERROR("Unable to allocate matrices.");
     } 
     
-    initialiseFields(collideField, streamField, flagField, massField, fractionField, length, boundaries, r, argv);
+    initialiseFields(collideField, streamField, flagField, massField, fractionField, length, boundaries, r, argv, & num_fluid_cells);
 
     // /* TODO This is only for debugging reasons, errase (comment) it when you don't need it */
         // int a=0;
@@ -69,10 +70,10 @@ int main(int argc, char *argv[]){
     // }
 
     treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
+        start_time = omp_get_wtime();  // Start the timer for the lattice updates
 
     for (t = 0; t < timesteps; t++) {
 
-        start_time = time(NULL);  // Start the timer for the lattice updates
 
         doStreaming(collideField, streamField, flagField, massField, fractionField, length, n_threads);
         swap = collideField;
@@ -82,18 +83,19 @@ int main(int argc, char *argv[]){
         updateFlagField(collideField, flagField, fractionField, filledCells, emptiedCells, length, n_threads);
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
 
-        total_time += time(NULL) - start_time; // Add elapsed ticks to total_time
 
         if (t % timestepsPerPlotting == 0) {
+            total_time += omp_get_wtime() - start_time ; // Add elapsed ticks to total_time
             run_checks(collideField, massField, flagField, length, t );
             writeVtkOutput(collideField, flagField, argv[1], t, length);
             printf("Time step %i finished, vtk file was created\n", t);
+            start_time = omp_get_wtime();  // Start the timer for the lattice updates
         }
     }
 
     /* Compute average mega-lattice-updates-per-second in order to judge performance */
-        float elapsed_time = total_time;
-        float mlups = ((length[0]+2) * (length[1]+2) * (length[2]+2) * timesteps) / (elapsed_time*1000000);
+        double elapsed_time = total_time; 
+        double mlups = num_fluid_cells * timesteps / (elapsed_time*1000000);
         printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
 
         for (i = 0; i < (n[0] * n[1] * n[2]); ++i){

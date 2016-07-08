@@ -21,9 +21,7 @@ void write_vtkFile(const char *szProblem,
     // char path[80] = "vtk-output/";
     FILE *fp=NULL;
     int n[3] = { length[0] + 2,length[1] + 2,length[2] + 2 };
-    float velocity[3];
     float density;
-    float * el = NULL;
 
     if (stat(path, &s) == -1) {
         mkdir(path, 0700);
