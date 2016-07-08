@@ -302,11 +302,12 @@ void treatBoundary(float *collideField,
                    const float * const ro_ref,
                    const float * const ro_in,
                    const float * const velocity,
-                   int * length) {
+                   int * length, 
+                   int n_threads) { 
     int x, y, z, flag, node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-#pragma omp parallel for schedule(dynamic) collapse(2) private(node, x, flag) num_threads(3)
+#pragma omp parallel for schedule(dynamic) collapse(2) private(node, x, flag) num_threads(n_threads)
     for (z = 0; z < n[2]; z++) {
         for (y = 0; y < n[1]; y++) {
             node[2] = z;

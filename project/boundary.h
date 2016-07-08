@@ -9,7 +9,8 @@ void treatBoundary(float * collideField,
                    const float * const ro_ref,
                    const float * const ro_in,
                    const float * const velocity,
-                   int * length);
+                   int * length, 
+                   int n_threads); 
 
 #endif
 

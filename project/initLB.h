@@ -17,7 +17,8 @@ int readParameters(
     float *ro_ref,                     /* reference density nomally set to 1 */
     float *ro_in,                       /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
-    int * r                             /* radius of the drop */
+    int * r,                             /* radius of the drop */
+    int * n_threads 
 );
 
 

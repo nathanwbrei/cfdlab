@@ -69,7 +69,7 @@ void computePostCollisionDistributions(int *node, float * currentCell, int* flag
     }
 }
 
-void doCollision(float *collideField, int *flagField, float * massField, float * fractionField, const float * const tau, int * length, float * extForces){
+void doCollision(float *collideField, int *flagField, float * massField, float * fractionField, const float * const tau, int * length, float * extForces, int n_threads){
     /* 
      * For each inner grid cell in collideField, compute the post-collide
      * distribution
@@ -85,7 +85,7 @@ void doCollision(float *collideField, int *flagField, float * massField, float *
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     const float tau_inv = 1 / *tau;
 
-#pragma omp parallel for collapse(2) schedule(dynamic) private(x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(3)
+#pragma omp parallel for collapse(2) schedule(dynamic) private(x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(n_threads)
     // Loop over inner cells: compare to streaming.c
     for (z = 1; z <= length[2]; z++) {
         for (y = 1; y <= length[1]; y++) {
