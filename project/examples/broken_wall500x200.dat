@@ -1,5 +1,5 @@
 xlength       	500
-ylength       	100
+ylength       	200
 zlength       	500
 radius          5
 tau           	1
@@ -12,9 +12,9 @@ forces_x    	0
 forces_y    	0
 forces_z    	-0.00005
 
-timesteps     	10000
+timesteps     	25000
 
-vtkoutput     	100
+vtkoutput     	200
 
 problem		constant
 ro_ref		1

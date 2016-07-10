@@ -63,24 +63,24 @@ void write_vtkFile(const char *szProblem,
 
     fprintf(fp,"\n");
 
-    fprintf(fp, "SCALARS density float 1 \n"); 
-    fprintf(fp, "LOOKUP_TABLE default \n");
-
-    for(z = 1; z <= length[2]; z++) {
-        node[2] = z;
-        for(y = 1; y <= length[1]; y++) {
-            node[1] = y;
-            for(x = 1; x <= length[0]; x++) {
-                node[0] = x;
-                if (*getFlag(flagField, node, n) != OBSTACLE) {
-                    computeDensity(getEl(collideField, node, 0, n), &density);
-                    fprintf(fp, "%f\n", density);
-                } else {
-                    fprintf(fp, "%f\n", 1.0);
-                }
-            }
-        }
-    }
+//    fprintf(fp, "SCALARS density float 1 \n"); 
+//    fprintf(fp, "LOOKUP_TABLE default \n");
+//
+//    for(z = 1; z <= length[2]; z++) {
+//        node[2] = z;
+//        for(y = 1; y <= length[1]; y++) {
+//            node[1] = y;
+//            for(x = 1; x <= length[0]; x++) {
+//                node[0] = x;
+//                if (*getFlag(flagField, node, n) != OBSTACLE) {
+//                    computeDensity(getEl(collideField, node, 0, n), &density);
+//                    fprintf(fp, "%f\n", density);
+//                } else {
+//                    fprintf(fp, "%f\n", 1.0);
+//                }
+//            }
+//        }
+//    }
 
     fprintf(fp,"\n");
 
