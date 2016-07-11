@@ -85,16 +85,18 @@ void doCollision(float *collideField, int *flagField, float * massField, float *
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     const float tau_inv = 1 / *tau;
 
-#pragma omp parallel for collapse(2) schedule(dynamic) private(x, node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(n_threads)
+#pragma omp parallel for collapse(3) schedule(guided) private(node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(n_threads)
     // Loop over inner cells: compare to streaming.c
     for (z = 1; z <= length[2]; z++) {
         for (y = 1; y <= length[1]; y++) {
-            node[2] = z;
-            node[1] = y;
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
+                node[1] = y;
+                node[2] = z;
+
                 flag = *getFlag(flagField, node, n);
                 isFluid = flag == FLUID;
+
                 if (isFluid || flag == INTERFACE) {
                     currentCell = getEl(collideField, node, 0, n);
                     computeDensity(currentCell, &density);
