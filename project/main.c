@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     float velocity[3], ro_in, ro_ref;
     float *swap=NULL;
 
-    double start_time, total_time = 0;
+    double start_time, total_time = 0, streamingTime = 0, collideTime = 0, flagTime = 0, boundaryTime = 0;
 
     char problem [10];
 
@@ -69,19 +69,32 @@ int main(int argc, char *argv[]){
     //     printf("\n");
     // }
 
+    boundaryTime -= omp_get_wtime();
     treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
-        start_time = omp_get_wtime();  // Start the timer for the lattice updates
+    start_time = omp_get_wtime();  // Start the timer for the lattice updates
+    boundaryTime += omp_get_wtime();
 
     for (t = 0; t < timesteps; t++) {
 
-
+        streamingTime -= omp_get_wtime();
         doStreaming(collideField, streamField, flagField, massField, fractionField, length, n_threads);
+        streamingTime += omp_get_wtime();
+
         swap = collideField;
         collideField = streamField;
         streamField = swap;
+
+        collideTime -= omp_get_wtime();
         doCollision(collideField, flagField, massField, fractionField, &tau, length, extForces, n_threads);
+        collideTime += omp_get_wtime();
+
+        flagTime -= omp_get_wtime();
         updateFlagField(collideField, flagField, fractionField, filledCells, emptiedCells, length, n_threads);
+        flagTime += omp_get_wtime();
+
+        boundaryTime -= omp_get_wtime();
         treatBoundary(collideField, flagField, problem, &Re, &ro_ref, &ro_in, velocity, length, n_threads);
+        boundaryTime += omp_get_wtime();
 
 
         if (t % timestepsPerPlotting == 0) {
@@ -94,16 +107,21 @@ int main(int argc, char *argv[]){
     }
 
     /* Compute average mega-lattice-updates-per-second in order to judge performance */
-        double elapsed_time = total_time; 
-        double mlups = num_fluid_cells * timesteps / (elapsed_time*1000000);
-        printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
+    double elapsed_time = total_time; 
+    double mlups = num_fluid_cells * timesteps / (elapsed_time*1000000);
 
-        for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
-            free(filledCells[i]);
-            free(emptiedCells[i]);
-        }
-        free(filledCells);
-        free(emptiedCells);
+    printf("Elapsed time (excluding vtk writes) = %f\nAverage MLUPS = %f\n", elapsed_time, mlups);
+    printf("Elapsed time in streaming step = %f\n", streamingTime);
+    printf("Elapsed time for collision = %f\n", collideTime);
+    printf("Elapsed time for flag update = %f\n", flagTime);
+    printf("Elapsed time for boundary treatment = %f\n", boundaryTime);
+
+    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
+        free(filledCells[i]);
+        free(emptiedCells[i]);
+    }
+    free(filledCells);
+    free(emptiedCells);
  
     free(collideField);
     free(streamField);
