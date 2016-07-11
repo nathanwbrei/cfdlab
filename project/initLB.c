@@ -21,7 +21,8 @@ int readParameters(
     float *ro_in,                      /* density of inflow/outflow */
     int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
     int * r, 
-    int * n_threads 
+    int * n_threads, 
+    float * exchange
     ){
 
     if (argc != 3) {
@@ -39,6 +40,7 @@ int readParameters(
     read_int(szFileName, "xlength", &length[0]);
     read_int(szFileName, "radius", r);
     read_float(szFileName,"tau", tau);
+    read_float(szFileName,"exchange_factor", exchange);
     
     read_float(szFileName, "velocity_x", &velocity[0]);
     read_float(szFileName, "velocity_y", &velocity[1]);

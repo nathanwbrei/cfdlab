@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
     int length[3], timesteps, timestepsPerPlotting, boundaries[6], r, t, n_threads;
 
     /* TODO do we need inVelocity? */
-    float tau, extForces[3];
+    float tau, extForces[3], exchange;
     float velocity[3], ro_in, ro_ref;
     float *swap=NULL;
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]){
     char problem [10];
 
     /* Read the file of parameters */
-    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r, &n_threads);
+    readParameters(length, &tau, velocity, extForces, &timesteps, &timestepsPerPlotting, argc, argv, problem, &ro_ref, &ro_in, boundaries, &r, &n_threads, &exchange);
     
     /* Allocate memory */
     float *collideField = (float *) malloc((size_t)( Q*(length[0]+2)*(length[1]+2)*(length[2]+2)) * sizeof( float ));
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]){
     for (t = 0; t < timesteps; t++) {
 
 
-        doStreaming(collideField, streamField, flagField, massField, fractionField, length, n_threads);
+        doStreaming(collideField, streamField, flagField, massField, fractionField, length, n_threads, exchange);
         swap = collideField;
         collideField = streamField;
         streamField = swap;
@@ -86,7 +86,9 @@ int main(int argc, char *argv[]){
 
         if (t % timestepsPerPlotting == 0) {
             total_time += omp_get_wtime() - start_time ; // Add elapsed ticks to total_time
-            run_checks(collideField, massField, flagField, length, t );
+            #ifdef DEBUG
+                run_checks(collideField, massField, flagField, length, t );
+            #endif
             writeVtkOutput(collideField, flagField, argv[1], t, length);
             printf("Time step %i finished, vtk file was created\n", t);
             start_time = omp_get_wtime();  // Start the timer for the lattice updates

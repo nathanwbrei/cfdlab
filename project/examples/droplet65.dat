@@ -4,6 +4,7 @@ zlength       	65
 radius          9
 
 tau           	0.6
+exchange_factor	3
 
 velocity_x    	0
 velocity_y    	0

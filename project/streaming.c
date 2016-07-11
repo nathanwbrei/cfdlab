@@ -4,7 +4,7 @@
 #include "computeCellValues.h"
 #include <omp.h>
 
-void doStremingCell(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * node, float * el, int * n, int isInterface, int isFluid) {
+void doStremingCell(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * node, float * el, int * n, int isInterface, int isFluid, float exchange) {
     int i, flag;
     int source_node[3];
     float fi_nb, se;
@@ -51,14 +51,14 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
             }
             if (flag == FLUID || flag == INTERFACE) {
                 se = fi_nb - *getEl(collideField, source_node, Q - 1 - i, n);
-                *getMass(massField, node, n) += 3.0 * se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) * 0.5;
+                *getMass(massField, node, n) += exchange * se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) * 0.5;
             } else {}
         }
     }
 
 }
 
-void doStreaming(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * length, int n_threads){
+void doStreaming(float * collideField, float * streamField, int * flagField, float * massField, float * fractionField, int * length, int n_threads, float exchange){
     int x, y, z, *flag, isFluid, isInterface;
     int node[3];
     float * el;
@@ -80,7 +80,7 @@ void doStreaming(float * collideField, float * streamField, int * flagField, flo
                 isInterface = *flag == INTERFACE;
 
                 if (isFluid || isInterface) {
-                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface, isFluid);
+                    doStremingCell(collideField, streamField, flagField, massField, fractionField, node, el, n, isInterface, isFluid, exchange);
                 }
             }
         }
