@@ -10,11 +10,14 @@ void computeDensity(const float *const currentCell, float *density){
      */
 
     int i;
+    float temp = 0.0;
 
-    *density = 0;
+#pragma omp simd reduction(+:temp) 
     for (i=0; i<Q; i++) {
-        *density += currentCell[i];
+        temp += currentCell[i];
     }
+
+    *density = temp;
 }
 
 void computeVelocity(const float * const currentCell, const float * const density, float *velocity){
@@ -24,6 +27,7 @@ void computeVelocity(const float * const currentCell, const float * const densit
      */
 
     int i;
+    float c0[Q], c1[Q], c2[Q];
     float density_inv = 1 / (*density);
 
     velocity[0] = 0;
@@ -31,9 +35,16 @@ void computeVelocity(const float * const currentCell, const float * const densit
     velocity[2] = 0;
     
     for (i=0; i<Q; i++) {
-        velocity[0] += LATTICEVELOCITIES[i][0] * currentCell[i];
-        velocity[1] += LATTICEVELOCITIES[i][1] * currentCell[i];
-        velocity[2] += LATTICEVELOCITIES[i][2] * currentCell[i];
+        c0[i] = LATTICEVELOCITIES[i][0];
+        c1[i] = LATTICEVELOCITIES[i][1];
+        c2[i] = LATTICEVELOCITIES[i][2];
+    }
+
+#pragma omp simd
+    for (i=0; i<Q; i++) {
+        velocity[0] += c0[i] * currentCell[i];
+        velocity[1] += c1[i] * currentCell[i];
+        velocity[2] += c2[i] * currentCell[i];
     }
     
     velocity[0] *= density_inv;

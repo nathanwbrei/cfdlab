@@ -85,7 +85,7 @@ void doCollision(float *collideField, int *flagField, float * massField, float *
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     const float tau_inv = 1 / *tau;
 
-#pragma omp parallel for collapse(3) schedule(guided) private(node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(n_threads)
+#pragma omp parallel for schedule(dynamic) private(node, density, feq, velocity, densityAtm, feqAtm, isFluid, flag, currentCell) num_threads(n_threads)
     // Loop over inner cells: compare to streaming.c
     for (z = 1; z <= length[2]; z++) {
         for (y = 1; y <= length[1]; y++) {
