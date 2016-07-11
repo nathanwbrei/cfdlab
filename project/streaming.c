@@ -8,6 +8,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
     int i, flag;
     int source_node[3];
     float fi_nb, se;
+    float velocity[3], feq[Q], *fluidCell, rho_ref = 1;
 
     for (i = 0; i < Q; i++) {
         /* neighboring cell from which particles are obtained */
@@ -17,6 +18,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
 
         /* Amount of particles that goes to this cell */
         fi_nb = *getEl(collideField, source_node, i, n);
+
         if (isFluid) {
             *(el + i) = fi_nb;
         }
@@ -32,7 +34,6 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
 
             flag = *getFlag(flagField, source_node, n); 
             if (flag == GAS) {
-                float velocity[3], feq[Q], *fluidCell, rho_ref = 1;
 
                 /* get pointer to the fluid cell */
                 fluidCell = getEl(collideField, node, 0, n);
@@ -52,7 +53,7 @@ void doStremingCell(float * collideField, float * streamField, int * flagField, 
             if (flag == FLUID || flag == INTERFACE) {
                 se = fi_nb - *getEl(collideField, source_node, Q - 1 - i, n);
                 *getMass(massField, node, n) += 3.0 * se * (*getFraction(fractionField, node, n) + *getFraction(fractionField, source_node, n)) * 0.5;
-            } else {}
+            }
         }
     }
 
@@ -66,13 +67,13 @@ void doStreaming(float * collideField, float * streamField, int * flagField, flo
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
     /* Loop for inner cells */
-#pragma omp parallel for schedule(dynamic) private(node, isFluid, flag, isInterface, el) num_threads(n_threads)
+#pragma omp parallel for schedule(dynamic) private(x, y, node, isFluid, flag, isInterface, el) num_threads(n_threads)
     for (z = 1; z <= length[2]; z++) {
+        node[2] = z;
         for (y = 1; y <= length[1]; y++) {
+            node[1] = y;
             for (x = 1; x <= length[0]; x++) {
                 node[0] = x;
-                node[1] = y;
-                node[2] = z;
 
                 el = getEl(streamField, node, 0, n);
                 flag = getFlag(flagField, node, n);

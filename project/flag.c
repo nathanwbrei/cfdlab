@@ -226,7 +226,7 @@ void performEmpty(float * collideField, int * flagField, int * n, int ** updated
 }
 
 void updateFlagField(float * collideField, int * flagField, float * fractionField, int ** filledCells, int ** emptiedCells, int * length, int n_threads) {
-    int x, y, z, flag, nFilled = 0, nEmptied = 0;
+    int x, y, z, flag, nFilled = 0, nEmptied = 0, k;
     int node[3];
     float fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
@@ -247,6 +247,7 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
       Saving all emptied and filled cells to emptiedCells and filledCells arrays.
     */
     /* TODO fill filledCells and emptiedCells on collide step */
+#pragma omp parallel for schedule(dynamic) private(x, y, node, flag, k) shared(nFilled, nEmptied)
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;
         for (y = 1; y <= length[1]; y++) {
@@ -260,16 +261,24 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
                     fraction = *getFraction(fractionField, node, n);
 
                     if (fraction > 1 + eps) {
-                        filledCells[nFilled][0] = node[0];
-                        filledCells[nFilled][1] = node[1];
-                        filledCells[nFilled][2] = node[2];
+                        #pragma omp atomic capture
+                        {
+                        k = nFilled;
                         nFilled++;
+                        }
+                        filledCells[k][0] = node[0];
+                        filledCells[k][1] = node[1];
+                        filledCells[k][2] = node[2];
 
                     } else if (fraction < -eps) {
-                        emptiedCells[nEmptied][0] = node[0];
-                        emptiedCells[nEmptied][1] = node[1];
-                        emptiedCells[nEmptied][2] = node[2];
+#pragma omp atomic capture
+                        {
+                        k = nEmptied;
                         nEmptied++;
+                        }
+                        emptiedCells[k][0] = node[0];
+                        emptiedCells[k][1] = node[1];
+                        emptiedCells[k][2] = node[2];
                     }
                 }
             }
