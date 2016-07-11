@@ -12,7 +12,6 @@ void computeDensity(const float *const currentCell, float *density){
     int i;
     float temp = 0.0;
 
-#pragma omp simd reduction(+:temp) 
     for (i=0; i<Q; i++) {
         temp += currentCell[i];
     }
