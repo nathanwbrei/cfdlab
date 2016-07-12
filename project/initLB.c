@@ -1,28 +1,28 @@
 #include "helper.h"
 #include "initLB.h"
 #include "LBDefinitions.h"
-
+#include <regex.h>
 
 /**
  * Reads the parameters for the lid driven cavity scenario from a config file.
  * Throws an error if number of program arguments does not equal 2.
  **/
 int readParameters(
-    int *length,                        /* reads domain size. Parameter name: "xlength" */
+    int *length,                       /* reads domain size. Parameter name: "xlength" */
     float *tau,                        /* relaxation parameter tau. Parameter name: "tau" */
-    float *velocity,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
+    float *velocity,                   /* velocity of the lid. Parameter name: "characteristicvelocity" */
     float *extForces,                  /* External force, like gravity or electromagnetic */
-    int *timesteps,                     /* number of timesteps. Parameter name: "timesteps" */
-    int *timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
-    int argc,                           /* number of arguments. Should equal 2 (program + name of config file */
-    char *argv[],                       /* argv[1] shall contain the path to the config file */
-    char *problem,                      /* specifies the considered problem scenario (parabolic or constant inflow )*/
+    int *timesteps,                    /* number of timesteps. Parameter name: "timesteps" */
+    int *timestepsPerPlotting,         /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
+    int argc,                          /* number of arguments. Should equal 2 (program + name of config file */
+    char *argv[],                      /* argv[1] shall contain the path to the config file */
+    char *problem,                     /* specifies the considered problem scenario (parabolic or constant inflow )*/
     float *ro_ref,                     /* reference density nomally set to 1 */
     float *ro_in,                      /* density of inflow/outflow */
-    int *boundaries,                     /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
-    int * r, 
-    int * n_threads, 
-    float * exchange
+    int *boundaries,                   /* definition of the type of boundaries on each one of the walls, for definitions see LBDefinitios.h*/
+    int * r,                           /* radius of a droplet */ 
+    int * n_threads,                   /* number of threads */
+    float * exchange                   /* factor for mass exchange */
     ){
 
     if (argc != 3) {
@@ -70,6 +70,9 @@ int readParameters(
     return 0;
 }
 
+/**
+   Initialize cell flag and fluid distributions
+ */
 void initialiseCell(float *collideField, float *streamField, int *flagField, int *n, int * node, int flag) {	
     int i;
 
@@ -142,9 +145,13 @@ void checkForbiddenPatterns(int ** image, int * length) {
     }
 }
 
+/**
+   Add droplet to the flag field.
+   Droplet center will be in (n0/2, n1/2, n2 - r - 2), where r  is droplet radius.
+ */
 void initDropletFlags(int * flagField, int * n, int r) {
-    int x0 = n[0] / 2; 
-    int y0 = n[1] / 2; 
+    int x0 = n[0] / 2;
+    int y0 = n[1] / 2;
     int z0 = n[2] - r - 2;
 
     int node[3], neighbor_node[3];
@@ -178,6 +185,9 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
+/*
+  Initialize flags from the image and set initial distributions for stream and collide field.
+ */
 void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagField, int ** image, int * length, int * n, int * walls, double * num_fluid_cells) {
     int x, y, z, node[3];
 
@@ -240,11 +250,16 @@ void initialiseFlagsAndDF(float * collideField, float * streamField, int * flagF
     }
 }
 
+/*
+  Initializes collide, stream, flag, mass and fraction fields.
+  Update number of fluid cells.
+ */
 void initialiseFields(float *collideField, float *streamField, int *flagField, float * massField, float * fractionField, int * length, int * boundaries, int r, char *argv[], double * num_fluid_cells){
-    int x, y, z, node[3];
+    int x, y, z, node[3], reti;
     int ** image;
     char path[80] = "examples/";
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
+    regex_t regex;
 
     /*Copy the value from argv to filename to not modify the original one*/ 
     strcat(path, argv[1]);
@@ -256,8 +271,15 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
     checkForbiddenPatterns(image, length);
 
     initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries, num_fluid_cells);
- 
-    if (strcmp(argv[1], "droplet65") == 0) {
+
+    reti = regcomp(&regex, "droplet", 0);
+    if (reti) {
+        ERROR("could not compile regular expression");
+    }
+
+    /* Check whether it is droplet example */
+    reti = regexec(&regex, argv[1], 0, NULL, 0);
+    if ( ! reti) {
         initDropletFlags(flagField, n, r);
     }
 
