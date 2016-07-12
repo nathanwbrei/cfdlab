@@ -1,5 +1,6 @@
 # Free Surfaces with LBM D3Q19
-Project for Computational Fluid Dynamics Lab course. Group 6.
+Project for Computational Fluid Dynamics Lab course.
+Group 6: Nathan Brei, Irving Cabrera, Natalia Saiapova.
 
 ## Compilation.
 
@@ -39,7 +40,7 @@ We added a few new fields to the ```input.dat``` file:
 
 ####New cell types
 First of all we added 2 new cell types: ```FLUID``` and ```INTERFACE```.
-Here is table representing cell types
+Here is table representing cell types, which should be used in ```<exampleName>.pgm``` file:
 
 | Cell type | Value | Cell type | Value
 | --- | --- | --- | --- |
