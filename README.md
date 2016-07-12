@@ -70,5 +70,8 @@ In the streaming step was added reconstruction from ```GAS``` cells. Streaming w
 
 ####Flag update
 
-5. Parallelization with OpenMP
-6. Other optimizations
+####Parallelization with OpenMP
+We have added ```pragma omp parallel for``` to streaming, collision, treatment boundaries and update flags.
+
+####Other optimizations
+At the beginning our main bottleneck was ```computeFeq``` function which took approximately 42% percent of the whole time. We splitted the Q-loop in this function in a way that compiler was able to vectorize it, then we got rid of all divisions and replaced them by corresponding multiplications. Then we changed types of all double fields to float. It gave us aproximately 2x speedup. 
