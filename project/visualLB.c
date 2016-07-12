@@ -18,10 +18,10 @@ void write_vtkFile(const char *szProblem,
     int x, y, z, node[3];
     char szFileName[80];
     char path[80] = "vtk-output";
-    // char path[80] = "vtk-output/";
     FILE *fp=NULL;
     int n[3] = { length[0] + 2,length[1] + 2,length[2] + 2 };
-    float density;
+    float density, *el, velocity[3];
+    int is_small = ((length[0] <100)&&(length[1] <100)&&(length[2] <100));
 
     if (stat(path, &s) == -1) {
         mkdir(path, 0700);
@@ -42,51 +42,54 @@ void write_vtkFile(const char *szProblem,
 
     fprintf(fp,"POINT_DATA %i \n", length[0] * length[1] * length[2]);
     fprintf(fp,"\n");
-//    fprintf(fp, "VECTORS velocity float\n");
-//    for(z = 1; z <= length[2]; z++) {
-//        node[2] = z;
-//        for(y = 1; y <= length[1]; y++) {
-//            node[1] = y;
-//            for(x = 1; x <= length[0]; x++) {
-//                node[0] = x;
-//                if (*getFlag(flagField, node, n) != OBSTACLE) {
-//                    el = getEl(collideField, node, 0, n);
-//                    computeDensity(el, &density);
-//                    computeVelocity(el, &density, velocity);
-//                    fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
-//                } else {
-//                    fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0); 
-//                }
-//            }
-//        }
-//    }
 
-    fprintf(fp,"\n");
+    /* If the domain is too big omit writing densities and velocites to save space */
+    if (is_small){
+        /* Write information about the velocities */
+        fprintf(fp, "VECTORS velocity float\n");
+        for(z = 1; z <= length[2]; z++) {
+            node[2] = z;
+            for(y = 1; y <= length[1]; y++) {
+                node[1] = y;
+                for(x = 1; x <= length[0]; x++) {
+                    node[0] = x;
+                    if (*getFlag(flagField, node, n) != OBSTACLE) {
+                        el = getEl(collideField, node, 0, n);
+                        computeDensity(el, &density);
+                        computeVelocity(el, &density, velocity);
+                        fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
+                    } else {
+                        fprintf(fp, "%f %f %f\n", 0.0, 0.0, 0.0); 
+                    }
+                }
+            }
+        }
+        fprintf(fp,"\n");
 
-//    fprintf(fp, "SCALARS density float 1 \n"); 
-//    fprintf(fp, "LOOKUP_TABLE default \n");
-//
-//    for(z = 1; z <= length[2]; z++) {
-//        node[2] = z;
-//        for(y = 1; y <= length[1]; y++) {
-//            node[1] = y;
-//            for(x = 1; x <= length[0]; x++) {
-//                node[0] = x;
-//                if (*getFlag(flagField, node, n) != OBSTACLE) {
-//                    computeDensity(getEl(collideField, node, 0, n), &density);
-//                    fprintf(fp, "%f\n", density);
-//                } else {
-//                    fprintf(fp, "%f\n", 1.0);
-//                }
-//            }
-//        }
-//    }
+        /* Write information about the densities */
+        fprintf(fp, "SCALARS density float 1 \n"); 
+        fprintf(fp, "LOOKUP_TABLE default \n");
+        for(z = 1; z <= length[2]; z++) {
+            node[2] = z;
+            for(y = 1; y <= length[1]; y++) {
+                node[1] = y;
+                for(x = 1; x <= length[0]; x++) {
+                    node[0] = x;
+                    if (*getFlag(flagField, node, n) != OBSTACLE) {
+                        computeDensity(getEl(collideField, node, 0, n), &density);
+                        fprintf(fp, "%f\n", density);
+                    } else {
+                        fprintf(fp, "%f\n", 1.0);
+                    }
+                }
+            }
+        }
+        fprintf(fp,"\n");
+    }
 
-    fprintf(fp,"\n");
-
-    fprintf(fp, "SCALARS a_taype int 1 \n"); 
+    /* Write information about the type of cell */
+    fprintf(fp, "SCALARS a_type int 1 \n"); 
     fprintf(fp, "LOOKUP_TABLE default \n");
-
     for(z = 1; z <= length[2]; z++) {
         node[2] = z;
         for(y = 1; y <= length[1]; y++) {
@@ -148,4 +151,3 @@ void writeVtkOutput(float * collideField,
                     int * length) {
     write_vtkFile(filename, t, length, collideField, flagField);
 }
-

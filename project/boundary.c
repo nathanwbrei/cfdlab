@@ -178,13 +178,16 @@ void setInflow(float * collideField,
     }
 }
 
+/**
+ * Set FREE-SLIP condition
+ */
 void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
     int i, j, k, coord_dest[3], non_fluid_cell[3], flag;
     float * cell_ptr, sum, lv0, lv1, lv2;
 
     for (i = 0; i < Q; i++) {
-        /* Initialize the cell with a flag, that will later make possible to know if some lattice was modifided*/
-        *getEl(collideField, node, i, n) = 0;    
+        /* Initialize the cell with a flag, that will later make possible to know if some lattice was modified*/
+        *getEl(collideField, node, i, n) = 0;
     }
 
     for (i = 0; i < Q; i++) {
@@ -201,10 +204,10 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
             coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
             /* If the pointed cell does not fall out of bounds */
             if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
-                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
+                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
                 flag = *getFlag(flagField, coord_dest, n);
                 /* if pointed cell is FLUID */
-                if (flag == FLUID || flag == INTERFACE) {    
+                if (flag == FLUID || flag == INTERFACE) {
                     for (j = 0; j < Q; j++) {
                         /* looking for a direction with one of the components inverse to the direction of the face */
                         if(LATTICEVELOCITIES[i][0]*LATTICEVELOCITIES[j][0] == -1.0 ||
@@ -219,13 +222,13 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
                             flag = *getFlag(flagField, non_fluid_cell, n);
                             if (flag != FLUID && flag != INTERFACE) {
                                 for (k = 0; k < Q; k++) {
-                                    /* Search for a (unique) direcrion in the boundary cell which is the reflection of the fluid cell */
-                                    if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1.0 || 
-                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[i][1] == 1.0 || 
+                                    /* Search for a (unique) direction in the boundary cell which is the reflection of the fluid cell */
+                                    if(( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[i][0] == 1.0 ||
+                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[i][1] == 1.0 ||
                                          LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[i][2] == 1.0 ) &&
-                                       ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1.0 || 
-                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1.0 || 
-                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1.0 )) {
+                                       ( LATTICEVELOCITIES[k][0]*LATTICEVELOCITIES[j][0] == 1.0 ||
+                                         LATTICEVELOCITIES[k][1]*LATTICEVELOCITIES[j][1] == 1.0 ||
+                                         LATTICEVELOCITIES[k][2]*LATTICEVELOCITIES[j][2] == 1.0 )){
                                         cell_ptr = getEl(collideField, node, k, n);
                                         *cell_ptr = *getEl(collideField, coord_dest, j, n);
                                         break;
@@ -241,9 +244,9 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
     
     /* for each lattice */
     for (i = 0; i < Q; i++) {
-        /*  If the lattice was not modifided in the previous process, this happens for the inverse direction of the latice going out of the face
-        *   is also possible that the boundary does not share a fece with the fluid but it shares an edge or vertex.
-        *   In those cases the boundary behabes as non slip, bouncing back everything*/
+        /*  If the lattice was not modified in the previous process, this happens for the inverse direction of the lattice going out of the face
+        *   is also possible that the boundary does not share a facet with the fluid but it shares an edge or vertex.
+        *   In those cases the boundary behaves as non slip, bouncing back everything*/
         if (*getEl(collideField, node, i, n) == 0){
             /* compute a cell where lattice is pointing*/
             coord_dest[0] = node[0] + LATTICEVELOCITIES[i][0];
@@ -251,7 +254,7 @@ void setFreeSlip(float * collideField, int * flagField, int * node, int * n) {
             coord_dest[2] = node[2] + LATTICEVELOCITIES[i][2];
     
             if (coord_dest[0] < n[0] && coord_dest[1] < n[1] && coord_dest[2] < n[2] &&
-                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {            
+                coord_dest[0] >= 0 && coord_dest[1] >= 0 && coord_dest[2] >= 0) {
                 flag = *getFlag(flagField, coord_dest, n); 
                 /* if pointed cell is FLUID */
                 if (flag == FLUID || flag == INTERFACE) {
@@ -307,7 +310,8 @@ void treatBoundary(float *collideField,
     int x, y, z, flag, node[3];
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
 
-#pragma omp parallel for schedule(dynamic) collapse(2) private(node, x, flag) num_threads(n_threads)
+    /* Pragma to parallelize the for loops for z and y using the indicated number of threads*/
+    #pragma omp parallel for schedule(dynamic) collapse(2) private(node, x, flag) num_threads(n_threads)
     for (z = 0; z < n[2]; z++) {
         for (y = 0; y < n[1]; y++) {
             node[2] = z;
@@ -315,6 +319,7 @@ void treatBoundary(float *collideField,
             for (x = 0; x < n[0]; x++) {
                 node[0] = x;
                 flag = *getFlag(flagField, node, n);
+                /* If the cell is fluid, obstacle or interface then it does not require boundary treatment */
                 if (flag != FLUID && flag != OBSTACLE && flag != INTERFACE) {
                     boundaryCell(collideField, flagField, scenario, Re, ro_ref, ro_in, velocity, node, flag, n);
                 }
