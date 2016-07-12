@@ -1,5 +1,6 @@
 # Free Surfaces with LBM D3Q19
 Project for Computational Fluid Dynamics Lab course.
+
 Group 6: Nathan Brei, Irving Cabrera, Natalia Saiapova.
 
 ## Compilation.
