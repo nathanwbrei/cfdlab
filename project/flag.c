@@ -15,13 +15,8 @@ void makeAvgDistFn(float * collideField, int * flagField, int * n, int * cell) {
     cell          The coordinates of the cell in need of a DF
     */    
 
-    // TODO: How does this conserve mass?
-    // TODO: Do we have to set the mass field?
-    // TODO: Can we make this faster?
-
     int i, neighbor[3], nNeighbors, flag;
-    float density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF;
-    
+    float density, density_avg, velocity[D], velocity_avg[D], * cellDF, * neighborDF, nNeighbors_inv;
 
     cellDF = getEl(collideField, cell, 0, n);
 
@@ -65,53 +60,34 @@ void makeAvgDistFn(float * collideField, int * flagField, int * n, int * cell) {
         velocity_avg[2] += velocity[2];
     }
 
-    density_avg /= nNeighbors;
-    velocity_avg[0] /= nNeighbors;
-    velocity_avg[1] /= nNeighbors;
-    velocity_avg[2] /= nNeighbors;
+    nNeighbors_inv = 1.0 / nNeighbors;
+
+    density_avg *= nNeighbors_inv;
+    velocity_avg[0] *= nNeighbors_inv;
+    velocity_avg[1] *= nNeighbors_inv;
+    velocity_avg[2] *= nNeighbors_inv;
+
+    /* Set cell DF as f_eq with average velocity */ 
     computeFeq(&density_avg, velocity_avg, cellDF);
 }
 
 
-// TODO Use a real data structure
+/**
+   Remove cell from emptied cell list
+ */
 void removeFromEmptyList(int ** emptiedCells, int * nEmptied, int * targetCell) {
-
-    //printf("REMOVING: %d,%d,%d\n", targetCell[0], targetCell[1], targetCell[2]);
-    // printf("BEFORE: List contains: ");
-    // for (int k=0; k < *nEmptied; k++) {
-    //     printf("(%d,%d,%d), ", emptiedCells[k][0],emptiedCells[k][1],emptiedCells[k][2]);
-
-    // }
-    // printf("\n");
-    int j = 0; 
+    int j = 0;
     while (j < *nEmptied && !(
-        emptiedCells[j][0] == targetCell[0] && 
+        emptiedCells[j][0] == targetCell[0] &&
         emptiedCells[j][1] == targetCell[1] &&
         emptiedCells[j][2] == targetCell[2])) {
         j++;
     }
-    
-    emptiedCells[j][0] = -1;
-    emptiedCells[j][0] = -1;
-    emptiedCells[j][0] = -1;
-  
-    // j is either nEmptied or index of match
-//    for (int k=j; k < (*nEmptied)-1; k++) {
-//        emptiedCells[k][0] = emptiedCells[k+1][0];
-//        emptiedCells[k][1] = emptiedCells[k+1][1];
-//        emptiedCells[k][2] = emptiedCells[k+1][2];
-//    }
-//    // Decrement list length
-//    if (j != *nEmptied) {
-//        // printf("*************** REMOVED SOMETHING ******************\n");
-//        (*nEmptied)--;
-//    }
 
-    // printf("After list contains: ");
-    // for (int k=0; k < *nEmptied; k++) {
-    //     printf("(%d,%d,%d), ", emptiedCells[k][0],emptiedCells[k][1],emptiedCells[k][2]);
-    // }
-    // printf("\n");
+    // Mark element as deleted (since coordinates should be non-negative)
+    emptiedCells[j][0] = -1;
+    emptiedCells[j][0] = -1;
+    emptiedCells[j][0] = -1;
 }
 
 
@@ -231,22 +207,12 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
     float fraction, eps = 1e-3;
     int n[3] = { length[0] + 2, length[1] + 2, length[2] + 2 };
     
-    // int filledCells[n[0] * n[1] * n[2]][3];
-    // int emptiedCells[n[0] * n[1] * n[2]][3];
-//    int **filledCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
-//    int **emptiedCells = (int **) malloc((size_t)( n[0] * n[1] * n[2] * sizeof( int * )));
-//    for (i = 0; i < (n[0] * n[1] * n[2]); ++i){
-//        filledCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
-//        emptiedCells[i] = (int *) malloc((size_t)( 3 * sizeof( int )));
-//    }
-
     /*
       Updating flags for INTERFACE cells:
          if fraction > 1 set flag to FLUID;
          if fraction < 0 set flag to GAS.
       Saving all emptied and filled cells to emptiedCells and filledCells arrays.
     */
-    /* TODO fill filledCells and emptiedCells on collide step */
     for (z = 1; z <= length[2]; z++) {
         node[2] = z;
         for (y = 1; y <= length[1]; y++) {
@@ -276,13 +242,8 @@ void updateFlagField(float * collideField, int * flagField, float * fractionFiel
         }
     }
 
-
     // Update neighbors of filled and emptied cells in order to have closed interface layer
     performFill(collideField, flagField, n, filledCells, nFilled, emptiedCells, &nEmptied, n_threads);
     performEmpty(collideField, flagField, n, emptiedCells, nEmptied, n_threads);
-
-   
-
-    // TODO: Redistribute mass
 }
 

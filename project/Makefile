@@ -5,7 +5,7 @@ SOURCES=initLB.c visualLB.c boundary.c collision.c streaming.c computeCellValues
 # --------
 CC=gcc
 
-CFLAGS=-Wpedantic -Wall -std=c99 -O3 -g -lpthread -fopenmp -msse2 -ftree-vectorize -ftree-vectorizer-verbose=5 -fopt-info-vec-optimized
+CFLAGS=-Wpedantic -Wall -std=c99 -O3 -lpthread -fopenmp -msse2
 
 # Linker flags
 # ------------
@@ -15,6 +15,8 @@ OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=lbsim
 
 all: $(EXECUTABLE)
+debug: CFLAGS += -DDEBUG -g -ftree-vectorizer-verbose=5 -fopt-info-vec-optimized
+debug: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) 
