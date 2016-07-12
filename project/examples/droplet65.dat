@@ -1,10 +1,10 @@
 xlength       	65
 ylength       	65
-zlength       	65
+zlength       	130
 radius          9
 
 tau           	0.6
-exchange_factor	3
+exchange_factor	1
 
 velocity_x    	0
 velocity_y    	0
@@ -12,7 +12,7 @@ velocity_z    	0.05
 
 forces_x    	0
 forces_y    	0
-forces_z    	-0.0005
+forces_z    	-0.001
 
 timesteps     	2000
 
