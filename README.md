@@ -73,7 +73,7 @@ In the streaming step was added reconstruction from ```GAS``` cells. Streaming w
 ####Flag update
 From the mass fraction for each cell we determine whether that cell emptied or filled. We track these cells using two arrays, ```emptiedCells``` and ```filledCells```. We perform the filling and emptying in separate phases, ```performFill()``` and ```performEmpty()```. These phases are asymmetric in order to handle the case of a cell filling adjacent to a cell emptying. If this happens, the 'filling' operation cancels the neighbor's 'emptying' operation and the neighboring cell is stricken from ```emptiedCells```. 
 
-Both phases maintain the loop invariant of a contiguous interface layer. When an INTERFACE cell is converted to FLUID, all GAS neighbors are converted to INTERFACE. Correspondingly, when an INTERFACE is converted to GAS, all FLUID cells are converted to INTERFACE. 
+Both phases maintain the loop invariant of a contiguous interface layer. When an ```INTERFACE``` cell is converted to ```FLUID```, all ```GAS``` neighbors are converted to ```INTERFACE```. Correspondingly, when an ```INTERFACE``` is converted to ```GAS```, all ```FLUID``` cells are converted to ```INTERFACE```. 
 
 
 ####Parallelization with OpenMP
