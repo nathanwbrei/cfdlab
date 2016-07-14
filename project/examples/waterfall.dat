@@ -5,9 +5,9 @@ radius          40
 tau           	1
 exchange_factor	3
 
-velocity_x    	0
+velocity_x    	0.005
 velocity_y    	0
-velocity_z    	0.05
+velocity_z    	0
 
 forces_x    	0
 forces_y    	0
@@ -21,7 +21,7 @@ problem		constant
 ro_ref		1
 ro_in		  1.01
 
-wall_x0	    7
+wall_x0	    3
 wall_xmax   7
 wall_y0	    7
 wall_ymax	7
