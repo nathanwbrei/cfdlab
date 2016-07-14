@@ -5,7 +5,7 @@ radius          40
 tau           	1
 exchange_factor	3
 
-velocity_x    	0.005
+velocity_x    	0.01
 velocity_y    	0
 velocity_z    	0
 
