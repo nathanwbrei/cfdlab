@@ -335,7 +335,7 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
         initDropletFlags(flagField, n, r);
     }
     
-    initMartiniFlags(flagField, n, r);
+//    initMartiniFlags(flagField, n, r);
 
     /* Set initial mass and fraction for INTERFACE cells */
     for (z = 1; z <= length[2]; z++) {
