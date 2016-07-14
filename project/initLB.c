@@ -2,6 +2,7 @@
 #include "initLB.h"
 #include "LBDefinitions.h"
 #include <regex.h>
+#include <math.h>
 
 /**
  * Reads the parameters for the lid driven cavity scenario from a config file.
@@ -185,6 +186,105 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
+void initBlock(int * flagField, int * n, int r) {
+    int cell[3];
+    for (int z = 5; z < 10; ++z) {
+        for (int y = 5; y < 10; ++y) {
+            for (int x = 10; x < 20; ++x) {
+
+                cell[0] = x;
+                cell[1] = y;
+                cell[2] = z;
+
+                *getFlag(flagField, cell, n) = OBSTACLE;
+            }
+        }
+    }
+}
+
+void initCone(int *flagField, int * n, int r) {
+
+    printf("Running initCone\n");
+    //initBlock(flagField, n, r);
+
+    // Define cone
+    double f[3] = {30, 15, 90};
+    double d[3] = {-10, 0, -4};
+    double theta = 3.141592/8;
+    double surface=0;
+    double u[3];
+    int cell[3], neighbor_node[3], *flag;
+
+    double eps = 800;
+    int xmax = 30;
+    int cutoff = 15;
+
+    // Flag cells within some distance of cone
+    for (int z = 0; z < n[2]; ++z) {
+        for (int y = 0; y < n[1]; ++y) {
+            for (int x = 1; x < min(xmax, n[2]); ++x) {
+
+                cell[0] = x;
+                cell[1] = y;
+                cell[2] = z;
+
+                u[0] = -f[0] + x;
+                u[1] = -f[1] + y;
+                u[2] = -f[2] + z;
+
+                double u_dot_d = u[0]*d[0] + u[1]*d[1] + u[2]*d[2];
+                double u_dot_u = u[0]*u[0] + u[1]*u[1] + u[2]*u[2];
+                double d_dot_d = d[0]*d[0] + d[1]*d[1] + d[2]*d[2];
+
+                // Eqn of cone:
+                // F(u) = (u.d)^2 - (d.d) * (u.u) * cos(theta)^2
+                surface = (u_dot_d * u_dot_d) - (d_dot_d * u_dot_u * cos(theta) * cos(theta));
+
+                // Set OBSTACLE for nozzle itself
+                if (abs(surface) <= eps && u_dot_u > cutoff*cutoff) {
+                    *getFlag(flagField, cell, n) = OBSTACLE;
+                }
+                // Set FLUID inside nozzle
+                else if (surface >= eps && x == 1) {
+                    *getFlag(flagField, cell, n) = FLUID;
+                }
+                // Set INTERFACE inside nozzle
+                else if (surface >= eps && x == 2) {
+                    *getFlag(flagField, cell, n) = INTERFACE;
+                }
+                // Set OBSTACLE wall behind nozzle
+                else if (surface < eps && x == 1) {
+                    *getFlag(flagField, cell, n) = OBSTACLE;                    
+                }
+            }
+        }
+    }
+
+    // Set disobedient neighbors to NOSLIP
+    for (int z = 0; z < n[2]; ++z) {
+        cell[2] = z;
+        for (int y = 0; y < n[1]; ++y) {
+            cell[1] = y;
+            for (int x = 0; x < n[0]; ++x) {
+                cell[0] = x;
+                if (*getFlag(flagField, cell, n) != OBSTACLE) continue;
+
+                for (int i = 0; i < Q; i++) {
+                    neighbor_node[0] = cell[0] + LATTICEVELOCITIES[i][0];
+                    neighbor_node[1] = cell[1] + LATTICEVELOCITIES[i][1];
+                    neighbor_node[2] = cell[2] + LATTICEVELOCITIES[i][2];
+                    flag = getFlag(flagField, neighbor_node, n);
+
+                    if (*flag == GAS || *flag == FLUID) {
+                        //printf("Setting NOSLIP at: %d,%d,%d\n", neighbor_node[0], neighbor_node[1], neighbor_node[2]);
+                        *flag = NOSLIP;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void initMartiniFlags(int *flagField, int *n, int r) {
     int node[3], neighbor_node[3], i;
 
@@ -336,6 +436,7 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
     }
     
     initMartiniFlags(flagField, n, r);
+    initCone(flagField, n, r);
 
     /* Set initial mass and fraction for INTERFACE cells */
     for (z = 1; z <= length[2]; z++) {
