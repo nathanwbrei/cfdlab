@@ -185,6 +185,58 @@ void initDropletFlags(int * flagField, int * n, int r) {
     }
 }
 
+void initMartiniFlags(int *flagField, int *n, int r) {
+    int node[3], neighbor_node[3], i;
+
+    int x0 = n[0] / 2;
+    int y0 = n[1] / 2;
+    int z0 = n[2] / 2;
+    int x, y, z, sum, eps = 1, *flag;
+
+    for (z = z0-r; z <= z0; z++) {
+        node[2] = z;
+        for (y = y0 - r; y <= y0 + r; y++) {
+            node[1] = y;
+            for (x = x0 - r; x <= x0 + r; x++) {
+                node[0] = x;
+                sum = (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0);
+                /* Initialize sphere of FLUID with radius r */
+                if (sum <= (r+eps)*(r+eps) && sum >= (r-eps)*(r-eps)) {
+                    *getFlag(flagField, node, n) = OBSTACLE;
+                }
+            }
+        }
+    }
+
+    for (z = z0-r; z <= z0; z++) {
+        node[2] = z;
+        for (y = y0 - r; y <= y0 + r; y++) {
+            node[1] = y;
+            for (x = x0 - r; x <= x0 + r; x++) {
+                node[0] = x;
+
+                if (*getFlag(flagField, node, n) != OBSTACLE) {
+                    continue;
+                }
+
+                /* Check whether its neighbors are in the sphere. If not mark them as NOSLIP */
+                for (i = 0; i < Q; i++) {
+                    neighbor_node[0] = node[0] + LATTICEVELOCITIES[i][0];
+                    neighbor_node[1] = node[1] + LATTICEVELOCITIES[i][1];
+                    neighbor_node[2] = node[2] + LATTICEVELOCITIES[i][2];
+                    flag = getFlag(flagField, neighbor_node, n);
+
+                    if (*flag != GAS) {
+                        continue;
+                    }
+
+                    *flag = NOSLIP;
+                }
+            }
+        }
+    }
+}
+
 /*
   Initialize flags from the image and set initial distributions for stream and collide field.
  */
@@ -282,6 +334,8 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
     if ( ! reti) {
         initDropletFlags(flagField, n, r);
     }
+    
+    initMartiniFlags(flagField, n, r);
 
     /* Set initial mass and fraction for INTERFACE cells */
     for (z = 1; z <= length[2]; z++) {
