@@ -99,14 +99,37 @@
   }
   Update flag field
 \end{frame}
+
 \begin{frame}
-  \frametitle{What can be done}
-  \begin{itemize}
-  \item Make beautiful examples with higher resolution (falling drop, obstacles
-    etc.);
-    \item Improve physical correctness;
-  \item Make our code faster.
-  \end{itemize}
+    \begin{block}{Optimizations}
+    Loops in the functions 
+    \begin{itemize}
+    \item Stream step,
+    \item Collide step,
+    \item Update flags and
+    \item Boundary treatment
+    \end{itemize}
+    where parallelized with OpenMP. \\
+    Function to calculate $f^{eq}$ was highly optimized with
+    \begin{itemize}
+    \item Vectorization
+    \item Redundant calculations omitted
+    \item Semantics
+    \end{itemize}    
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Some numbers}
+    \begin{itemize}
+    \item 1 733 lines of code.
+    \item 38 functions implemented.
+    \item For the biggest example (500x500x200)
+    \begin{itemize}
+    \item Each vtk file weights 651 MB
+    \item It needs 13 GB of memory to make the calculations
+    \end{itemize}
+    \end{itemize}
 \end{frame}
 
 
