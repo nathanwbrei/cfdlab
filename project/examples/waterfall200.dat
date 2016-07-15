@@ -1,11 +1,11 @@
 xlength       	200
 ylength       	100
-zlength       	200
-radius          40
+zlength       	250
+radius          20
 tau           	1
 exchange_factor	3
 
-velocity_x    	0.05
+velocity_x    	0.02
 velocity_y    	0
 velocity_z    	0
 
@@ -22,7 +22,7 @@ ro_ref		1
 ro_in		  1.01
 
 wall_x0	    3
-wall_xmax   7
+wall_xmax   4
 wall_y0	    7
 wall_ymax	7
 wall_z0	    7

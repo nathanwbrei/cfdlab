@@ -237,6 +237,37 @@ void initMartiniFlags(int *flagField, int *n, int r) {
     }
 }
 
+void initWaterfallFlags(int * flagField, int * n, int r, int x0, int y0, int z0) {
+    int node[3], neighbor_node[3];
+
+    int x, y, z, i;
+
+    for (z = z0 - r; z <= z0 + r; z++) {
+        node[2] = z;
+        for (y = y0 - r; y <= y0 + r; y++) {
+            node[1] = y;
+            for (x = x0 - r; x <= x0 + r; x++) {
+                node[0] = x;
+                /* Initialize sphere of FLUID with radius r */
+                if ((x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) < r*r) {
+                    *getFlag(flagField, node, n) = OBSTACLE;
+                    /* Check whether its neighbors are in the sphere. If not mark them as INTERFACE */
+                    for (i = 0; i < Q; i++) {
+                        neighbor_node[0] = node[0] + LATTICEVELOCITIES[i][0];
+                        neighbor_node[1] = node[1] + LATTICEVELOCITIES[i][1];
+                        neighbor_node[2] = node[2] + LATTICEVELOCITIES[i][2];
+
+                        if ((neighbor_node[0]-x0)*(neighbor_node[0]-x0) +
+                            (neighbor_node[1]-y0)*(neighbor_node[1]-y0) +
+                            (neighbor_node[2]-z0)*(neighbor_node[2]-z0) >= r*r) {
+                            *getFlag(flagField, node, n) = NOSLIP;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 /*
   Initialize flags from the image and set initial distributions for stream and collide field.
  */
@@ -324,7 +355,7 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
 
     initialiseFlagsAndDF(collideField, streamField, flagField, image, length, n, boundaries, num_fluid_cells);
 
-    reti = regcomp(&regex, "droplet", 0);
+    reti = regcomp(&regex, "waterfall", 0);
     if (reti) {
         ERROR("could not compile regular expression");
     }
@@ -332,10 +363,15 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
     /* Check whether it is droplet example */
     reti = regexec(&regex, argv[1], 0, NULL, 0);
     if ( ! reti) {
-        initDropletFlags(flagField, n, r);
+        //       initDropletFlags(flagField, n, r);
     }
-    
-//    initMartiniFlags(flagField, n, r);
+
+
+    if (! reti) {
+        initWaterfallFlags(flagField, n, 1.7*r, n[0]/1.8, n[1]/2, n[2]/1.8);
+        initWaterfallFlags(flagField, n, r, n[0]/1.7 - 2*r, n[1]/2, n[2]/5);
+        initWaterfallFlags(flagField, n, r, n[0]/1.7 + 2*r, n[1]/2, n[2]/3);
+    }
 
     /* Set initial mass and fraction for INTERFACE cells */
     for (z = 1; z <= length[2]; z++) {
