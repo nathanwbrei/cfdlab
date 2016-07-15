@@ -1,0 +1,161 @@
+\documentclass[10pt,a4paper]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[breakable, theorems, skins]{tcolorbox}
+\usepackage{multimedia}
+\author{ Nathan Brei, Irving Cabrera, Natalia Saiapova}
+\institute[TUM]{TU München}
+\date{\today}
+\title{Free surfaces with Lattice-Boltzmann method}
+\titlegraphic{\includegraphics[height=4cm]{water-drop}}
+\DeclareRobustCommand{\mybox}[2][gray!20]{%
+\begin{tcolorbox}[   %% Adjust the following parameters at will.
+        breakable,
+        left=0pt,
+        right=0pt,
+        top=0pt,
+        bottom=0pt,
+        colback=#1,
+        colframe=#1,
+        width=\dimexpr\textwidth\relax, 
+        enlarge left by=0mm,
+        boxsep=5pt,
+        arc=0pt,outer arc=0pt,
+        ]
+        #2
+\end{tcolorbox}
+}
+\begin{document}
+\begin{frame}
+	\maketitle
+\end{frame}
+\begin{frame}
+	\frametitle{Output from previous worksheets}
+	\begin{itemize}
+	\item LBM D3Q19;
+	\item Different boundary conditions
+		\begin{itemize}
+		\item Non-Slip;  
+		\item Inflow;
+		\item Free-Slip.
+		\end{itemize}
+	\item 2D complex geometries reader.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{itemize}
+    \frametitle{New values}
+  \item New cell types: \textbf{GAS} and \textbf{INTERFACE};
+  \item New values for cell: \textbf{mass} (double) and \textbf{fluid fraction} (double).\\
+    Fluid fraction is
+    \(
+    \epsilon = \frac{m}{\rho},
+    \)
+    where $\rho$ is a density.
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Boundary conditions and gravity}
+  \begin{itemize}
+  \item Add gravity to our model;
+  $$ f^c_i (x, t) = (1 - \omega)f_i (x, t) + \omega f_i ^{eq} \mathbf{ + w_ i \rho e_i g }$$
+  \item Reconstruct distributions from GAS cells to INTERFACE.\\
+    Use INFLOW boundary conditions.
+    $$f_i (x,t) = f ^{eq} _{inv(i)} (\rho _{ref} ,\overrightarrow{v} ) + f ^{eq} _ i (\rho _{ref} ,\overrightarrow{v} ) - f _{inv(i)} (x + c_i \Delta t, t)$$
+    Where $\rho _{ref} = 1 $ is the  atmospheric pressure.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Mass exchange}
+  Calculate new mass for INTERFACE cells.
+    \begin{equation}
+      m\left(x, t+\Delta t\right) = m\left(x,t\right)+\sum_{i=1}\Delta m_i
+    \end{equation}
+    where $\Delta m_i$ is calculated only between INTERFACE-INTERFACE or
+    FLUID-INTERFACE cells in the following way:
+    \begin{equation}
+      \Delta m_i = \left(f_{\bar{i}}\left(x+\Delta te_i,t\right)-f_i\left(x,t\right)\right)\frac{\epsilon\left(x+\Delta te_i,t\right)+\epsilon\left(x,t\right)}{2}
+    \end{equation}
+    For fluid cell mass is equal to its density.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Flag field update}
+ [Schreiber, 2010]:
+  \includegraphics[height=4cm]{interface} 
+
+
+  Update fraction field
+  \mybox[green!20]{
+    \textbf{Important rule}\\
+    Between GAS and FLUID cells \textbf{always} has to be
+    an INTERFACE cell.
+  }
+  Update flag field
+\end{frame}
+\begin{frame}
+  \frametitle{What can be done}
+  \begin{itemize}
+  \item Make beautiful examples with higher resolution (falling drop, obstacles
+    etc.);
+    \item Improve physical correctness;
+  \item Make our code faster.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Thank you for your attention!}
+\movie [width=7cm,height=5cm,duration=5s,poster]{}{wall100-freeslip.mp4} 
+\end{frame}
+
+
+\begin{frame}
+  References
+  \begin{itemize}
+  \item Physically based Animation of Free Surface Flows with the Lattice
+    Boltzmann Method, Nils Thürey, 2007.
+  \item GPU based simulation and visualization of fluids with free surfaces, Martin Schreiber, 2010.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+	Loops in the functions 
+	\begin{itemize}
+	\item Stream step
+	\item Collide step
+	\item Update flags
+	\item Boundary treatment
+	\end{itemize}
+	where parallelized with OpenMP
+\end{frame}
+
+\begin{frame}
+	Function to calculate $f^{eq}$ was highly optimized
+	\begin{itemize}
+	\item Vectorization
+	\item Redundant calculations omitted
+	\item Semantics
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{scalabillity}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Some numbers}
+	\begin{itemize}
+	\item 1 733 lines of code
+	\item 38 functions implemented
+	\item For the biggest example each vtk file weights 651 MB
+	\item It needs 13 GB of memory to store all data (True???)
+	\end{itemize}
+\end{frame}
+
+\end{document}
