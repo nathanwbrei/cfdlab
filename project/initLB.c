@@ -368,10 +368,10 @@ void initialiseFields(float *collideField, float *streamField, int *flagField, f
 
 
     if (! reti) {
-        initWaterfallFlags(flagField, n, 1.7*r, n[0]/1.2, n[1]/2-1.7*r, n[2]/1.8);
-        initWaterfallFlags(flagField, n, 1.7*r, n[0]/1.8, n[1]/2, n[2]/1.8);
-        initWaterfallFlags(flagField, n, r, n[0]/1.7 - 2*r, n[1]/2, n[2]/5);
-        initWaterfallFlags(flagField, n, r, n[0]/1.7 + 2*r, n[1]/2, n[2]/3);
+        initWaterfallFlags(flagField, n, 1.7*r, n[0]/2, n[1], n[2]/1.1);
+        initWaterfallFlags(flagField, n, 1.7*r, n[0]/1.7, n[1]/2, n[2]/1.8);
+        initWaterfallFlags(flagField, n, r, n[0]/1.7 - r, n[1]/2, n[2]/5);
+        initWaterfallFlags(flagField, n, r, n[0]/1.7 + r, n[1]/2, n[2]/3);
     }
 
     /* Set initial mass and fraction for INTERFACE cells */
